@@ -5,10 +5,12 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string-array name="internal_tabs">
-        <item>History</item>
-        <item>Favorites</item>
+        <item>История</item>
+        <item>Избранное</item>
     </string-array>
 
-    <string name="favorites_search_hint_history">Search in history</string>
-    <string name="favorites_search_hint_favorites">Search in favorites</string>
+    <string name="favorites_search_hint_history">Найти в истории</string>
+    <string name="favorites_search_hint_favorites">Найти в избранном</string>
+
+
 </resources>

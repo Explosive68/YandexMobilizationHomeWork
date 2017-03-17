@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="main_pager_icons">
+        <item>@drawable/ic_translate</item>
+        <item>@drawable/ic_turned_in</item>
+        <item>@drawable/ic_settings</item>
+    </integer-array>
+</resources>

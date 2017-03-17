@@ -1,4 +1,4 @@
-package roman.illarionov.yandexmobilizationhomework;
+package ru.illarionovroman.yandexmobilizationhomework;
 
 import android.app.Application;
 
