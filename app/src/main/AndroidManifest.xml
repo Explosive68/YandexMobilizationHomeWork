@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.illarionovroman.yandexmobilizationhomework">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name="ru.illarionovroman.yandexmobilizationhomework.MobilizationApp"
@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="ru.illarionovroman.yandexmobilizationhomework.ui.activities.MainActivity">
+        <activity
+            android:name="ru.illarionovroman.yandexmobilizationhomework.ui.activities.MainActivity"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +25,7 @@
         <provider
             android:name="ru.illarionovroman.yandexmobilizationhomework.db.AppContentProvider"
             android:authorities="ru.illarionovroman.yandexmobilizationhomework"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -33,6 +33,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile 'com.android.support.constraint:constraint-layout:1.0.1'
 
     // Test dependencies
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

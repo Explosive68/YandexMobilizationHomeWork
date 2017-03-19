@@ -11,4 +11,6 @@
 
     <string name="favorites_search_hint_history">Search in history</string>
     <string name="favorites_search_hint_favorites">Search in favorites</string>
+    <string name="test_text_long">SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText
+    SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText SomeTestText</string>
 </resources>
