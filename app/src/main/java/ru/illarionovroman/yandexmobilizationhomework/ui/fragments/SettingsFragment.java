@@ -16,7 +16,7 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 public class SettingsFragment extends Fragment {
 
     @BindView(R.id.tvSettings)
-    TextView tvSettings;
+    TextView mTvSettings;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

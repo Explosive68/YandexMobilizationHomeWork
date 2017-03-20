@@ -4,10 +4,9 @@
     android:layout_height="match_parent"
     tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragments.InternalHistoryFragment">
 
-    <TextView
-        android:id="@+id/tvInternalHistory"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvInternalHistory"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello Internal history fragment" />
+        android:layout_height="match_parent"/>
 
 </FrameLayout>
