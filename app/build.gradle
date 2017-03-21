@@ -12,7 +12,8 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField 'String', 'TRANSLATOR_END_POINT', '"https://translate.yandex.net/api/v1.5/tr.json"'
+        buildConfigField 'String', 'TRANSLATOR_END_POINT', '"https://translate.yandex.net/api/v1.5/tr.json/"'
+        buildConfigField 'String', 'TRANSLATOR_API_KEY', '"trnsl.1.1.20170321T130741Z.f2f8ae81a3f923f1.57ed54ad0c9911c28b9615df505b77fe522d2f28"'
     }
     buildTypes {
         release {

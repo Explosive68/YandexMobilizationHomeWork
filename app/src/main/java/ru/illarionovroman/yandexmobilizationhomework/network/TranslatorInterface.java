@@ -1,22 +1,24 @@
 package ru.illarionovroman.yandexmobilizationhomework.network;
 
-import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
+import ru.illarionovroman.yandexmobilizationhomework.network.responses.DetectLanguageResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.responses.SupportedLanguagesResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
 
 
 public interface TranslatorInterface {
 
-    @GET("/getLangs?ui={lang_code}")
-    Flowable<String> getSupportedLanguages(@Path("lang_code") String languageCode);
+    @GET("getLangs")
+    Observable<SupportedLanguagesResponse> getSupportedLanguages(@Query("ui") String languageCode);
 
-    @GET("/detect?text={text}")
-    Flowable<String> detectLanguage(@Path("text") String languageCode,
-                                    @Query("hint") String hintList);
+    @GET("detect")
+    Observable<DetectLanguageResponse> detectLanguage(@Query("text") String languageCode,
+                                                      @Query("hint") String hintList);
 
-    @GET("/translate?text={text}&lang={lang}")
-    Flowable<String> getTranslation(@Path("text") String text,
-                                    @Path("lang") String langFromTo,
-                                    @Query("format") String format);
+    @GET("translate")
+    Observable<TranslationResponse> getTranslation(@Query("text") String text,
+                                                   @Query("lang") String langFromTo,
+                                                   @Query("format") String format);
 }

@@ -6,19 +6,18 @@ import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import ru.illarionovroman.yandexmobilizationhomework.BuildConfig;
 
-/**
- * Created by WakeUp on 20.03.2017.
- */
 
-public class ApiKeyInterceptor implements Interceptor {
+public class ApiKeyInsertInterceptor implements Interceptor {
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
         HttpUrl originalHttpUrl = originalRequest.url();
 
         HttpUrl urlWithApiKey = originalHttpUrl.newBuilder()
-                .addQueryParameter("key", "")
+                .addQueryParameter("key", BuildConfig.TRANSLATOR_API_KEY)
                 .build();
 
         Request.Builder requestBuilder = originalRequest.newBuilder()

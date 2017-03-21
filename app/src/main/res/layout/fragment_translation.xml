@@ -10,9 +10,9 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
         android:layout_weight="1"
-        android:background="@drawable/border"
-        android:layout_margin="10dp">
+        android:background="@drawable/border">
 
         <ImageView
             android:id="@+id/ivWordMic"
@@ -33,9 +33,9 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_settings"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivWordClean"
@@ -46,37 +46,47 @@
             android:layout_marginStart="8dp"
             android:src="@drawable/ic_settings"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="parent"/>
+            app:layout_constraintLeft_toRightOf="parent" />
 
         <EditText
             android:id="@+id/etWordInput"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="8dp"
-            android:inputType="textMultiLine"
-            android:text="@string/test_text_long"
-            android:gravity="top"
             android:background="@android:color/transparent"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:scrollbars="vertical"
+            android:text="@string/test_text_long"
             app:layout_constraintBottom_toTopOf="@+id/ivWordClean"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/ivWordMic"
-            app:layout_constraintTop_toTopOf="parent"
-            android:scrollbars="vertical"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
         android:layout_weight="2"
+        android:gravity="center_horizontal"
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/tvTranslation"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="gone" />
+
         <LinearLayout
+            android:id="@+id/llTranslationButtons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -114,6 +124,12 @@
                 android:src="@drawable/ic_settings" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTranslationError"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

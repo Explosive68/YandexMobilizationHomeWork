@@ -21,7 +21,7 @@ public class ApiModule {
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .addInterceptor(loggingInterceptor)
-                .addInterceptor(new ApiKeyInterceptor())
+                .addInterceptor(new ApiKeyInsertInterceptor())
                 .build();
 
         Retrofit.Builder builder = new Retrofit.Builder()
