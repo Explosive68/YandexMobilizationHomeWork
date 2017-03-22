@@ -16,35 +16,32 @@
 
         <ImageView
             android:id="@+id/ivWordMic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_settings"
+            android:layout_width="@dimen/image_size_normal"
+            android:layout_height="@dimen/image_size_normal"
+            android:layout_marginEnd="@dimen/margin_quarter"
+            android:layout_marginTop="@dimen/margin_quarter"
+            android:src="@drawable/ic_mic"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivWordSpeaker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_settings"
+            android:layout_width="@dimen/image_size_normal"
+            android:layout_height="@dimen/image_size_normal"
+            android:layout_marginEnd="@dimen/margin_quarter"
+            android:layout_marginTop="@dimen/margin_quarter"
+            android:src="@drawable/ic_speaker"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivWordClean"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_settings"
+            android:layout_width="@dimen/image_size_normal"
+            android:layout_height="@dimen/image_size_normal"
+            android:layout_marginBottom="@dimen/margin_quarter"
+            android:layout_marginStart="@dimen/margin_quarter"
+            android:src="@drawable/ic_cross"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="parent" />
 
@@ -52,7 +49,7 @@
             android:id="@+id/etWordInput"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/margin_half"
             android:background="@android:color/transparent"
             android:gravity="top"
             android:inputType="textMultiLine"
@@ -65,72 +62,80 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
         android:layout_weight="2"
-        android:gravity="center_horizontal"
         android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvTranslation"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
 
         <ProgressBar
             android:id="@+id/pbLoading"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
         <LinearLayout
             android:id="@+id/llTranslationButtons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_alignParentEnd="true">
 
             <ImageView
                 android:id="@+id/ivTranslationSpeaker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_settings" />
+                android:layout_width="@dimen/image_size_normal"
+                android:layout_height="@dimen/image_size_normal"
+                android:layout_margin="@dimen/margin_quarter"
+                android:src="@drawable/ic_speaker" />
 
             <ImageView
                 android:id="@+id/ivTranslationFavorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_settings" />
+                android:layout_width="@dimen/image_size_normal"
+                android:layout_height="@dimen/image_size_normal"
+                android:layout_margin="@dimen/margin_quarter"
+                android:src="@drawable/ic_turned_in" />
 
             <ImageView
                 android:id="@+id/ivTranslationShare"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_settings" />
+                android:layout_width="@dimen/image_size_normal"
+                android:layout_height="@dimen/image_size_normal"
+                android:layout_margin="@dimen/margin_quarter"
+                android:src="@drawable/ic_share" />
 
             <ImageView
                 android:id="@+id/ivTranslationFullscreen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                android:src="@drawable/ic_settings" />
+                android:layout_width="@dimen/image_size_normal"
+                android:layout_height="@dimen/image_size_normal"
+                android:layout_margin="@dimen/margin_quarter"
+                android:src="@drawable/ic_fullscreen" />
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/tvTranslation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@id/llTranslationButtons" />
+
+        <TextView
             android:id="@+id/tvTranslationError"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retry"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

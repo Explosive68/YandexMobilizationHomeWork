@@ -6,12 +6,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 
-@IntDef({ResponseCodes.SUCCESS, ResponseCodes.API_KEY_INVALID, ResponseCodes.API_KEY_BLOCKED,
-        ResponseCodes.DAY_LIMIT_EXCEED, ResponseCodes.TEXT_SIZE_EXCEED,
-        ResponseCodes.TEXT_UNTRANSLATABLE, ResponseCodes.TRANSLATION_DIRECTION_UNSUPPORTED})
+@IntDef({ResponseErrorCodes.API_KEY_INVALID, ResponseErrorCodes.API_KEY_BLOCKED,
+        ResponseErrorCodes.DAY_LIMIT_EXCEED, ResponseErrorCodes.TEXT_SIZE_EXCEED,
+        ResponseErrorCodes.TEXT_UNTRANSLATABLE, ResponseErrorCodes.TRANSLATION_DIRECTION_UNSUPPORTED})
 @Retention(RetentionPolicy.SOURCE)
-public @interface ResponseCodes {
-    int SUCCESS = 200;
+public @interface ResponseErrorCodes {
     int API_KEY_INVALID = 401;
     int API_KEY_BLOCKED = 402;
     int DAY_LIMIT_EXCEED = 404;

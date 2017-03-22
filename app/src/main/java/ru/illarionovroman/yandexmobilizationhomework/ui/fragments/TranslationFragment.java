@@ -3,6 +3,7 @@ package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +14,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.HttpException;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.network.ApiModule;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.ResponseCodes;
+import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
+import ru.illarionovroman.yandexmobilizationhomework.network.responses.ErrorResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.responses.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
+import timber.log.Timber;
 
 
 public class TranslationFragment extends Fragment {
@@ -49,39 +59,43 @@ public class TranslationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         ButterKnife.bind(this, view);
 
-        mIvTranslationFullscreen.setOnClickListener(v -> {
-            String inputText = mEtWordInput.getText().toString().trim();
-            if (inputText.length() == 0) {
-                return;
-            }
-
-            showLoading();
-
-            Observable<TranslationResponse> translationResponseObservable =
-                    ApiModule.getApiInterface().getTranslation(
-                            inputText,
-                            "en-ru",
-                            null);
-
-            mCompositeDisposable = new CompositeDisposable();
-            mCompositeDisposable.add(translationResponseObservable
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::handleRxResponse, this::handleRxError, this::handleRxComplete)
-            );
-        });
-
         return view;
+    }
+
+    @OnClick(R.id.ivTranslationFullscreen)
+    public void submit() {
+        prepareAndProcessTranslationRequest();
+    }
+
+    @OnClick(R.id.btnRetry)
+    public void retry() {
+        prepareAndProcessTranslationRequest();
+    }
+
+    private void prepareAndProcessTranslationRequest() {
+        String inputText = mEtWordInput.getText().toString().trim();
+        if (inputText.length() == 0) {
+            return;
+        }
+
+        showLoading();
+
+        Observable<TranslationResponse> translationResponseObservable =
+                ApiManager.getApiInterfaceInstance().getTranslation(
+                        inputText,
+                        "en-ru",
+                        null);
+
+        mCompositeDisposable = new CompositeDisposable();
+        mCompositeDisposable.add(translationResponseObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleRxResponse, this::handleRxError, this::handleRxComplete)
+        );
     }
 
     private void handleRxResponse(TranslationResponse response) {
         hideLoading();
-
-        @ResponseCodes int responseCode = response.getCode();
-        if (responseCode != ResponseCodes.SUCCESS) {
-            handleError(responseCode);
-            return;
-        }
 
         StringBuilder translationBuilder = new StringBuilder();
         for (int i = 0; i < response.getTranslations().size(); i++) {
@@ -96,7 +110,22 @@ public class TranslationFragment extends Fragment {
 
     private void handleRxError(Throwable error) {
         hideLoading();
-        Toast.makeText(getContext(), "onError!", Toast.LENGTH_SHORT).show();
+
+        if (error instanceof HttpException) {
+            try {
+                Converter<ResponseBody, ErrorResponse> errorConverter = ApiManager.getRetrofitInstance()
+                        .responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+                ErrorResponse errorResponse = errorConverter
+                        .convert(((HttpException) error).response().errorBody());
+                handleError(errorResponse.getCode(), errorResponse.getErrorMessage());
+            } catch (IOException ex) {
+                showError("Unknown error: " + error.getMessage());
+                Timber.e(error, "Couldn't convert error response!");
+            }
+        } else {
+            showError("Unknown error: " + error.getMessage());
+        }
+
         error.printStackTrace();
     }
 
@@ -105,26 +134,31 @@ public class TranslationFragment extends Fragment {
         Toast.makeText(getContext(), "onComplete!", Toast.LENGTH_SHORT).show();
     }
 
-    private void handleError(@ResponseCodes int errorCode) {
+    private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
         hideLoading();
 
+        if (!TextUtils.isEmpty(errorMessage)) {
+            showError(errorMessage);
+            return;
+        }
+
         switch (errorCode) {
-            case ResponseCodes.API_KEY_BLOCKED:
+            case ResponseErrorCodes.API_KEY_BLOCKED:
                 showError("API_KEY_BLOCKED");
                 break;
-            case ResponseCodes.API_KEY_INVALID:
+            case ResponseErrorCodes.API_KEY_INVALID:
                 showError("API_KEY_INVALID");
                 break;
-            case ResponseCodes.DAY_LIMIT_EXCEED:
+            case ResponseErrorCodes.DAY_LIMIT_EXCEED:
                 showError("DAY_LIMIT_EXCEED");
                 break;
-            case ResponseCodes.TEXT_SIZE_EXCEED:
+            case ResponseErrorCodes.TEXT_SIZE_EXCEED:
                 showError("TEXT_SIZE_EXCEED");
                 break;
-            case ResponseCodes.TEXT_UNTRANSLATABLE:
+            case ResponseErrorCodes.TEXT_UNTRANSLATABLE:
                 showError("TEXT_UNTRANSLATABLE");
                 break;
-            case ResponseCodes.TRANSLATION_DIRECTION_UNSUPPORTED:
+            case ResponseErrorCodes.TRANSLATION_DIRECTION_UNSUPPORTED:
                 showError("TRANSLATION_DIRECTION_UNSUPPORTED");
                 break;
             default:

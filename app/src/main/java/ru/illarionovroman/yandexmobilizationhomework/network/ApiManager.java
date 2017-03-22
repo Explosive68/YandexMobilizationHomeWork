@@ -10,9 +10,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.illarionovroman.yandexmobilizationhomework.BuildConfig;
 
 
-public class ApiModule {
+public class ApiManager {
 
-    public static TranslatorInterface getApiInterface() {
+    private static TranslatorInterface sTranslatorInterface;
+    private static Retrofit sRetrofit;
+
+    public static TranslatorInterface getApiInterfaceInstance() {
+        if (sTranslatorInterface == null) {
+            sTranslatorInterface = getRetrofitInstance().create(TranslatorInterface.class);
+        }
+        return sTranslatorInterface;
+    }
+
+    public static Retrofit getRetrofitInstance() {
+        if (sRetrofit == null) {
+            sRetrofit = createRetrofit();
+        }
+        return sRetrofit;
+    }
+
+    private static Retrofit createRetrofit() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -30,8 +47,6 @@ public class ApiModule {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create());
 
-        return builder.build().create(TranslatorInterface.class);
-
-
+        return builder.build();
     }
 }
