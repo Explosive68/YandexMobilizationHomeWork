@@ -12,10 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +25,7 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -51,13 +54,24 @@ public class TranslationFragment extends Fragment {
     @BindView(R.id.ivTranslationFullscreen)
     ImageView mIvTranslationFullscreen;
 
-    private CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable mDisposables;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         ButterKnife.bind(this, view);
+
+        mDisposables = new CompositeDisposable();
+
+        Disposable inputWatcher = RxTextView.textChanges(mEtWordInput)
+                .debounce(1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(charSequence -> {
+                    prepareAndProcessTranslationRequest();
+                });
+        mDisposables.add(inputWatcher);
 
         return view;
     }
@@ -81,16 +95,12 @@ public class TranslationFragment extends Fragment {
         showLoading();
 
         Observable<TranslationResponse> translationResponseObservable =
-                ApiManager.getApiInterfaceInstance().getTranslation(
-                        inputText,
-                        "en-ru",
-                        null);
+                ApiManager.getApiInterfaceInstance().getTranslation(inputText, "en-ru", null);
 
-        mCompositeDisposable = new CompositeDisposable();
-        mCompositeDisposable.add(translationResponseObservable
+        mDisposables.add(translationResponseObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleRxResponse, this::handleRxError, this::handleRxComplete)
+                .subscribe(this::handleRxResponse, this::handleRxError)
         );
     }
 
@@ -129,14 +139,10 @@ public class TranslationFragment extends Fragment {
         error.printStackTrace();
     }
 
-    private void handleRxComplete() {
-        hideLoading();
-        Toast.makeText(getContext(), "onComplete!", Toast.LENGTH_SHORT).show();
-    }
-
     private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
         hideLoading();
 
+        // TODO: always show localized error text
         if (!TextUtils.isEmpty(errorMessage)) {
             showError(errorMessage);
             return;
@@ -198,8 +204,8 @@ public class TranslationFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mCompositeDisposable != null) {
-            mCompositeDisposable.clear();
+        if (mDisposables != null) {
+            mDisposables.clear();
         }
     }
 }

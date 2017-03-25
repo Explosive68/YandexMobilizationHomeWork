@@ -5,6 +5,27 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * POJO for getLangs query response <br>
+ * <br>
+ * Example of response:
+ * <pre>
+ * {
+ *    "dirs": [
+ *    "ru-en",
+ *    "ru-pl",
+ *    "ru-hu",
+ *    ...
+ *    ],
+ *    "langs": {
+ *    "ru": "русский",
+ *    "en": "английский",
+ *    "pl": "польский",
+ *    ...
+ *    }
+ * }
+ * </pre>
+ */
 public class SupportedLanguagesResponse {
 
     @SerializedName("dirs")

@@ -10,6 +10,10 @@ import ru.illarionovroman.yandexmobilizationhomework.network.responses.Translati
 
 public interface TranslatorInterface {
 
+    /**
+     * @param languageCode Generally, it's 2 or 3 letter language code (ISO 639-1 or ISO 639-2)
+     * @return JSON response which contains list of supported languages
+     */
     @GET("getLangs")
     Observable<SupportedLanguagesResponse> getSupportedLanguages(@Query("ui") String languageCode);
 
