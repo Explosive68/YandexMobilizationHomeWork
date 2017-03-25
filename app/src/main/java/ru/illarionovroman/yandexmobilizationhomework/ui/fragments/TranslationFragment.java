@@ -56,6 +56,14 @@ public class TranslationFragment extends Fragment {
 
     private CompositeDisposable mDisposables;
 
+    public TranslationFragment() {
+    }
+
+    public static TranslationFragment newInstance() {
+        TranslationFragment fragment = new TranslationFragment();
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

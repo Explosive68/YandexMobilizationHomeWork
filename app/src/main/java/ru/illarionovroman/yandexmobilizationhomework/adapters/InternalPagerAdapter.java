@@ -25,9 +25,9 @@ public class InternalPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return new InternalHistoryFragment();
+            return InternalHistoryFragment.newInstance();
         } else {
-            return new InternalFavoritesFragment();
+            return InternalFavoritesFragment.newInstance();
         }
     }
 

@@ -23,6 +23,14 @@ public class InternalFavoritesFragment extends Fragment {
 
     private HistoryCursorAdapter mAdapter;
 
+    public InternalFavoritesFragment() {
+    }
+
+    public static InternalFavoritesFragment newInstance() {
+        InternalFavoritesFragment fragment = new InternalFavoritesFragment();
+        return fragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

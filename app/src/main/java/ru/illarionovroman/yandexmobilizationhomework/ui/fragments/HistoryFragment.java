@@ -17,26 +17,48 @@ import ru.illarionovroman.yandexmobilizationhomework.adapters.InternalPagerAdapt
 
 public class HistoryFragment extends Fragment {
 
+    private static final String BUNDLE_SELECTED_PAGE = "BUNDLE_SELECTED_PAGE";
+
     @BindView(R.id.tlInternal)
     TabLayout mInternalTabLayout;
     @BindView(R.id.vpInternal)
     ViewPager mInternalPager;
+
+    public HistoryFragment() {
+    }
+
+    public static HistoryFragment newInstance() {
+        HistoryFragment fragment = new HistoryFragment();
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
+
+        InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
+                getChildFragmentManager());
+        mInternalPager.setAdapter(internalAdapter);
+        mInternalTabLayout.setupWithViewPager(mInternalPager);
+
+        // FIXME: Not working :(
+        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_SELECTED_PAGE)) {
+            mInternalPager.setCurrentItem(savedInstanceState.getInt(BUNDLE_SELECTED_PAGE, 0));
+        }
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
 
-        InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(), getActivity().getSupportFragmentManager());
-        mInternalPager.setAdapter(internalAdapter);
-
-        mInternalTabLayout.setupWithViewPager(mInternalPager);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(BUNDLE_SELECTED_PAGE, mInternalTabLayout.getSelectedTabPosition());
     }
 }

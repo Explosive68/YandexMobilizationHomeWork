@@ -23,6 +23,14 @@ public class InternalHistoryFragment extends Fragment {
 
     private HistoryCursorAdapter mAdapter;
 
+    public InternalHistoryFragment() {
+    }
+
+    public static InternalHistoryFragment newInstance() {
+        InternalHistoryFragment fragment = new InternalHistoryFragment();
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -26,11 +26,11 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return new TranslationFragment();
+            return TranslationFragment.newInstance();
         } else if (position == 1) {
-            return new HistoryFragment();
+            return HistoryFragment.newInstance();
         } else {
-            return new SettingsFragment();
+            return SettingsFragment.newInstance();
         }
     }
 
