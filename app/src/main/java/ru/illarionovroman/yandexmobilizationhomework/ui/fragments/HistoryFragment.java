@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,6 +21,7 @@ public class HistoryFragment extends Fragment {
 
     private static final String BUNDLE_SELECTED_PAGE = "BUNDLE_SELECTED_PAGE";
 
+    @Nullable
     @BindView(R.id.tlInternal)
     TabLayout mInternalTabLayout;
     @BindView(R.id.vpInternal)
@@ -41,7 +44,34 @@ public class HistoryFragment extends Fragment {
         InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());
         mInternalPager.setAdapter(internalAdapter);
-        mInternalTabLayout.setupWithViewPager(mInternalPager);
+
+        // FIXME: There is no listener for ivDelete button before PageChange event
+        mInternalPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                ImageView ivDelete = (ImageView) getActivity().findViewById(R.id.ivDelete);
+                if (ivDelete != null) {
+                    if (position == 0) {
+                        ivDelete.setOnClickListener(view -> deleteHistory());
+                    } else {
+                        ivDelete.setOnClickListener(view -> deleteFavorites());
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+
+        mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
+        if (mInternalTabLayout != null) {
+            mInternalTabLayout.setupWithViewPager(mInternalPager);
+        }
 
         // FIXME: Not working :(
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_SELECTED_PAGE)) {
@@ -49,6 +79,16 @@ public class HistoryFragment extends Fragment {
         }
 
         return view;
+    }
+
+    public void deleteHistory() {
+        Toast.makeText(getActivity(), "Delete history not implemented yet",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    protected void deleteFavorites() {
+        Toast.makeText(getActivity(), "Delete favorites not implemented yet",
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -59,6 +99,16 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(BUNDLE_SELECTED_PAGE, mInternalTabLayout.getSelectedTabPosition());
+        if (mInternalTabLayout != null) {
+            outState.putInt(BUNDLE_SELECTED_PAGE, mInternalTabLayout.getSelectedTabPosition());
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mInternalPager != null) {
+            mInternalPager.clearOnPageChangeListeners();
+        }
     }
 }

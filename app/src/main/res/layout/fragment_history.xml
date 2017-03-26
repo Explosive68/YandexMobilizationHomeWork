@@ -1,21 +1,12 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragments.HistoryFragment"
-    android:orientation="vertical">
-
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tlInternal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabMode="fixed"/>
+    tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragments.HistoryFragment">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpInternal"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1"/>
-
-</LinearLayout>
+        android:layout_height="match_parent"/>
+</FrameLayout>

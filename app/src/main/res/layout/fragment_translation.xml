@@ -96,7 +96,7 @@
                 android:layout_width="@dimen/image_size_normal"
                 android:layout_height="@dimen/image_size_normal"
                 android:layout_margin="@dimen/margin_quarter"
-                android:src="@drawable/ic_turned_in" />
+                android:src="@drawable/ic_favorite" />
 
             <ImageView
                 android:id="@+id/ivTranslationShare"

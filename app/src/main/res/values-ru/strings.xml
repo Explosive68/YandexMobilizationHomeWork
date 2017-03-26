@@ -12,5 +12,6 @@
     <string name="favorites_search_hint_history">Найти в истории</string>
     <string name="favorites_search_hint_favorites">Найти в избранном</string>
 
+    <string name="actionbar_title_settings">Настройки</string>
 
 </resources>
