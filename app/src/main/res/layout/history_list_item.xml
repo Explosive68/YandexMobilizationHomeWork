@@ -1,7 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
+    android:layout_height="@dimen/list_item_height"
     android:orientation="horizontal">
 
+    <ToggleButton
+        android:id="@+id/tbFavorite"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0"
+        android:background="@drawable/ic_favorite_toggle"
+        android:padding="5dp"
+        android:textOn=""
+        android:textOff=""/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvOriginalWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:paddingEnd="5dp"/>
+
+        <TextView
+            android:id="@+id/tvTranslation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:paddingEnd="5dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTranslationDirection"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_vertical|left"
+        android:layout_weight="0"
+        android:padding="3dp"
+        tools:text="EN - RU"/>
 </LinearLayout>

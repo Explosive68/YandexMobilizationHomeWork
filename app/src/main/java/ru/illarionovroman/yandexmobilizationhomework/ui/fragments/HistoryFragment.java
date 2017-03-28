@@ -5,16 +5,17 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapters.InternalPagerAdapter;
+import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 
 
 public class HistoryFragment extends Fragment {
@@ -53,7 +54,7 @@ public class HistoryFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                ImageView ivDelete = (ImageView) getActivity().findViewById(R.id.ivDelete);
+                ImageView ivDelete = ButterKnife.findById(getActivity(), R.id.ivDelete);
                 if (ivDelete != null) {
                     if (position == 0) {
                         ivDelete.setOnClickListener(view -> deleteHistory());
@@ -82,13 +83,31 @@ public class HistoryFragment extends Fragment {
     }
 
     public void deleteHistory() {
-        Toast.makeText(getActivity(), "Delete history not implemented yet",
-                Toast.LENGTH_SHORT).show();
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle(R.string.history_title)
+                .setMessage(R.string.dialog_delete_history_message)
+                .setPositiveButton(android.R.string.yes, ((dialog1, which) -> {
+                    Utils.DB.deleteAllHistory(getContext());
+                }))
+                .setNegativeButton(android.R.string.cancel, ((dialog1, which) -> {
+                    // Do nothing
+                }))
+                .create();
+        dialog.show();
     }
 
     protected void deleteFavorites() {
-        Toast.makeText(getActivity(), "Delete favorites not implemented yet",
-                Toast.LENGTH_SHORT).show();
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_title)
+                .setMessage(R.string.dialog_delete_favorites_message)
+                .setPositiveButton(android.R.string.yes, ((dialog1, which) -> {
+                    Utils.DB.deleteAllFavorites(getContext());
+                }))
+                .setNegativeButton(android.R.string.cancel, ((dialog1, which) -> {
+                    // Do nothing
+                }))
+                .create();
+        dialog.show();
     }
 
     @Override

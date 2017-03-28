@@ -18,23 +18,25 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        final String SQL_CREATE_TRANSLATIONS_HISTORY_TABLE =
-                "CREATE TABLE" + TranslationHistoryEntry.TABLE_NAME +
+        final String SQL_CREATE_HISTORY_TABLE =
+                "CREATE TABLE " + HistoryEntry.TABLE_NAME +
                 " (" +
-                TranslationHistoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TranslationHistoryEntry.WORD + " TEXT NOT NULL, " +
-                TranslationHistoryEntry.TRANSLATION + " TEXT NOT NULL, " +
-                TranslationHistoryEntry.LANGUAGE_FROM + " CHARACTER(2) NOT NULL, " +
-                TranslationHistoryEntry.LANGUAGE_TO + " CHARACTER(2) NOT NULL, " +
-                TranslationHistoryEntry.DATE + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                HistoryEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                HistoryEntry.WORD + " TEXT NOT NULL, " +
+                HistoryEntry.TRANSLATION + " TEXT NOT NULL, " +
+                HistoryEntry.LANGUAGE_FROM + " CHARACTER(2) NOT NULL, " +
+                HistoryEntry.LANGUAGE_TO + " CHARACTER(2) NOT NULL, " +
+                HistoryEntry.DATE + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                HistoryEntry.IS_FAVORITE + " INTEGER DEFAULT 0, " +
+                "UNIQUE (" + HistoryEntry.WORD + ") ON CONFLICT REPLACE" +
                 ");";
-        db.execSQL(SQL_CREATE_TRANSLATIONS_HISTORY_TABLE);
+        db.execSQL(SQL_CREATE_HISTORY_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Update this method after version increment
-        db.execSQL("DROP TABLE IF EXISTS " + TranslationHistoryEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + HistoryEntry.TABLE_NAME);
         onCreate(db);
     }
 }

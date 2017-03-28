@@ -6,12 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.models.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 
-/**
- * Created by WakeUp on 20.03.2017.
- */
 
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {
 
@@ -31,7 +35,31 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
 
     @Override
     public void onBindViewHolder(HistoryViewHolder holder, int position) {
-        // TODO: Set data for item
+        mCursor.moveToPosition(position);
+        final HistoryItem item = new HistoryItem(mCursor);
+
+        holder.itemView.setTag(item.getId());
+        holder.tvOriginalWord.setText(item.getWord());
+        holder.tvTranslation.setText(item.getTranslation() + item.getDate());
+        holder.tvTranslationDirection.setText(item.getLanguageFrom() + " - " + item.getLanguageTo());
+        String translationDirection = String.format(
+                mContext.getString(R.string.placeholder_language_from_to),
+                item.getLanguageFrom(),
+                item.getLanguageTo());
+        holder.tvTranslationDirection.setText(translationDirection);
+
+        holder.tbFavorite.setChecked(item.getIsFavorite());
+        holder.tbFavorite.setOnClickListener(view -> {
+            if (((ToggleButton) view).isChecked()) {
+                item.setIsFavorite(true);
+            } else {
+                item.setIsFavorite(false);
+            }
+            int updatedCount = Utils.DB.updateHistoryItem(mContext, item);
+            Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
+        });
+
+        // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)
     }
 
     @Override
@@ -61,12 +89,18 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
 
     class HistoryViewHolder extends RecyclerView.ViewHolder {
 
-        // TODO: Declare history list item fields
+        @BindView(R.id.tbFavorite)
+        ToggleButton tbFavorite;
+        @BindView(R.id.tvOriginalWord)
+        TextView tvOriginalWord;
+        @BindView(R.id.tvTranslation)
+        TextView tvTranslation;
+        @BindView(R.id.tvTranslationDirection)
+        TextView tvTranslationDirection;
 
         public HistoryViewHolder(View itemView) {
             super(itemView);
-
-            // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)
+            ButterKnife.bind(this, itemView);
         }
     }
 

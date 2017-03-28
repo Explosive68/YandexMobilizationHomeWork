@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
@@ -31,10 +32,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.HttpException;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.models.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
+import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 import timber.log.Timber;
 
 
@@ -84,11 +87,6 @@ public class TranslationFragment extends Fragment {
         return view;
     }
 
-    @OnClick(R.id.ivTranslationFullscreen)
-    public void submit() {
-        prepareAndProcessTranslationRequest();
-    }
-
     @OnClick(R.id.btnRetry)
     public void retry() {
         prepareAndProcessTranslationRequest();
@@ -122,8 +120,17 @@ public class TranslationFragment extends Fragment {
             translationBuilder.append(response.getTranslations().get(i));
             translationBuilder.append("\n");
         }
-
         mTvTranslation.setText(translationBuilder.toString());
+
+        HistoryItem item = new HistoryItem(
+                mEtWordInput.getText().toString(),
+                translationBuilder.toString(),
+                "EN",
+                "RU"
+        );
+        long id = Utils.DB.addHistoryItem(getContext(), item);
+
+        Toast.makeText(getContext(), "id = " + id, Toast.LENGTH_SHORT).show();
     }
 
     private void handleRxError(Throwable error) {

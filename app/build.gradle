@@ -5,7 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "roman.illarionov.yandexmobilizationhomework"
+        applicationId "ru.illarionovroman.yandexmobilizationhomework"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1

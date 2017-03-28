@@ -13,5 +13,10 @@
     <string name="favorites_search_hint_favorites">Найти в избранном</string>
 
     <string name="actionbar_title_settings">Настройки</string>
+    <string name="history_title">История</string>
+    <string name="favorites_title">Избранное</string>
+
+    <string name="dialog_delete_history_message">Вы уверены, что хотите очистить историю?</string>
+    <string name="dialog_delete_favorites_message">Вы уверены, что хотите очистить избранное?</string>
 
 </resources>
