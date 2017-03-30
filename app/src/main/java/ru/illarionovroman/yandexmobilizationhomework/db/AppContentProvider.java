@@ -141,12 +141,6 @@ public class AppContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(@NonNull Uri uri) {
-        return null;
-    }
-
-    @Nullable
-    @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
 
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -202,26 +196,6 @@ public class AppContentProvider extends ContentProvider {
                 deletedCount = db.delete(Contract.HistoryEntry.TABLE_NAME, whereClause, whereArgs);
                 break;
             }
-            case HISTORY_SEARCH: {
-                String wordToDelete = uri.getLastPathSegment();
-
-                String whereClause = Contract.HistoryEntry.WORD + "=?";
-                String[] whereArgs = new String[]{wordToDelete};
-                deletedCount = db.delete(Contract.HistoryEntry.TABLE_NAME, whereClause, whereArgs);
-                break;
-            }
-            case FAVORITES_SEARCH: {
-                String wordToDelete = uri.getLastPathSegment();
-
-                String mSelection = Contract.HistoryEntry.IS_FAVORITE + "=?" +
-                        " AND " +
-                        Contract.HistoryEntry.WORD + "=?";
-                String[] mSelectionArgs = new String[]{SQL_BOOLEAN_TRUE, wordToDelete};
-
-                deletedCount = db.delete(Contract.HistoryEntry.TABLE_NAME,
-                        mSelection, mSelectionArgs);
-                break;
-            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -246,43 +220,6 @@ public class AppContentProvider extends ContentProvider {
                 updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
                         selection, selectionArgs);
                 break;
-            case FAVORITES: {
-                String mSelection = Contract.HistoryEntry.IS_FAVORITE + "=?";
-                String[] mSelectionArgs = new String[]{SQL_BOOLEAN_TRUE};
-                updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
-                        mSelection, mSelectionArgs);
-                break;
-            }
-            case HISTORY_WITH_ID: {
-                String idToUpdate = uri.getLastPathSegment();
-
-                String mSelection = Contract.HistoryEntry._ID + "=?";
-                String[] mSelectionArgs = new String[]{idToUpdate};
-                updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
-                        mSelection, mSelectionArgs);
-                break;
-            }
-            case HISTORY_SEARCH: {
-                String wordToUpdate = uri.getLastPathSegment();
-
-                String mSelection = Contract.HistoryEntry.WORD + "=?";
-                String[] mSelectionArgs = new String[]{wordToUpdate};
-                updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
-                        mSelection, mSelectionArgs);
-                break;
-            }
-            case FAVORITES_SEARCH: {
-                String wordToUpdate = uri.getLastPathSegment();
-
-                String mSelection = Contract.HistoryEntry.IS_FAVORITE + "=?" +
-                        " AND " +
-                        Contract.HistoryEntry.WORD + "=?";
-                String[] mSelectionArgs = new String[]{SQL_BOOLEAN_TRUE, wordToUpdate};
-
-                updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
-                        mSelection, mSelectionArgs);
-                break;
-            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -296,5 +233,11 @@ public class AppContentProvider extends ContentProvider {
         }
 
         return updatedCount;
+    }
+
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        return null;
     }
 }
