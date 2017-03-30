@@ -1,11 +1,13 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
 
-import android.database.ContentObserver;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,22 +22,16 @@ import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 
 
-public class InternalFavoritesFragment extends Fragment {
+public class InternalFavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int FAVORITES_LOADER_ID = 2;
 
     @BindView(R.id.rvInternalFavorite)
     RecyclerView mRvInternalFavorite;
 
     private HistoryCursorAdapter mAdapter;
 
-    private ContentObserver mDbObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            Cursor favoritesCursor = Utils.DB.getFavoriteHistoryItemsCursor(getContext());
-            if (mAdapter != null) {
-                mAdapter.swapCursor(favoritesCursor);
-            }
-        }
-    };
+    private Boolean mIsVisible;
 
     public InternalFavoritesFragment() {
     }
@@ -58,26 +54,59 @@ public class InternalFavoritesFragment extends Fragment {
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
         mRvInternalFavorite.setAdapter(mAdapter);
 
+        getActivity().getSupportLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
+
         return view;
     }
 
+    /**
+     * We don't need to instantly delete manually unfavorited items, so we update data when
+     * Favorites fragment has been hidden
+     */
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getContext().getContentResolver().registerContentObserver(
-                Contract.HistoryEntry.CONTENT_URI_FAVORITES, false, mDbObserver);
-    }
+        // Save it to prevent instant item deletion in onLoadFinished()
+        mIsVisible = isVisibleToUser;
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mDbObserver != null) {
-            getContext().getContentResolver().unregisterContentObserver(mDbObserver);
+        if (!isVisibleToUser) {
+            Context context = getContext();
+            if (context != null && mAdapter != null) {
+                Cursor favoritesCursor = Utils.DB.getFavoriteHistoryItemsCursor(context);
+                mAdapter.swapCursor(favoritesCursor);
+            }
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CursorLoader cursorLoader = new CursorLoader(
+                getContext(),
+                Contract.HistoryEntry.CONTENT_URI_FAVORITES,
+                null,
+                null,
+                null,
+                Contract.HistoryEntry.DATE);
+        return cursorLoader;
+    }
+
+    /**
+     * Do not delete items while we are looking at it
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (mIsVisible != null && !mIsVisible) {
+            if (cursor.moveToFirst()) {
+                mAdapter.swapCursor(cursor);
+            } else {
+                mAdapter.swapCursor(null);
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }

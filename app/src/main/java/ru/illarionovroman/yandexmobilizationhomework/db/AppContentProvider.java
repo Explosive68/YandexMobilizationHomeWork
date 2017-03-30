@@ -289,6 +289,10 @@ public class AppContentProvider extends ContentProvider {
 
         if (updatedCount != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
+            // TODO: Is this the good way?
+            // Manually notify Favorites observers about History changes
+            getContext().getContentResolver()
+                    .notifyChange(Contract.HistoryEntry.CONTENT_URI_FAVORITES, null);
         }
 
         return updatedCount;

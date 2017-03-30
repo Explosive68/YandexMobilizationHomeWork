@@ -1,11 +1,12 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
 
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,22 +21,14 @@ import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 
 
-public class InternalHistoryFragment extends Fragment {
+public class InternalHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int HISTORY_LOADER_ID = 1;
 
     @BindView(R.id.rvInternalHistory)
     RecyclerView mRvInternalHistory;
 
     private HistoryCursorAdapter mAdapter;
-
-    private ContentObserver mDbObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            Cursor historyCursor = Utils.DB.getAllHistoryItemsCursor(getContext());
-            if (mAdapter != null) {
-                mAdapter.swapCursor(historyCursor);
-            }
-        }
-    };
 
     public InternalHistoryFragment() {
     }
@@ -57,6 +50,8 @@ public class InternalHistoryFragment extends Fragment {
         mAdapter = new HistoryCursorAdapter(getContext(), historyCursor);
         mRvInternalHistory.setAdapter(mAdapter);
 
+        getActivity().getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null, this);
+
         return view;
     }
 
@@ -66,17 +61,28 @@ public class InternalHistoryFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        getContext().getContentResolver().registerContentObserver(
-                Contract.HistoryEntry.CONTENT_URI_HISTORY, false, mDbObserver);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CursorLoader cursorLoader = new CursorLoader(
+                getContext(),
+                Contract.HistoryEntry.CONTENT_URI_HISTORY,
+                null,
+                null,
+                null,
+                Contract.HistoryEntry.DATE);
+        return cursorLoader;
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        if (mDbObserver != null) {
-            getContext().getContentResolver().unregisterContentObserver(mDbObserver);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            mAdapter.swapCursor(cursor);
+        } else {
+            mAdapter.swapCursor(null);
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }
