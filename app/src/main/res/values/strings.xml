@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">YandexMobilizationHomeWork</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string-array name="internal_tabs">
         <item>History</item>
         <item>Favorites</item>
@@ -11,7 +8,6 @@
 
     <string name="favorites_search_hint_history">Search in history</string>
     <string name="favorites_search_hint_favorites">Search in favorites</string>
-    <string name="test_text_long">Sample text</string>
     <string name="actionbar_title_settings">Settings</string>
     <string name="history_title">History</string>
     <string name="favorites_title">Favorites</string>
@@ -19,5 +15,113 @@
     <string name="dialog_delete_history_message">Are you sure you want to delete history?</string>
     <string name="dialog_delete_favorites_message">Are you sure you want to delete favorites?</string>
 
-    <string name="placeholder_language_from_to" translatable="false">%1$s - %2$s</string>
+    <string name="language_selection_title_from">Text language</string>
+    <string name="language_selection_title_to">Translation language</string>
+
+    <string name="default_language_from">English</string>
+    <string name="default_language_to">Russian</string>
+
+    <string name="test_text">Sample text</string>
+    <string name="language_from_to" translatable="false">%1$s - %2$s</string>
+    <string name="translate_query_param_language_from_to" translatable="false">%1$s-%2$s</string>
+
+    <!-- Localized array of supported languages -->
+
+    <string-array name="language_codes_names">
+        <item>af:Afrikaans</item>
+        <item>am:Amharic</item>
+        <item>ar:Arabic</item>
+        <item>az:Azerbaijani</item>
+        <item>ba:Bashkir</item>
+        <item>be:Belarusian</item>
+        <item>bg:Bulgarian</item>
+        <item>bn:Bengali</item>
+        <item>bs:Bosnian</item>
+        <item>ca:Catalan</item>
+        <item>cs:Czech</item>
+        <item>cy:Welsh</item>
+        <item>da:Danish</item>
+        <item>de:German</item>
+        <item>el:Greek</item>
+        <item>en:English</item>
+        <item>eo:Esperanto</item>
+        <item>es:Spanish</item>
+        <item>et:Estonian</item>
+        <item>eu:Basque</item>
+        <item>fa:Persian</item>
+        <item>fi:Finnish</item>
+        <item>fr:French</item>
+        <item>ga:Irish</item>
+        <item>gd:Scottish Gaelic</item>
+        <item>gl:Galician</item>
+        <item>gu:Gujarati</item>
+        <item>he:Hebrew</item>
+        <item>hi:Hindi</item>
+        <item>hr:Croatian</item>
+        <item>ht:Haitian</item>
+        <item>hu:Hungarian</item>
+        <item>hy:Armenian</item>
+        <item>id:Indonesian</item>
+        <item>is:Icelandic</item>
+        <item>it:Italian</item>
+        <item>ja:Japanese</item>
+        <item>jv:Javanese</item>
+        <item>ka:Georgian</item>
+        <item>kk:Kazakh</item>
+        <item>km:Khmer</item>
+        <item>kn:Kannada</item>
+        <item>ko:Korean</item>
+        <item>ky:Kyrgyz</item>
+        <item>la:Latin</item>
+        <item>lb:Luxembourgish</item>
+        <item>lo:Lao</item>
+        <item>lt:Lithuanian</item>
+        <item>lv:Latvian</item>
+        <item>mg:Malagasy</item>
+        <item>mi:Maori</item>
+        <item>mk:Macedonian</item>
+        <item>ml:Malayalam</item>
+        <item>mn:Mongolian</item>
+        <item>mr:Marathi</item>
+        <item>ms:Malay</item>
+        <item>mt:Maltese</item>
+        <item>my:Burmese</item>
+        <item>ne:Nepali</item>
+        <item>nl:Dutch</item>
+        <item>no:Norwegian</item>
+        <item>pa:Punjabi</item>
+        <item>pl:Polish</item>
+        <item>pt:Portuguese</item>
+        <item>ro:Romanian</item>
+        <item>ru:Russian</item>
+        <item>si:Sinhalese</item>
+        <item>sk:Slovak</item>
+        <item>sl:Slovenian</item>
+        <item>sq:Albanian</item>
+        <item>sr:Serbian</item>
+        <item>su:Sundanese</item>
+        <item>sv:Swedish</item>
+        <item>sw:Swahili</item>
+        <item>ta:Tamil</item>
+        <item>te:Telugu</item>
+        <item>tg:Tajik</item>
+        <item>th:Thai</item>
+        <item>tl:Tagalog</item>
+        <item>tr:Turkish</item>
+        <item>tt:Tatar</item>
+        <item>uk:Ukrainian</item>
+        <item>ur:Urdu</item>
+        <item>uz:Uzbek</item>
+        <item>vi:Vietnamese</item>
+        <item>xh:Xhosa</item>
+        <item>yi:Yiddish</item>
+        <item>zh:Chinese</item>
+        <item>ceb:Cebuano</item>
+        <item>mhr:Mari</item>
+        <item>mrj:Hill Mari</item>
+        <item>pap:Papiamento</item>
+        <item>udm:Udmurt</item>
+    </string-array>
+    <string name="title_activity_choose_language">ChooseLanguageActivity</string>
+
 </resources>

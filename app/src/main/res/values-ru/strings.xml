@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">YandexMobilizationHomeWork</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string-array name="internal_tabs">
         <item>История</item>
         <item>Избранное</item>
@@ -11,12 +8,117 @@
 
     <string name="favorites_search_hint_history">Найти в истории</string>
     <string name="favorites_search_hint_favorites">Найти в избранном</string>
-
     <string name="actionbar_title_settings">Настройки</string>
     <string name="history_title">История</string>
     <string name="favorites_title">Избранное</string>
 
     <string name="dialog_delete_history_message">Вы уверены, что хотите очистить историю?</string>
     <string name="dialog_delete_favorites_message">Вы уверены, что хотите очистить избранное?</string>
+
+    <string name="language_selection_title_from">Язык текста</string>
+    <string name="language_selection_title_to">Язык перевода</string>
+
+    <string name="default_language_from">Русский</string>
+    <string name="default_language_to">Английский</string>
+
+    <string name="test_text">Пример текста</string>
+
+    <!-- Localized array of supported languages -->
+
+    <string-array name="language_codes_names">
+        <item>af:Африкаанс</item>
+        <item>am:Амхарский</item>
+        <item>ar:Арабский</item>
+        <item>az:Азербайджанский</item>
+        <item>ba:Башкирский</item>
+        <item>be:Белорусский</item>
+        <item>bg:Болгарский</item>
+        <item>bn:Бенгальский</item>
+        <item>bs:Боснийский</item>
+        <item>ca:Каталанский</item>
+        <item>cs:Чешский</item>
+        <item>cy:Валлийский</item>
+        <item>da:Датский</item>
+        <item>de:Немецкий</item>
+        <item>el:Греческий</item>
+        <item>en:Английский</item>
+        <item>eo:Эсперанто</item>
+        <item>es:Испанский</item>
+        <item>et:Эстонский</item>
+        <item>eu:Баскский</item>
+        <item>fa:Персидский</item>
+        <item>fi:Финский</item>
+        <item>fr:Французский</item>
+        <item>ga:Ирландский</item>
+        <item>gd:Шотландский</item>
+        <item>gl:Галисийский</item>
+        <item>gu:Гуджарати</item>
+        <item>he:Иврит</item>
+        <item>hi:Хинди</item>
+        <item>hr:Хорватский</item>
+        <item>ht:Гаитянский</item>
+        <item>hu:Венгерский</item>
+        <item>hy:Армянский</item>
+        <item>id:Индонезийский</item>
+        <item>is:Исландский</item>
+        <item>it:Итальянский</item>
+        <item>ja:Японский</item>
+        <item>jv:Яванский</item>
+        <item>ka:Грузинский</item>
+        <item>kk:Казахский</item>
+        <item>km:Кхмерский</item>
+        <item>kn:Каннада</item>
+        <item>ko:Корейский</item>
+        <item>ky:Киргизский</item>
+        <item>la:Латынь</item>
+        <item>lb:Люксембургский</item>
+        <item>lo:Лаосский</item>
+        <item>lt:Литовский</item>
+        <item>lv:Латышский</item>
+        <item>mg:Малагасийский</item>
+        <item>mi:Маори</item>
+        <item>mk:Македонский</item>
+        <item>ml:Малаялам</item>
+        <item>mn:Монгольский</item>
+        <item>mr:Маратхи</item>
+        <item>ms:Малайский</item>
+        <item>mt:Мальтийский</item>
+        <item>my:Бирманский</item>
+        <item>ne:Непальский</item>
+        <item>nl:Голландский</item>
+        <item>no:Норвежский</item>
+        <item>pa:Панджаби</item>
+        <item>pl:Польский</item>
+        <item>pt:Португальский</item>
+        <item>ro:Румынский</item>
+        <item>ru:Русский</item>
+        <item>si:Сингальский</item>
+        <item>sk:Словацкий</item>
+        <item>sl:Словенский</item>
+        <item>sq:Албанский</item>
+        <item>sr:Сербский</item>
+        <item>su:Сунданский</item>
+        <item>sv:Шведский</item>
+        <item>sw:Суахили</item>
+        <item>ta:Тамильский</item>
+        <item>te:Телугу</item>
+        <item>tg:Таджикский</item>
+        <item>th:Тайский</item>
+        <item>tl:Тагальский</item>
+        <item>tr:Турецкий</item>
+        <item>tt:Татарский</item>
+        <item>uk:Украинский</item>
+        <item>ur:Урду</item>
+        <item>uz:Узбекский</item>
+        <item>vi:Вьетнамский</item>
+        <item>xh:Коса</item>
+        <item>yi:Идиш</item>
+        <item>zh:Китайский</item>
+        <item>ceb:Себуанский</item>
+        <item>mhr:Марийский</item>
+        <item>mrj:Горномарийский</item>
+        <item>pap:Папьяменто</item>
+        <item>udm:Удмуртский</item>
+    </string-array>
 
 </resources>

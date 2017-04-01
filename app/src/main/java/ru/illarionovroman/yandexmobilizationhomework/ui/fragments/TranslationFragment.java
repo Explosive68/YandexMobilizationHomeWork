@@ -1,6 +1,9 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -37,11 +40,17 @@ import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activities.LanguageSelectionActivity;
 import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
 import timber.log.Timber;
 
 
 public class TranslationFragment extends Fragment {
+
+    public static final int REQUEST_CODE_LANGUAGE_FROM = 1;
+    public static final int REQUEST_CODE_LANGUAGE_TO = 2;
+    public static final String EXTRA_CURRENT_LANGUAGE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_CURRENT_LANGUAGE";
+    public static final String EXTRA_REQUEST_CODE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_REQUEST_CODE";
 
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
@@ -56,6 +65,10 @@ public class TranslationFragment extends Fragment {
 
     @BindView(R.id.ivTranslationFullscreen)
     ImageView mIvTranslationFullscreen;
+
+    private TextView mTvLanguageFrom;
+    private TextView mTvLanguageTo;
+    private ImageView mIvSwapLanguages;
 
     private CompositeDisposable mDisposables;
 
@@ -73,18 +86,70 @@ public class TranslationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         ButterKnife.bind(this, view);
 
-        mDisposables = new CompositeDisposable();
+        mTvLanguageFrom = ButterKnife.findById(getActivity(), R.id.tvLanguageFrom);
+        mTvLanguageTo = ButterKnife.findById(getActivity(), R.id.tvLanguageTo);
+        mIvSwapLanguages = ButterKnife.findById(getActivity(), R.id.ivSwapLanguages);
+        setLanguageSelectionClickListeners();
 
-        Disposable inputWatcher = RxTextView.textChanges(mEtWordInput)
+        mDisposables = new CompositeDisposable();
+        mDisposables.add(createDisposableInputWatcher());
+        return view;
+    }
+
+    private void setLanguageSelectionClickListeners() {
+        mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
+            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
+            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
+            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
+        });
+
+        mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
+            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
+            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
+            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
+        });
+
+        mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
+            // Swap actionBar items
+            String buf = mTvLanguageFrom.getText().toString();
+            mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
+            mTvLanguageTo.setText(buf);
+
+            // Insert translation to input
+            String translation = mTvTranslation.getText().toString();
+            if (!TextUtils.isEmpty(translation)) {
+                mEtWordInput.setText(translation);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            String resultLangCode = data.getStringExtra(LanguageSelectionActivity.EXTRA_RESULT);
+            String selectedLangName = Utils.getLangNameByCode(getContext(), resultLangCode);
+            if (requestCode == REQUEST_CODE_LANGUAGE_FROM) {
+                mTvLanguageFrom.setText(selectedLangName);
+            } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
+                mTvLanguageTo.setText(selectedLangName);
+            }
+            prepareAndProcessTranslationRequest();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @NonNull
+    private Disposable createDisposableInputWatcher() {
+        return RxTextView.textChanges(mEtWordInput)
                 .debounce(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(charSequence -> {
+                .subscribe(textToTranslate -> {
                     prepareAndProcessTranslationRequest();
                 });
-        mDisposables.add(inputWatcher);
-
-        return view;
     }
 
     @OnClick(R.id.btnRetry)
@@ -100,40 +165,63 @@ public class TranslationFragment extends Fragment {
 
         showLoading();
 
-        Observable<TranslationResponse> translationResponseObservable =
-                ApiManager.getApiInterfaceInstance().getTranslation(inputText, "en-ru", null);
+        String langFromTo = buildTranslationLangParam();
+        Observable<TranslationResponse> translationResponseObservable = ApiManager
+                .getApiInterfaceInstance().getTranslation(inputText, langFromTo, null);
 
         mDisposables.add(translationResponseObservable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleRxResponse, this::handleRxError)
+                .subscribe(this::handleTranslateResponse, this::handleTranslateError)
         );
     }
 
-    private void handleRxResponse(TranslationResponse response) {
+    private String buildTranslationLangParam() {
+        String codeLangFrom = getCurrentCodeLanguageFrom();
+        String codeLangTo = getCurrentCodeLanguageTo();
+        return getString(R.string.translate_query_param_language_from_to,
+                codeLangFrom, codeLangTo);
+    }
+
+    private String getCurrentCodeLanguageFrom() {
+        if (mTvLanguageFrom != null) {
+            String nameLangFrom = mTvLanguageFrom.getText().toString();
+            return Utils.getLangCodeByName(getContext(), nameLangFrom);
+        } else {
+            return "";
+        }
+    }
+
+    private String getCurrentCodeLanguageTo() {
+        if (mTvLanguageTo != null) {
+            String nameLangTo = mTvLanguageTo.getText().toString();
+            return Utils.getLangCodeByName(getContext(), nameLangTo);
+        } else {
+            return "";
+        }
+    }
+
+    private void handleTranslateResponse(TranslationResponse response) {
         hideLoading();
 
         StringBuilder translationBuilder = new StringBuilder();
         for (int i = 0; i < response.getTranslations().size(); i++) {
-            translationBuilder.append(i+1);
-            translationBuilder.append(") ");
             translationBuilder.append(response.getTranslations().get(i));
-            translationBuilder.append("\n");
         }
         mTvTranslation.setText(translationBuilder.toString());
 
         HistoryItem item = new HistoryItem(
                 mEtWordInput.getText().toString(),
                 translationBuilder.toString(),
-                "EN",
-                "RU"
+                getCurrentCodeLanguageFrom(),
+                getCurrentCodeLanguageTo()
         );
         long id = Utils.DB.addHistoryItem(getContext(), item);
 
         Toast.makeText(getContext(), "id = " + id, Toast.LENGTH_SHORT).show();
     }
 
-    private void handleRxError(Throwable error) {
+    private void handleTranslateError(Throwable error) {
         hideLoading();
 
         if (error instanceof HttpException) {
@@ -186,11 +274,6 @@ public class TranslationFragment extends Fragment {
                 showError("Unknown error occurred while loading translation data");
                 break;
         }
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showLoading() {

@@ -10,26 +10,20 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/margin_half"
         android:layout_weight="1"
         android:background="@drawable/border">
 
         <ImageView
             android:id="@+id/ivWordMic"
-            android:layout_width="@dimen/image_size_normal"
-            android:layout_height="@dimen/image_size_normal"
-            android:layout_marginEnd="@dimen/margin_quarter"
-            android:layout_marginTop="@dimen/margin_quarter"
+            style="@style/TranslationActionImage"
             android:src="@drawable/ic_mic"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivWordSpeaker"
-            android:layout_width="@dimen/image_size_normal"
-            android:layout_height="@dimen/image_size_normal"
-            android:layout_marginEnd="@dimen/margin_quarter"
-            android:layout_marginTop="@dimen/margin_quarter"
+            style="@style/TranslationActionImage"
             android:src="@drawable/ic_speaker"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
@@ -37,10 +31,7 @@
 
         <ImageView
             android:id="@+id/ivWordClean"
-            android:layout_width="@dimen/image_size_normal"
-            android:layout_height="@dimen/image_size_normal"
-            android:layout_marginBottom="@dimen/margin_quarter"
-            android:layout_marginStart="@dimen/margin_quarter"
+            style="@style/TranslationActionImage"
             android:src="@drawable/ic_cross"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="parent" />
@@ -54,7 +45,7 @@
             android:gravity="top"
             android:inputType="textMultiLine"
             android:scrollbars="vertical"
-            android:text="@string/test_text_long"
+            android:text="@string/test_text"
             app:layout_constraintBottom_toTopOf="@+id/ivWordClean"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/ivWordMic"
@@ -65,14 +56,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/margin_half"
         android:layout_weight="2"
         android:orientation="horizontal">
 
         <ProgressBar
             android:id="@+id/pbLoading"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/progress_bar_size"
+            android:layout_height="@dimen/progress_bar_size"
             android:visibility="gone"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true" />
@@ -86,38 +77,32 @@
 
             <ImageView
                 android:id="@+id/ivTranslationSpeaker"
-                android:layout_width="@dimen/image_size_normal"
-                android:layout_height="@dimen/image_size_normal"
-                android:layout_margin="@dimen/margin_quarter"
+                style="@style/TranslationActionImage"
                 android:src="@drawable/ic_speaker" />
 
             <ImageView
                 android:id="@+id/ivTranslationFavorite"
-                android:layout_width="@dimen/image_size_normal"
-                android:layout_height="@dimen/image_size_normal"
-                android:layout_margin="@dimen/margin_quarter"
+                style="@style/TranslationActionImage"
                 android:src="@drawable/ic_favorite" />
 
             <ImageView
                 android:id="@+id/ivTranslationShare"
-                android:layout_width="@dimen/image_size_normal"
-                android:layout_height="@dimen/image_size_normal"
-                android:layout_margin="@dimen/margin_quarter"
+                style="@style/TranslationActionImage"
                 android:src="@drawable/ic_share" />
 
             <ImageView
                 android:id="@+id/ivTranslationFullscreen"
-                android:layout_width="@dimen/image_size_normal"
-                android:layout_height="@dimen/image_size_normal"
-                android:layout_margin="@dimen/margin_quarter"
+                style="@style/TranslationActionImage"
                 android:src="@drawable/ic_fullscreen" />
 
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvTranslation"
+            style="@style/TextTranslated"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="@dimen/margin_half"
             android:layout_toStartOf="@id/llTranslationButtons" />
 
         <TextView

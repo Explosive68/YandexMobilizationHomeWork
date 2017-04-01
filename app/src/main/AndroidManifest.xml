@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="ru.illarionovroman.yandexmobilizationhomework.MobilizationApp"
+        android:name=".MobilizationApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="ru.illarionovroman.yandexmobilizationhomework.ui.activities.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,9 +23,19 @@
         </activity>
 
         <provider
-            android:name="ru.illarionovroman.yandexmobilizationhomework.db.AppContentProvider"
+            android:name=".db.AppContentProvider"
             android:authorities="ru.illarionovroman.yandexmobilizationhomework"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.LanguageSelectionActivity"
+            android:label="@string/title_activity_choose_language"
+            android:parentActivityName=".ui.activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.illarionovroman.yandexmobilizationhomework.ui.activities.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

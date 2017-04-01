@@ -37,13 +37,16 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
     public void onBindViewHolder(HistoryViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         final HistoryItem item = new HistoryItem(mCursor);
+        bindHolderItem(holder, item);
+    }
 
+    private void bindHolderItem(HistoryViewHolder holder, HistoryItem item) {
         holder.itemView.setTag(item.getId());
         holder.tvOriginalWord.setText(item.getWord());
         holder.tvTranslation.setText(item.getTranslation() + item.getDate());
         holder.tvTranslationDirection.setText(item.getLanguageFrom() + " - " + item.getLanguageTo());
         String translationDirection = String.format(
-                mContext.getString(R.string.placeholder_language_from_to),
+                mContext.getString(R.string.language_from_to),
                 item.getLanguageFrom(),
                 item.getLanguageTo());
         holder.tvTranslationDirection.setText(translationDirection);
@@ -58,13 +61,16 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             int updatedCount = Utils.DB.updateHistoryItem(mContext, item);
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
-
         // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)
     }
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        if (mCursor != null) {
+            return mCursor.getCount();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -81,9 +87,9 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
         this.mCursor = c;
 
         //check if this is a valid cursor, then update the cursor
-        if (c != null) {
+        //if (c != null) {
             this.notifyDataSetChanged();
-        }
+        //}
         return temp;
     }
 

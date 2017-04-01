@@ -22,11 +22,18 @@ public class HistoryFragment extends Fragment {
 
     private static final String BUNDLE_SELECTED_PAGE = "BUNDLE_SELECTED_PAGE";
 
+    private static final int POSITION_HISTORY = 0;
+    private static final int POSITION_FAVORITES = 1;
+
     @Nullable
     @BindView(R.id.tlInternal)
     TabLayout mInternalTabLayout;
     @BindView(R.id.vpInternal)
     ViewPager mInternalPager;
+
+    @Nullable
+    @BindView(R.id.ivDelete)
+    ImageView mIvDelete;
 
     public HistoryFragment() {
     }
@@ -42,47 +49,46 @@ public class HistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
 
+        initPagerAndTabs();
+        setOnDeleteClickListener();
+        restoreState(savedInstanceState);
+
+        return view;
+    }
+
+    private void initPagerAndTabs() {
+        // It is important to use CHILD FragmentManager
         InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());
         mInternalPager.setAdapter(internalAdapter);
-
-        // FIXME: There is no listener for ivDelete button before PageChange event
-        mInternalPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                ImageView ivDelete = ButterKnife.findById(getActivity(), R.id.ivDelete);
-                if (ivDelete != null) {
-                    if (position == 0) {
-                        ivDelete.setOnClickListener(view -> deleteHistory());
-                    } else {
-                        ivDelete.setOnClickListener(view -> deleteFavorites());
-                    }
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
 
         mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
         if (mInternalTabLayout != null) {
             mInternalTabLayout.setupWithViewPager(mInternalPager);
         }
-
-        // FIXME: Not working :(
-        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_SELECTED_PAGE)) {
-            mInternalPager.setCurrentItem(savedInstanceState.getInt(BUNDLE_SELECTED_PAGE, 0));
-        }
-
-        return view;
     }
 
-    public void deleteHistory() {
+    private void setOnDeleteClickListener() {
+        ImageView mIvDelete = ButterKnife.findById(getActivity(), R.id.ivDelete);
+        mIvDelete.setOnClickListener(imageView -> {
+            int currentPosition = mInternalPager.getCurrentItem();
+            if (currentPosition == POSITION_HISTORY) {
+                showDeleteHistoryDialog();
+            } else {
+                showDeleteFavoritesDialog();
+            }
+        });
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        // FIXME: Not working :(
+        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_SELECTED_PAGE)) {
+            mInternalPager.setCurrentItem(savedInstanceState
+                    .getInt(BUNDLE_SELECTED_PAGE, POSITION_HISTORY));
+        }
+    }
+
+    public void showDeleteHistoryDialog() {
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(R.string.history_title)
                 .setMessage(R.string.dialog_delete_history_message)
@@ -96,7 +102,7 @@ public class HistoryFragment extends Fragment {
         dialog.show();
     }
 
-    protected void deleteFavorites() {
+    protected void showDeleteFavoritesDialog() {
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle(R.string.favorites_title)
                 .setMessage(R.string.dialog_delete_favorites_message)
@@ -118,8 +124,8 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mInternalTabLayout != null) {
-            outState.putInt(BUNDLE_SELECTED_PAGE, mInternalTabLayout.getSelectedTabPosition());
+        if (mInternalPager != null) {
+            outState.putInt(BUNDLE_SELECTED_PAGE, mInternalPager.getCurrentItem());
         }
     }
 

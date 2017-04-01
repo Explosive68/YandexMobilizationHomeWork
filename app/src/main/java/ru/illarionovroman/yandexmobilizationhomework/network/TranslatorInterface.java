@@ -21,6 +21,14 @@ public interface TranslatorInterface {
     Observable<DetectLanguageResponse> detectLanguage(@Query("text") String languageCode,
                                                       @Query("hint") String hintList);
 
+    /**
+     * @param text The text which we want to be translated
+     * @param langFromTo String of pattern "langCodeFrom-langCodeTo", e.g. "en-ru"
+     * @param format Possible values:<br>
+     * &nbsp&nbsp&nbsp&nbsp plain — Text without markup (default value);<br>
+     * &nbsp&nbsp&nbsp&nbsp html — HTML text.
+     * @return Translated text
+     */
     @GET("translate")
     Observable<TranslationResponse> getTranslation(@Query("text") String text,
                                                    @Query("lang") String langFromTo,
