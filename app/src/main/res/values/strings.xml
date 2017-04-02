@@ -129,5 +129,21 @@
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="retry">Retry</string>
+
+    <string name="error_title_simple">Error</string>
+    <string name="error_title_authorization">Authorization error</string>
+    <string name="error_text_api_key_blocked">API key is blocked</string>
+    <string name="error_text_api_key_invalid">API key is invalid</string>
+    <string name="error_title_translation">Translation error</string>
+    <string name="error_text_day_limit_exceed">Day limit exceeded</string>
+    <string name="error_text_text_size_exceed">Text size exceeded</string>
+    <string name="error_text_untranslatable">Text is untranslatable</string>
+    <string name="error_text_direction_unsupported">Selected translation direction is not supported</string>
+    <string name="error_title_connection">Connection error</string>
+    <string name="error_text_connection">Failed to query the translation server. Check your internet connection and try again</string>
+    <string name="error_title_unknown">Oops!</string>
+    <string name="error_text_unknown">An unknown error occurred while loading translation data</string>
+
 
 </resources>

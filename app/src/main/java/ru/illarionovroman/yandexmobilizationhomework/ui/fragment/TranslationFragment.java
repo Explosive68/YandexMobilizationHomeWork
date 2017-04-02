@@ -21,6 +21,7 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -62,8 +63,12 @@ public class TranslationFragment extends Fragment {
     TextView mTvTranslation;
     @BindView(R.id.llTranslationButtons)
     LinearLayout mLlTranslationButtons;
-    @BindView(R.id.tvTranslationError)
-    TextView mTvTranslationError;
+    @BindView(R.id.llTranslationError)
+    LinearLayout mLlTranslationError;
+    @BindView(R.id.tvTranslationErrorTitle)
+    TextView mTvTranslationErrorTitle;
+    @BindView(R.id.tvTranslationErrorText)
+    TextView mTvTranslationErrorText;
     @BindView(R.id.pbLoading)
     ProgressBar mPbLoading;
 
@@ -95,7 +100,11 @@ public class TranslationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         ButterKnife.bind(this, view);
+        initializeFragment();
+        return view;
+    }
 
+    private void initializeFragment() {
         mTvLanguageFrom = ButterKnife.findById(getActivity(), R.id.tvLanguageFrom);
         mTvLanguageTo = ButterKnife.findById(getActivity(), R.id.tvLanguageTo);
         mIvSwapLanguages = ButterKnife.findById(getActivity(), R.id.ivSwapLanguages);
@@ -103,7 +112,6 @@ public class TranslationFragment extends Fragment {
 
         mDisposables = new CompositeDisposable();
         mDisposables.add(createDisposableInputWatcher());
-        return view;
     }
 
     private void setLanguageSelectionClickListeners() {
@@ -265,18 +273,26 @@ public class TranslationFragment extends Fragment {
         if (error instanceof HttpException) {
             try {
                 // Get real error code
-                Converter<ResponseBody, ErrorResponse> errorConverter = ApiManager.getRetrofitInstance()
+                Converter<ResponseBody, ErrorResponse> errorConverter = ApiManager
+                        .getRetrofitInstance()
                         .responseBodyConverter(ErrorResponse.class, new Annotation[0]);
-                ErrorResponse errorResponse = errorConverter
-                        .convert(((HttpException) error).response().errorBody());
+                ResponseBody errorBody = ((HttpException) error).response().errorBody();
+                ErrorResponse errorResponse = errorConverter.convert(errorBody);
                 // Use code to show localized error
-                handleError(errorResponse.getCode(), errorResponse.getErrorMessage());
+                handleError(errorResponse.getCode(), errorResponse.getMessage());
             } catch (IOException ex) {
-                showError("Unknown error: " + error.getMessage());
-                Timber.e(error, "Couldn't convert error response!");
+                showError(getString(R.string.error_title_unknown),
+                        getString(R.string.error_text_unknown));
+                Timber.e(error, "Couldn't convert error response! Message: " + error.getMessage());
             }
+        } else if (error instanceof UnknownHostException) {
+            showError(getString(R.string.error_title_connection),
+                    getString(R.string.error_text_connection));
+            Timber.d(error, "Unknown host error. Message: " + error.getMessage());
         } else {
-            showError("Unknown error: " + error.getMessage());
+            showError(getString(R.string.error_title_simple),
+                    getString(R.string.error_text_unknown));
+            Timber.e(error, "Not HTTP translation error! Message: " + error.getMessage());
         }
 
         error.printStackTrace();
@@ -288,42 +304,44 @@ public class TranslationFragment extends Fragment {
     private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
         hideLoading();
 
-        // TODO: always show localized error text
-        if (!TextUtils.isEmpty(errorMessage)) {
-            showError(errorMessage);
-            return;
-        }
-
         switch (errorCode) {
             case ResponseErrorCodes.API_KEY_BLOCKED:
-                showError("API_KEY_BLOCKED");
+                showError(getString(R.string.error_title_authorization),
+                        getString(R.string.error_text_api_key_blocked));
                 break;
             case ResponseErrorCodes.API_KEY_INVALID:
-                showError("API_KEY_INVALID");
+                showError(getString(R.string.error_title_authorization),
+                        getString(R.string.error_text_api_key_invalid));
                 break;
             case ResponseErrorCodes.DAY_LIMIT_EXCEED:
-                showError("DAY_LIMIT_EXCEED");
+                showError(getString(R.string.error_title_translation),
+                        getString(R.string.error_text_day_limit_exceed));
                 break;
             case ResponseErrorCodes.TEXT_SIZE_EXCEED:
-                showError("TEXT_SIZE_EXCEED");
+                showError(getString(R.string.error_title_translation),
+                        getString(R.string.error_text_text_size_exceed));
                 break;
             case ResponseErrorCodes.TEXT_UNTRANSLATABLE:
-                showError("TEXT_UNTRANSLATABLE");
+                showError(getString(R.string.error_title_translation),
+                        getString(R.string.error_text_untranslatable));
                 break;
             case ResponseErrorCodes.TRANSLATION_DIRECTION_UNSUPPORTED:
-                showError("TRANSLATION_DIRECTION_UNSUPPORTED");
+                showError(getString(R.string.error_title_translation),
+                        getString(R.string.error_text_direction_unsupported));
                 break;
             default:
-                showError("Unknown error occurred while loading translation data");
+                showError(getString(R.string.error_title_unknown),
+                        getString(R.string.error_text_unknown));
                 break;
         }
+        Timber.d("handleError: errorCode=" + errorCode + ", msg=" + errorMessage);
     }
 
     private void showLoading() {
         mPbLoading.setVisibility(View.VISIBLE);
         mTvTranslation.setVisibility(View.GONE);
         setTranslationButtonsEnabledState(false);
-        mTvTranslationError.setVisibility(View.GONE);
+        mLlTranslationError.setVisibility(View.GONE);
     }
 
     private void hideLoading() {
@@ -331,7 +349,7 @@ public class TranslationFragment extends Fragment {
         mTvTranslation.setVisibility(View.VISIBLE);
         mLlTranslationButtons.setVisibility(View.VISIBLE);
         setTranslationButtonsEnabledState(true);
-        mTvTranslationError.setVisibility(View.GONE);
+        mLlTranslationError.setVisibility(View.GONE);
     }
 
     private void setTranslationButtonsEnabledState(boolean enabled) {
@@ -347,13 +365,14 @@ public class TranslationFragment extends Fragment {
         mIvTranslationFullscreen.setAlpha(alpha);
     }
 
-    private void showError(String errorText) {
+    private void showError(String errorTitle, String errorText) {
         mPbLoading.setVisibility(View.GONE);
         mTvTranslation.setVisibility(View.GONE);
         mLlTranslationButtons.setVisibility(View.GONE);
 
-        mTvTranslationError.setText(errorText);
-        mTvTranslationError.setVisibility(View.VISIBLE);
+        mTvTranslationErrorTitle.setText(errorTitle);
+        mTvTranslationErrorText.setText(errorText);
+        mLlTranslationError.setVisibility(View.VISIBLE);
     }
 
     @Override

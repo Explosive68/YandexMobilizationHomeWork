@@ -6,7 +6,6 @@
     android:orientation="vertical"
     tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment">
 
-
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,14 +15,14 @@
 
         <ImageView
             android:id="@+id/ivWordMic"
-            style="@style/TranslationActionImage"
+            style="@style/WordInputActionImage"
             android:src="@drawable/ic_mic"
             app:layout_constraintRight_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/ivWordSpeaker"
-            style="@style/TranslationActionImage"
+            style="@style/WordInputActionImage"
             android:src="@drawable/ic_speaker"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="parent"
@@ -31,7 +30,7 @@
 
         <ImageView
             android:id="@+id/ivWordClean"
-            style="@style/TranslationActionImage"
+            style="@style/WordInputActionImage"
             android:src="@drawable/ic_cross"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="parent" />
@@ -57,8 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_half"
-        android:layout_weight="2"
-        android:orientation="horizontal">
+        android:layout_weight="2">
 
         <ProgressBar
             android:id="@+id/pbLoading"
@@ -94,7 +92,6 @@
                 android:id="@+id/ivTranslationFullscreen"
                 style="@style/TranslationActionImage"
                 android:src="@drawable/ic_fullscreen" />
-
         </LinearLayout>
 
         <TextView
@@ -105,21 +102,42 @@
             android:padding="@dimen/margin_half"
             android:layout_toStartOf="@id/llTranslationButtons" />
 
-        <TextView
-            android:id="@+id/tvTranslationError"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/llTranslationError"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:paddingTop="@dimen/margin_full"
+            android:paddingStart="@dimen/margin_double"
+            android:paddingEnd="@dimen/margin_double"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center_horizontal">
 
-        <Button
-            android:id="@+id/btnRetry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Retry"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"/>
+            <TextView
+                android:id="@+id/tvTranslationErrorTitle"
+                style="@style/TextRegular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/tvTranslationErrorText"
+                style="@style/TextHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_half"
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/retry"
+                android:layout_marginTop="@dimen/margin_half"
+                android:layout_gravity="center"/>
+        </LinearLayout>
 
     </RelativeLayout>
 

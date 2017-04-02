@@ -12,14 +12,14 @@ public class ErrorResponse {
 
     @SerializedName("message")
     @Expose
-    private String mErrorMessage;
+    private String mMessage;
 
     public @ResponseErrorCodes
     Integer getCode() {
         return mCode;
     }
 
-    public String getErrorMessage() {
-        return mErrorMessage;
+    public String getMessage() {
+        return mMessage;
     }
 }

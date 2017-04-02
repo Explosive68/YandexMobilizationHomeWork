@@ -123,4 +123,20 @@
         <item>udm:Удмуртский</item>
     </string-array>
 
+    <string name="retry">Повторить</string>
+
+    <string name="error_title_simple">Ошибка</string>
+    <string name="error_title_authorization">Ошибка авторизации</string>
+    <string name="error_text_api_key_invalid">Неправильный API-ключ</string>
+    <string name="error_text_api_key_blocked">API-ключ заблокирован</string>
+    <string name="error_title_translation">Ошибка перевода</string>
+    <string name="error_text_day_limit_exceed">Превышено суточное ограничение на объем переведенного текста</string>
+    <string name="error_text_text_size_exceed">Превышен максимально допустимый размер текста</string>
+    <string name="error_text_untranslatable">Текст не может быть переведен</string>
+    <string name="error_text_direction_unsupported">Заданное направление перевода не поддерживается</string>
+    <string name="error_title_connection">Ошибка соединения</string>
+    <string name="error_text_connection">Не удалось выполнить запрос на сервер перевода. Проверьте подключение к интернету и повторите попытку</string>
+    <string name="error_title_unknown">Ой!</string>
+    <string name="error_text_unknown">При загрузке данных возникла неизвестная ошибка</string>
+
 </resources>
