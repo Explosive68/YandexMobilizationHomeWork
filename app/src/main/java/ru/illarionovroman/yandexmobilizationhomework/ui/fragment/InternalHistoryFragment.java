@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,16 +49,20 @@ public class InternalHistoryFragment extends Fragment implements LoaderManager.L
 
         Cursor historyCursor = Utils.DB.getAllHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), historyCursor);
-        mRvInternalHistory.setAdapter(mAdapter);
+        initializeRecyclerView(mAdapter);
 
         getActivity().getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null, this);
 
         return view;
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    private void initializeRecyclerView(HistoryCursorAdapter adapter) {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRvInternalHistory.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
+                layoutManager.getOrientation());
+        mRvInternalHistory.addItemDecoration(dividerItemDecoration);
+        mRvInternalHistory.setAdapter(adapter);
     }
 
     @Override

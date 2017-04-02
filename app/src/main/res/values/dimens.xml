@@ -4,9 +4,10 @@
     <dimen name="margin_half">8dp</dimen>
     <dimen name="margin_quarter">4dp</dimen>
 
-    <dimen name="image_size_normal">30dp</dimen>
+    <dimen name="image_size_normal">40dp</dimen>
     <dimen name="text_size_normal">16sp</dimen>
     <dimen name="progress_bar_size">48dp</dimen>
 
     <dimen name="list_item_height">48dp</dimen>
+    <dimen name="history_list_item_height">72dp</dimen>
 </resources>

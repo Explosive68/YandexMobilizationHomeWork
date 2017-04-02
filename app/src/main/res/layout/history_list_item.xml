@@ -1,50 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/list_item_height"
+    android:layout_height="@dimen/history_list_item_height"
     android:orientation="horizontal">
 
     <ToggleButton
         android:id="@+id/tbFavorite"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="0"
+        android:layout_width="@dimen/image_size_normal"
+        android:layout_height="@dimen/image_size_normal"
         android:background="@drawable/ic_favorite_toggle"
-        android:padding="5dp"
+        android:layout_marginStart="@dimen/margin_half"
+        android:layout_marginEnd="@dimen/margin_half"
+        android:textOff=""
         android:textOn=""
-        android:textOff=""/>
+        android:layout_gravity="center"/>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/tvOriginalWord"
-            android:layout_width="wrap_content"
+            style="@style/TextRegular"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:paddingEnd="5dp"/>
+            android:lines="1"
+            tools:text="Original"/>
 
         <TextView
             android:id="@+id/tvTranslation"
-            android:layout_width="wrap_content"
+            style="@style/TextHint"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:paddingEnd="5dp"/>
+            android:lines="1"
+            android:paddingTop="@dimen/margin_quarter"
+            tools:text="Translation"/>
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvTranslationDirection"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center_vertical|start"
         android:layout_weight="0"
-        android:padding="3dp"
-        android:textAllCaps="true"/>
+        android:gravity="center_vertical|start"
+        android:textAllCaps="true"
+        android:paddingEnd="@dimen/margin_full"
+        tools:text="EN - RU"/>
 </LinearLayout>

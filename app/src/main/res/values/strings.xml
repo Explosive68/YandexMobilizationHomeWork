@@ -18,6 +18,8 @@
     <string name="language_selection_title_from">Text language</string>
     <string name="language_selection_title_to">Translation language</string>
 
+    <string name="translation_share_intent_title">Send translation using application</string>
+
     <string name="default_language_from">English</string>
     <string name="default_language_to">Russian</string>
 
@@ -123,5 +125,9 @@
         <item>udm:Udmurt</item>
     </string-array>
     <string name="title_activity_choose_language">ChooseLanguageActivity</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 </resources>

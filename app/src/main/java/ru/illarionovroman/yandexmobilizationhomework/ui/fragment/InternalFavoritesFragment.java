@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,15 +49,22 @@ public class InternalFavoritesFragment extends Fragment implements LoaderManager
         View view = inflater.inflate(R.layout.fragment_internal_favorites, container, false);
         ButterKnife.bind(this, view);
 
-        mRvInternalFavorite.setLayoutManager(new LinearLayoutManager(getContext()));
-
         Cursor favoritesCursor = Utils.DB.getFavoriteHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
-        mRvInternalFavorite.setAdapter(mAdapter);
+        initializeRecyclerView(mAdapter);
 
         getActivity().getSupportLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
 
         return view;
+    }
+
+    private void initializeRecyclerView(HistoryCursorAdapter adapter) {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRvInternalFavorite.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
+                layoutManager.getOrientation());
+        mRvInternalFavorite.addItemDecoration(dividerItemDecoration);
+        mRvInternalFavorite.setAdapter(adapter);
     }
 
     /**

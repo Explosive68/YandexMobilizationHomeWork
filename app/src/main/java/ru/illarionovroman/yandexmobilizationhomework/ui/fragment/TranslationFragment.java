@@ -40,6 +40,7 @@ import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
 import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
@@ -49,8 +50,11 @@ public class TranslationFragment extends Fragment {
 
     public static final int REQUEST_CODE_LANGUAGE_FROM = 1;
     public static final int REQUEST_CODE_LANGUAGE_TO = 2;
+
     public static final String EXTRA_CURRENT_LANGUAGE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_CURRENT_LANGUAGE";
     public static final String EXTRA_REQUEST_CODE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_REQUEST_CODE";
+
+    private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
 
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
@@ -63,6 +67,12 @@ public class TranslationFragment extends Fragment {
     @BindView(R.id.pbLoading)
     ProgressBar mPbLoading;
 
+    @BindView(R.id.ivTranslationSpeaker)
+    ImageView mIvTranslationSpeaker;
+    @BindView(R.id.ivTranslationFavorite)
+    ImageView mIvTranslationFavorite;
+    @BindView(R.id.ivTranslationShare)
+    ImageView mIvTranslationShare;
     @BindView(R.id.ivTranslationFullscreen)
     ImageView mIvTranslationFullscreen;
 
@@ -157,6 +167,34 @@ public class TranslationFragment extends Fragment {
         prepareAndProcessTranslationRequest();
     }
 
+    @OnClick(R.id.ivWordClean)
+    public void cleanWordInput() {
+        mEtWordInput.setText("");
+    }
+
+    @OnClick(R.id.ivTranslationShare)
+    public void shareTranslation() {
+        String translation = mTvTranslation.getText().toString();
+        if (TextUtils.isEmpty(translation)) {
+            return;
+        }
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, translation);
+
+        Intent chooser = Intent.createChooser(shareIntent,
+                getString(R.string.translation_share_intent_title));
+
+        if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            getContext().startActivity(chooser);
+        }
+    }
+
+    @OnClick(R.id.ivTranslationFullscreen)
+    public void showFullScreen() {
+        startActivity(new Intent(getContext(), FullscreenActivity.class));
+    }
+
     private void prepareAndProcessTranslationRequest() {
         String inputText = mEtWordInput.getText().toString().trim();
         if (inputText.length() == 0) {
@@ -226,10 +264,12 @@ public class TranslationFragment extends Fragment {
 
         if (error instanceof HttpException) {
             try {
+                // Get real error code
                 Converter<ResponseBody, ErrorResponse> errorConverter = ApiManager.getRetrofitInstance()
                         .responseBodyConverter(ErrorResponse.class, new Annotation[0]);
                 ErrorResponse errorResponse = errorConverter
                         .convert(((HttpException) error).response().errorBody());
+                // Use code to show localized error
                 handleError(errorResponse.getCode(), errorResponse.getErrorMessage());
             } catch (IOException ex) {
                 showError("Unknown error: " + error.getMessage());
@@ -242,6 +282,9 @@ public class TranslationFragment extends Fragment {
         error.printStackTrace();
     }
 
+    /**
+     * Method for showing a localized error message by its code
+     */
     private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
         hideLoading();
 
@@ -279,7 +322,7 @@ public class TranslationFragment extends Fragment {
     private void showLoading() {
         mPbLoading.setVisibility(View.VISIBLE);
         mTvTranslation.setVisibility(View.GONE);
-        mLlTranslationButtons.setVisibility(View.GONE);
+        setTranslationButtonsEnabledState(false);
         mTvTranslationError.setVisibility(View.GONE);
     }
 
@@ -287,7 +330,21 @@ public class TranslationFragment extends Fragment {
         mPbLoading.setVisibility(View.GONE);
         mTvTranslation.setVisibility(View.VISIBLE);
         mLlTranslationButtons.setVisibility(View.VISIBLE);
+        setTranslationButtonsEnabledState(true);
         mTvTranslationError.setVisibility(View.GONE);
+    }
+
+    private void setTranslationButtonsEnabledState(boolean enabled) {
+        float alpha = enabled ? 1f : ALPHA_BUTTONS_DISABLED;
+
+        mIvTranslationSpeaker.setEnabled(enabled);
+        mIvTranslationSpeaker.setAlpha(alpha);
+        mIvTranslationFavorite.setEnabled(enabled);
+        mIvTranslationFavorite.setAlpha(alpha);
+        mIvTranslationShare.setEnabled(enabled);
+        mIvTranslationShare.setAlpha(alpha);
+        mIvTranslationFullscreen.setEnabled(enabled);
+        mIvTranslationFullscreen.setAlpha(alpha);
     }
 
     private void showError(String errorText) {

@@ -18,6 +18,8 @@
     <string name="language_selection_title_from">Язык текста</string>
     <string name="language_selection_title_to">Язык перевода</string>
 
+    <string name="translation_share_intent_title">Отправить перевод с помощью</string>
+
     <string name="default_language_from">Русский</string>
     <string name="default_language_to">Английский</string>
 
