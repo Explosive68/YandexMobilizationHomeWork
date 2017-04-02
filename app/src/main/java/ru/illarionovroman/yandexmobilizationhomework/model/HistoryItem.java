@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.models;
+package ru.illarionovroman.yandexmobilizationhomework.model;
 
 
 import android.content.ContentValues;

@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.activities;
+package ru.illarionovroman.yandexmobilizationhomework.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.adapters.LanguageSelectionAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment;
+import ru.illarionovroman.yandexmobilizationhomework.adapter.LanguageSelectionAdapter;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
 
 
 public class LanguageSelectionActivity extends AppCompatActivity

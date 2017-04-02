@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
+package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,8 +14,8 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.adapters.InternalPagerAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.adapter.InternalPagerAdapter;
+import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 
 
 public class HistoryFragment extends Fragment {

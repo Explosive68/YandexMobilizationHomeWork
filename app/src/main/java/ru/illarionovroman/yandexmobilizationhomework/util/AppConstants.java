@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.utils;
+package ru.illarionovroman.yandexmobilizationhomework.util;
 
 
 public class AppConstants {

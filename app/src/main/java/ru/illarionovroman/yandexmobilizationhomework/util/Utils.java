@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.utils;
+package ru.illarionovroman.yandexmobilizationhomework.util;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
-import ru.illarionovroman.yandexmobilizationhomework.models.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
 
 public class Utils {

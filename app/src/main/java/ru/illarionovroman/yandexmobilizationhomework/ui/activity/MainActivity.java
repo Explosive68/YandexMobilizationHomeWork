@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.activities;
+package ru.illarionovroman.yandexmobilizationhomework.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.IntDef;
@@ -15,9 +15,9 @@ import java.lang.annotation.RetentionPolicy;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.HistoryFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.SettingsFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.SettingsFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
 
 
 public class MainActivity extends AppCompatActivity {

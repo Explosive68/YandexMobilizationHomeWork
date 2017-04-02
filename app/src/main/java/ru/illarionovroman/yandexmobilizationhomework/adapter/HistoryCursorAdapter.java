@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.adapters;
+package ru.illarionovroman.yandexmobilizationhomework.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -13,8 +13,8 @@ import android.widget.ToggleButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.models.HistoryItem;
-import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 
 
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {

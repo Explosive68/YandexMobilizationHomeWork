@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
+package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -35,13 +35,13 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.HttpException;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.models.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.ErrorResponse;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.ResponseErrorCodes;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
-import ru.illarionovroman.yandexmobilizationhomework.ui.activities.LanguageSelectionActivity;
-import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
+import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
 

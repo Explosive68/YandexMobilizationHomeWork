@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.adapters;
+package ru.illarionovroman.yandexmobilizationhomework.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.utils.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 
 
 public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelectionAdapter.LanguageViewHolder> {

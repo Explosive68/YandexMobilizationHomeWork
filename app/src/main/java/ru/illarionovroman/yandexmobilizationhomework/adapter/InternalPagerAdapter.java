@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.adapters;
+package ru.illarionovroman.yandexmobilizationhomework.adapter;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.InternalFavoritesFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragments.InternalHistoryFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalFavoritesFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalHistoryFragment;
 
 
 public class InternalPagerAdapter extends FragmentPagerAdapter {

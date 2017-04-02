@@ -1,11 +1,9 @@
-package ru.illarionovroman.yandexmobilizationhomework.network.responses;
+package ru.illarionovroman.yandexmobilizationhomework.network.response;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class TranslationResponse {
+public class DetectLanguageResponse {
 
     @SerializedName("code")
     @Expose
@@ -13,9 +11,6 @@ public class TranslationResponse {
     @SerializedName("lang")
     @Expose
     private String mLang;
-    @SerializedName("text")
-    @Expose
-    private List<String> translations = new ArrayList<>();
 
     public Integer getCode() {
         return mCode;
@@ -31,14 +26,6 @@ public class TranslationResponse {
 
     public void setLang(String lang) {
         this.mLang = lang;
-    }
-
-    public List<String> getTranslations() {
-        return translations;
-    }
-
-    public void setTranslations(List<String> translations) {
-        this.translations = translations;
     }
 
 }

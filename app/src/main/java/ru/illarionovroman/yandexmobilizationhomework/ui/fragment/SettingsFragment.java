@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.fragments;
+package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

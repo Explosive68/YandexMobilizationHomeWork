@@ -3,9 +3,9 @@ package ru.illarionovroman.yandexmobilizationhomework.network;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.DetectLanguageResponse;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.SupportedLanguagesResponse;
-import ru.illarionovroman.yandexmobilizationhomework.network.responses.TranslationResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.DetectLanguageResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.SupportedLanguagesResponse;
+import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
 
 
 public interface TranslatorInterface {

@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.network.responses;
+package ru.illarionovroman.yandexmobilizationhomework.network.response;
 
 import java.util.ArrayList;
 import java.util.List;

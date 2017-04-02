@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.network.responses;
+package ru.illarionovroman.yandexmobilizationhomework.network.response;
 
 import android.support.annotation.IntDef;
 

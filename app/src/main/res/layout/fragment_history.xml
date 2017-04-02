@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragments.HistoryFragment">
+    tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpInternal"
