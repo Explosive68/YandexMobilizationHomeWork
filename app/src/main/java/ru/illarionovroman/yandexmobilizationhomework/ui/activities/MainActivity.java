@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -58,9 +59,10 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             @FragmentPosition int restoredPosition = savedInstanceState.getInt(BOTTOM_NAVIGATION_POSITION,
                     FragmentPosition.TRANSLATION);
-            replaceFragmentAndUpdateActionBar(restoredPosition);
+            replaceFragmentAndUpdateActionBar(restoredPosition, false);
         } else {
-            replaceFragmentAndUpdateActionBar(FragmentPosition.TRANSLATION);
+            replaceFragmentAndUpdateActionBar(FragmentPosition.TRANSLATION, false);
+
         }
 
         mBnvMain.setOnNavigationItemSelectedListener(this::navigateToItem);
@@ -92,10 +94,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceFragmentAndUpdateActionBar(@FragmentPosition int newPosition) {
-        replaceFragment(newPosition);
+    private void replaceFragmentAndUpdateActionBar(@FragmentPosition int newPosition,
+                                                   boolean isAnimated) {
+        replaceFragment(newPosition, isAnimated);
         updateActionBar(newPosition);
         mCurrentFragmentPosition = newPosition;
+    }
+
+    private void replaceFragmentAndUpdateActionBar(@FragmentPosition int newPosition) {
+        replaceFragmentAndUpdateActionBar(newPosition, true);
     }
 
     /**
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param newPosition position of fragment to show
      */
-    private void replaceFragment(@FragmentPosition int newPosition) {
+    private void replaceFragment(@FragmentPosition int newPosition, boolean isAnimated) {
         Fragment newFragment;
         switch (newPosition) {
             case FragmentPosition.TRANSLATION:
@@ -119,12 +126,15 @@ public class MainActivity extends AppCompatActivity {
                 throw new IllegalArgumentException("Unacceptable fragment position: " + newPosition);
         }
 
-        AnimationDirection animDirection = getAnimationDirection(newPosition, mCurrentFragmentPosition);
-
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(animDirection.getFrom(), animDirection.getTo())
-                .replace(R.id.flFragmentContainer, newFragment, newFragment.getClass().toString())
-                .commit();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        if (isAnimated) {
+            AnimationDirection animDirection = getAnimationDirection(newPosition,
+                    mCurrentFragmentPosition);
+            ft.setCustomAnimations(animDirection.getEnter(), animDirection.getExit(),
+                    animDirection.getPopEnter(), animDirection.getPopExit());
+        }
+        ft.replace(R.id.flFragmentContainer, newFragment, newFragment.getClass().toString());
+        ft.commit();
     }
 
     private void updateActionBar(@FragmentPosition int newPosition) {
@@ -164,23 +174,37 @@ public class MainActivity extends AppCompatActivity {
      * Enum to store possible animation directions with their resources for 'enter' and 'exit'
      */
     private enum AnimationDirection {
-        FROM_LEFT_TO_RIGHT(R.anim.enter_from_left, R.anim.exit_to_right),
-        FROM_RIGHT_TO_LEFT(R.anim.enter_from_right, R.anim.exit_to_left);
+        FROM_LEFT_TO_RIGHT(R.anim.enter_from_left, R.anim.exit_to_right,
+                R.anim.enter_from_left, R.anim.exit_to_right),
+        FROM_RIGHT_TO_LEFT(R.anim.enter_from_right, R.anim.exit_to_left,
+                R.anim.enter_from_right, R.anim.exit_to_left);
 
-        private int mFrom;
-        private int mTo;
+        private int mEnter;
+        private int mExit;
+        private int mPopEnter;
+        private int mPopExit;
 
-        AnimationDirection(int from, int to) {
-            mFrom = from;
-            mTo = to;
+        AnimationDirection(int enter, int exit, int popEnter, int popExit) {
+            mEnter = enter;
+            mExit = exit;
+            mPopEnter = popEnter;
+            mPopExit = popExit;
         }
 
-        public int getFrom() {
-            return mFrom;
+        public int getEnter() {
+            return mEnter;
         }
 
-        public int getTo() {
-            return mTo;
+        public int getExit() {
+            return mExit;
+        }
+
+        public int getPopEnter() {
+            return mPopEnter;
+        }
+
+        public int getPopExit() {
+            return mPopExit;
         }
     }
 
