@@ -11,14 +11,20 @@ import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 
 
 public class HistoryItem implements Parcelable {
+    
+    public static final long UNSPECIFIED_ID = -1;
 
-    private long mId = -1;
+    private long mId = UNSPECIFIED_ID;
     private String mWord;
     private String mTranslation;
     private String mLanguageFrom;
     private String mLanguageTo;
     private String mDate = null;
     private int mIsFavorite = -1;
+    
+    // Specially for RxJava2, because nulls are forbidden
+    public HistoryItem() {
+    }
 
     public HistoryItem(String word, String translation, String languageFrom, String languageTo) {
         this.mWord = word;

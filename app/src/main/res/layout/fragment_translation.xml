@@ -11,7 +11,9 @@
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_half"
         android:layout_weight="1"
-        android:background="@drawable/border">
+        android:background="@drawable/border"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
         <ImageView
             android:id="@+id/ivWordMic"
@@ -81,7 +83,7 @@
             <ImageView
                 android:id="@+id/ivTranslationFavorite"
                 style="@style/TranslationActionImage"
-                android:src="@drawable/ic_favorite" />
+                android:src="@drawable/ic_favorite_toggle_activated" />
 
             <ImageView
                 android:id="@+id/ivTranslationShare"

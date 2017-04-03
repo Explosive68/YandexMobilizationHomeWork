@@ -44,6 +44,49 @@ public class Utils {
                     Contract.HistoryEntry.DATE);
         }
 
+        public static HistoryItem getHistoryItemByWord(Context context, String word) {
+            HistoryItem item = null;
+
+            Uri searchWordUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
+                    .appendPath(word).build();
+            Cursor cursor =  context.getContentResolver().query(
+                    searchWordUri,
+                    null,
+                    null,
+                    null,
+                    null);
+
+            if (cursor != null) {
+                if (cursor.moveToNext()) {
+                    item = new HistoryItem(cursor);
+                }
+                cursor.close();
+            }
+            return item;
+        }
+
+        public static HistoryItem getHistoryItemById(Context context, long id) {
+            HistoryItem item = null;
+
+            String strId = String.valueOf(id);
+            Uri searchIdUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
+                    .appendPath(strId).build();
+            Cursor cursor =  context.getContentResolver().query(
+                    searchIdUri,
+                    null,
+                    null,
+                    null,
+                    null);
+
+            if (cursor != null) {
+                if (cursor.moveToNext()) {
+                    item = new HistoryItem(cursor);
+                }
+                cursor.close();
+            }
+            return item;
+        }
+
         public static long addHistoryItem(Context context, HistoryItem item) {
             Uri uri = context.getContentResolver().insert(
                     Contract.HistoryEntry.CONTENT_URI_HISTORY, item.toContentValues());

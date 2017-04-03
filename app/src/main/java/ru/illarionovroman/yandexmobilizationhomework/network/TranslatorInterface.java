@@ -1,6 +1,7 @@
 package ru.illarionovroman.yandexmobilizationhomework.network;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.DetectLanguageResponse;
@@ -30,7 +31,7 @@ public interface TranslatorInterface {
      * @return Translated text
      */
     @GET("translate")
-    Observable<TranslationResponse> getTranslation(@Query("text") String text,
-                                                   @Query("lang") String langFromTo,
-                                                   @Query("format") String format);
+    Single<TranslationResponse> getTranslation(@Query("text") String text,
+                                               @Query("lang") String langFromTo,
+                                               @Query("format") String format);
 }

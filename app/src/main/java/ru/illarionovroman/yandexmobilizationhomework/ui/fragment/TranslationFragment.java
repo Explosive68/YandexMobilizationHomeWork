@@ -28,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -86,6 +87,7 @@ public class TranslationFragment extends Fragment {
     private ImageView mIvSwapLanguages;
 
     private CompositeDisposable mDisposables;
+    private HistoryItem mCurrentItem;
 
     public TranslationFragment() {
     }
@@ -143,132 +145,65 @@ public class TranslationFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK) {
-            String resultLangCode = data.getStringExtra(LanguageSelectionActivity.EXTRA_RESULT);
-            String selectedLangName = Utils.getLangNameByCode(getContext(), resultLangCode);
-            if (requestCode == REQUEST_CODE_LANGUAGE_FROM) {
-                mTvLanguageFrom.setText(selectedLangName);
-            } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
-                mTvLanguageTo.setText(selectedLangName);
-            }
-            prepareAndProcessTranslationRequest();
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     @NonNull
     private Disposable createDisposableInputWatcher() {
         return RxTextView.textChanges(mEtWordInput)
+                // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
+                .map(String::valueOf)
+                .distinctUntilChanged()
                 .debounce(1, TimeUnit.SECONDS)
+                .filter(inputText -> !TextUtils.isEmpty(inputText))
+                .filter(inputText -> {
+                    if (mCurrentItem != null && inputText.equals(mCurrentItem.getWord())) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(textToTranslate -> {
-                    prepareAndProcessTranslationRequest();
-                });
+                .subscribe(this::updateHistoryItem);
     }
 
-    @OnClick(R.id.btnRetry)
-    public void retry() {
-        prepareAndProcessTranslationRequest();
-    }
-
-    @OnClick(R.id.ivWordClean)
-    public void cleanWordInput() {
-        mEtWordInput.setText("");
-    }
-
-    @OnClick(R.id.ivTranslationShare)
-    public void shareTranslation() {
-        String translation = mTvTranslation.getText().toString();
-        if (TextUtils.isEmpty(translation)) {
-            return;
-        }
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, translation);
-
-        Intent chooser = Intent.createChooser(shareIntent,
-                getString(R.string.translation_share_intent_title));
-
-        if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
-            getContext().startActivity(chooser);
-        }
-    }
-
-    @OnClick(R.id.ivTranslationFullscreen)
-    public void showFullScreen() {
-        startActivity(new Intent(getContext(), FullscreenActivity.class));
-    }
-
-    private void prepareAndProcessTranslationRequest() {
-        String inputText = mEtWordInput.getText().toString().trim();
-        if (inputText.length() == 0) {
-            return;
-        }
-
+    private void updateHistoryItem(String inputText) {
         showLoading();
 
-        String langFromTo = buildTranslationLangParam();
-        Observable<TranslationResponse> translationResponseObservable = ApiManager
-                .getApiInterfaceInstance().getTranslation(inputText, langFromTo, null);
+        final String wordToTranslate = inputText.trim();
+        Observable<HistoryItem> historyItemObservable =
+                Observable.just(wordToTranslate)
+                        .map(sameWord -> {
+                            // Try to find this word in database
+                            HistoryItem historyItem = Utils.DB.getHistoryItemByWord(getContext(),
+                                    sameWord);
+                            if (historyItem == null) {
+                                historyItem = new HistoryItem();
+                            }
+                            return historyItem;
+                        })
+                        .map(historyItem -> {
+                            // If not found - do network request
+                            if (historyItem.getId() == HistoryItem.UNSPECIFIED_ID) {
+                                historyItem = getHistoryItemFromServer(wordToTranslate);
+                            }
+                            return historyItem;
+                        })
+                        // Do the work with DB and network in another thread
+                        .subscribeOn(Schedulers.io())
+                        // Show result in ui thread
+                        .observeOn(AndroidSchedulers.mainThread());
 
-        mDisposables.add(translationResponseObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleTranslateResponse, this::handleTranslateError)
-        );
+        mDisposables.add(historyItemObservable
+                .subscribe(this::handleHistoryItemUpdate, this::handleTranslateError));
     }
 
-    private String buildTranslationLangParam() {
-        String codeLangFrom = getCurrentCodeLanguageFrom();
-        String codeLangTo = getCurrentCodeLanguageTo();
-        return getString(R.string.translate_query_param_language_from_to,
-                codeLangFrom, codeLangTo);
-    }
-
-    private String getCurrentCodeLanguageFrom() {
-        if (mTvLanguageFrom != null) {
-            String nameLangFrom = mTvLanguageFrom.getText().toString();
-            return Utils.getLangCodeByName(getContext(), nameLangFrom);
-        } else {
-            return "";
-        }
-    }
-
-    private String getCurrentCodeLanguageTo() {
-        if (mTvLanguageTo != null) {
-            String nameLangTo = mTvLanguageTo.getText().toString();
-            return Utils.getLangCodeByName(getContext(), nameLangTo);
-        } else {
-            return "";
-        }
-    }
-
-    private void handleTranslateResponse(TranslationResponse response) {
-        hideLoading();
-
-        StringBuilder translationBuilder = new StringBuilder();
-        for (int i = 0; i < response.getTranslations().size(); i++) {
-            translationBuilder.append(response.getTranslations().get(i));
-        }
-        mTvTranslation.setText(translationBuilder.toString());
-
-        HistoryItem item = new HistoryItem(
-                mEtWordInput.getText().toString(),
-                translationBuilder.toString(),
-                getCurrentCodeLanguageFrom(),
-                getCurrentCodeLanguageTo()
-        );
-        long id = Utils.DB.addHistoryItem(getContext(), item);
-
-        Toast.makeText(getContext(), "id = " + id, Toast.LENGTH_SHORT).show();
+    private void handleHistoryItemUpdate(HistoryItem item) {
+        mCurrentItem = item;
+        showHistoryItemTranslation(item);
+        Toast.makeText(getContext(), "id = " + item.getId(), Toast.LENGTH_SHORT).show();
     }
 
     private void handleTranslateError(Throwable error) {
-        hideLoading();
+        showTranslationViews();
 
         if (error instanceof HttpException) {
             try {
@@ -299,10 +234,105 @@ public class TranslationFragment extends Fragment {
     }
 
     /**
+     * Use this method in background thread only
+     * @param wordToTranslate
+     * @return {@link HistoryItem}
+     */
+    private HistoryItem getHistoryItemFromServer(String wordToTranslate) {
+        String langFromTo = buildTranslationLangParam();
+
+        // Perform blocking network request
+        Single<TranslationResponse> translationResponseObservable = ApiManager
+                .getApiInterfaceInstance().getTranslation(wordToTranslate, langFromTo, null);
+        TranslationResponse response = translationResponseObservable.blockingGet();
+
+        // May be this is overhead to use builder here, but let it be just in case
+        StringBuilder translationBuilder = new StringBuilder();
+        for (int i = 0; i < response.getTranslations().size(); i++) {
+            translationBuilder.append(response.getTranslations().get(i));
+        }
+
+        // Create incomplete item
+        HistoryItem item = new HistoryItem(
+                wordToTranslate,
+                translationBuilder.toString(),
+                getCurrentCodeLanguageFrom(),
+                getCurrentCodeLanguageTo()
+        );
+        // Write it to DB
+        long id = Utils.DB.addHistoryItem(getContext(), item);
+        // Now we can get the completed item
+        HistoryItem resultItem = Utils.DB.getHistoryItemById(getContext(), id);
+        return resultItem;
+    }
+
+    private String buildTranslationLangParam() {
+        String codeLangFrom = getCurrentCodeLanguageFrom();
+        String codeLangTo = getCurrentCodeLanguageTo();
+        return getString(R.string.translate_query_param_language_from_to,
+                codeLangFrom, codeLangTo);
+    }
+
+    private void showHistoryItemTranslation(HistoryItem item) {
+        mTvTranslation.setText(item.getTranslation());
+        showTranslationViews();
+        mIvTranslationFavorite.setActivated(item.getIsFavorite());
+    }
+
+    @OnClick(R.id.btnRetry)
+    public void retry() {
+        updateHistoryItem(mEtWordInput.getText().toString());
+    }
+
+    @OnClick(R.id.ivWordClean)
+    public void cleanWordInput() {
+        mEtWordInput.setText("");
+    }
+
+    @OnClick(R.id.ivTranslationFavorite)
+    public void toggleTranslationFavorite() {
+        if (mCurrentItem != null) {
+            boolean activated = mIvTranslationFavorite.isActivated();
+            if (activated) {
+                mCurrentItem.setIsFavorite(false);
+                Utils.DB.updateHistoryItem(getContext(), mCurrentItem);
+                mIvTranslationFavorite.setActivated(false);
+            } else {
+                mCurrentItem.setIsFavorite(true);
+                Utils.DB.updateHistoryItem(getContext(), mCurrentItem);
+                mIvTranslationFavorite.setActivated(true);
+            }
+        }
+    }
+
+    @OnClick(R.id.ivTranslationShare)
+    public void shareTranslation() {
+        String translation = mTvTranslation.getText().toString();
+        if (TextUtils.isEmpty(translation)) {
+            return;
+        }
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, translation);
+
+        Intent chooser = Intent.createChooser(shareIntent,
+                getString(R.string.translation_share_intent_title));
+
+        if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            getContext().startActivity(chooser);
+        }
+    }
+
+    @OnClick(R.id.ivTranslationFullscreen)
+    public void showFullScreen() {
+        startActivity(new Intent(getContext(), FullscreenActivity.class));
+    }
+
+    /**
      * Method for showing a localized error message by its code
      */
     private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
-        hideLoading();
+        showTranslationViews();
 
         switch (errorCode) {
             case ResponseErrorCodes.API_KEY_BLOCKED:
@@ -337,6 +367,44 @@ public class TranslationFragment extends Fragment {
         Timber.d("handleError: errorCode=" + errorCode + ", msg=" + errorMessage);
     }
 
+    /**
+     * Method for processing language selection
+     * @param data Intent, which contains code of selected language
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            String resultLangCode = data.getStringExtra(LanguageSelectionActivity.EXTRA_RESULT);
+            String selectedLangName = Utils.getLangNameByCode(getContext(), resultLangCode);
+            if (requestCode == REQUEST_CODE_LANGUAGE_FROM) {
+                mTvLanguageFrom.setText(selectedLangName);
+            } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
+                mTvLanguageTo.setText(selectedLangName);
+            }
+            updateHistoryItem(mEtWordInput.getText().toString());
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private String getCurrentCodeLanguageFrom() {
+        if (mTvLanguageFrom != null) {
+            String nameLangFrom = mTvLanguageFrom.getText().toString();
+            return Utils.getLangCodeByName(getContext(), nameLangFrom);
+        } else {
+            return "";
+        }
+    }
+
+    private String getCurrentCodeLanguageTo() {
+        if (mTvLanguageTo != null) {
+            String nameLangTo = mTvLanguageTo.getText().toString();
+            return Utils.getLangCodeByName(getContext(), nameLangTo);
+        } else {
+            return "";
+        }
+    }
+
     private void showLoading() {
         mPbLoading.setVisibility(View.VISIBLE);
         mTvTranslation.setVisibility(View.GONE);
@@ -344,7 +412,7 @@ public class TranslationFragment extends Fragment {
         mLlTranslationError.setVisibility(View.GONE);
     }
 
-    private void hideLoading() {
+    private void showTranslationViews() {
         mPbLoading.setVisibility(View.GONE);
         mTvTranslation.setVisibility(View.VISIBLE);
         mLlTranslationButtons.setVisibility(View.VISIBLE);

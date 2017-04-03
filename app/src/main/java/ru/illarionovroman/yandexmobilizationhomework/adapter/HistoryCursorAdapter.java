@@ -43,7 +43,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
     private void bindHolderItem(HistoryViewHolder holder, HistoryItem item) {
         holder.itemView.setTag(item.getId());
         holder.tvOriginalWord.setText(item.getWord());
-        holder.tvTranslation.setText(item.getTranslation() + item.getDate());
+        holder.tvTranslation.setText(item.getTranslation());
         holder.tvTranslationDirection.setText(item.getLanguageFrom() + " - " + item.getLanguageTo());
         String translationDirection = String.format(
                 mContext.getString(R.string.language_from_to),
@@ -62,6 +62,10 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
         // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)
+        holder.itemView.setOnClickListener(holderItemView -> {
+            Toast.makeText(mContext, "tag = " + holder.itemView.getTag() +
+                    ", date = " + item.getDate(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
