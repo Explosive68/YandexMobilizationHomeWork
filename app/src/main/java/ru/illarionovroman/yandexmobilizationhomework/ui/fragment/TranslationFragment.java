@@ -27,16 +27,17 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.HttpException;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
@@ -57,6 +58,7 @@ public class TranslationFragment extends Fragment {
     public static final String EXTRA_REQUEST_CODE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_REQUEST_CODE";
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
+    public static final int USER_INPUT_UPDATE_TIMEOUT_SECONDS = 2;
 
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
@@ -107,16 +109,20 @@ public class TranslationFragment extends Fragment {
     }
 
     private void initializeFragment() {
+        initializeActionBarItems();
+
+        mDisposables = new CompositeDisposable();
+        mDisposables.add(createDisposableUserInputWatcher());
+    }
+
+    private void initializeActionBarItems() {
         mTvLanguageFrom = ButterKnife.findById(getActivity(), R.id.tvLanguageFrom);
         mTvLanguageTo = ButterKnife.findById(getActivity(), R.id.tvLanguageTo);
         mIvSwapLanguages = ButterKnife.findById(getActivity(), R.id.ivSwapLanguages);
-        setLanguageSelectionClickListeners();
-
-        mDisposables = new CompositeDisposable();
-        mDisposables.add(createDisposableInputWatcher());
+        setActionBarClickListeners();
     }
 
-    private void setLanguageSelectionClickListeners() {
+    private void setActionBarClickListeners() {
         mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
             Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
             intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
@@ -145,15 +151,22 @@ public class TranslationFragment extends Fragment {
         });
     }
 
+    /**
+     * Rx watcher for user input in the EditText. After every valid update initiates translation
+     * loading procedure
+     * @return
+     */
     @NonNull
-    private Disposable createDisposableInputWatcher() {
+    private Disposable createDisposableUserInputWatcher() {
         return RxTextView.textChanges(mEtWordInput)
                 // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
                 .map(String::valueOf)
+                .map(String::trim)
                 .distinctUntilChanged()
-                .debounce(1, TimeUnit.SECONDS)
+                .debounce(USER_INPUT_UPDATE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .filter(inputText -> !TextUtils.isEmpty(inputText))
                 .filter(inputText -> {
+                    // Don't pass if the same item is currently displayed
                     if (mCurrentItem != null && inputText.equals(mCurrentItem.getWord())) {
                         return false;
                     } else {
@@ -165,44 +178,96 @@ public class TranslationFragment extends Fragment {
                 .subscribe(this::updateHistoryItem);
     }
 
-    private void updateHistoryItem(String inputText) {
+    /**
+     * We use reactivex.Single here,
+     * since there could be either just one resulting item or failure
+     */
+    private void updateHistoryItem(String wordToTranslate) {
         showLoading();
 
-        final String wordToTranslate = inputText.trim();
-        Observable<HistoryItem> historyItemObservable =
-                Observable.just(wordToTranslate)
-                        .map(sameWord -> {
-                            // Try to find this word in database
-                            HistoryItem historyItem = Utils.DB.getHistoryItemByWord(getContext(),
-                                    sameWord);
-                            if (historyItem == null) {
-                                historyItem = new HistoryItem();
-                            }
-                            return historyItem;
-                        })
-                        .map(historyItem -> {
-                            // If not found - do network request
-                            if (historyItem.getId() == HistoryItem.UNSPECIFIED_ID) {
-                                historyItem = getHistoryItemFromServer(wordToTranslate);
-                            }
-                            return historyItem;
-                        })
-                        // Do the work with DB and network in another thread
-                        .subscribeOn(Schedulers.io())
-                        // Show result in ui thread
-                        .observeOn(AndroidSchedulers.mainThread());
+        Single<HistoryItem> historyItemObservable =
+                createHistoryItemUpdateSingle(wordToTranslate);
 
         mDisposables.add(historyItemObservable
-                .subscribe(this::handleHistoryItemUpdate, this::handleTranslateError));
+                .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
     }
 
-    private void handleHistoryItemUpdate(HistoryItem item) {
+    /**
+     * The common scheme is as follows: at first, we are trying to get translation from DB,
+     * if there is no such translation that we are looking for, then try to get it from the server
+     * @param wordToTranslate
+     * @return
+     */
+    private Single<HistoryItem> createHistoryItemUpdateSingle(final String wordToTranslate) {
+        return Single.just(wordToTranslate)
+                .flatMap(new Function<String, Single<HistoryItem>>() {
+                    @Override
+                    public Single<HistoryItem> apply(String word) throws Exception {
+                        // Try to find this word in database
+                        HistoryItem historyItem = DBManager.getHistoryItemByWord(getContext(),
+                                word);
+                        if (historyItem == null) {
+                            historyItem = new HistoryItem();
+                        }
+                        return Single.just(historyItem);
+                    }
+                })
+                .flatMap(new Function<HistoryItem, Single<HistoryItem>>() {
+                    @Override
+                    public Single<HistoryItem> apply(HistoryItem historyItem) throws Exception {
+                        if (historyItem.getId() != HistoryItem.UNSPECIFIED_ID) {
+                            // If found in DB - just return
+                            return Single.just(historyItem);
+                        } else {
+                            // If not found - do network request
+                            return createHistoryItemFromNetworkSingle(wordToTranslate);
+                        }
+                    }
+                })
+                // Do the work with DB and network in another thread
+                .subscribeOn(Schedulers.io())
+                // Show result in ui thread
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * Perform network request, transform response to desired HistoryItem. This is reachable
+     * only through DB write and read to obtain autogenerated item's ID and Date
+     */
+    private Single<HistoryItem> createHistoryItemFromNetworkSingle(String wordToTranslate) {
+        String langFromTo = buildTranslationLangParam();
+
+        Single<HistoryItem> historyItemSingle = ApiManager.getApiInterfaceInstance()
+                .getTranslation(wordToTranslate, langFromTo, null)
+                .map(translationResponse -> {
+                    // Pull data from response
+                    StringBuilder translationBuilder = new StringBuilder();
+                    for (int i = 0; i < translationResponse.getTranslations().size(); i++) {
+                        translationBuilder.append(translationResponse.getTranslations().get(i));
+                    }
+                    // Create incomplete item
+                    HistoryItem item = new HistoryItem(
+                            wordToTranslate,
+                            translationBuilder.toString(),
+                            getCurrentCodeLanguageFrom(),
+                            getCurrentCodeLanguageTo()
+                    );
+                    // Write it to DB
+                    long id = DBManager.addHistoryItem(getContext(), item);
+                    // Now we can get the completed item
+                    HistoryItem resultItem = DBManager.getHistoryItemById(getContext(), id);
+                    return resultItem;
+                });
+        return historyItemSingle;
+    }
+
+    private void handleTranslationSuccess(HistoryItem item) {
         mCurrentItem = item;
         showHistoryItemTranslation(item);
         Toast.makeText(getContext(), "id = " + item.getId(), Toast.LENGTH_SHORT).show();
     }
 
-    private void handleTranslateError(Throwable error) {
+    private void handleTranslationError(Throwable error) {
         showTranslationViews();
 
         if (error instanceof HttpException) {
@@ -260,12 +325,16 @@ public class TranslationFragment extends Fragment {
                 getCurrentCodeLanguageTo()
         );
         // Write it to DB
-        long id = Utils.DB.addHistoryItem(getContext(), item);
+        long id = DBManager.addHistoryItem(getContext(), item);
         // Now we can get the completed item
-        HistoryItem resultItem = Utils.DB.getHistoryItemById(getContext(), id);
+        HistoryItem resultItem = DBManager.getHistoryItemById(getContext(), id);
         return resultItem;
     }
 
+    /**
+     * Method for building parameter for translation request using currently selected languages.
+     * @return E.g.: "ru-en", "en-ru", etc.
+     */
     private String buildTranslationLangParam() {
         String codeLangFrom = getCurrentCodeLanguageFrom();
         String codeLangTo = getCurrentCodeLanguageTo();
@@ -274,9 +343,10 @@ public class TranslationFragment extends Fragment {
     }
 
     private void showHistoryItemTranslation(HistoryItem item) {
+        mEtWordInput.setText(item.getWord());
         mTvTranslation.setText(item.getTranslation());
-        showTranslationViews();
         mIvTranslationFavorite.setActivated(item.getIsFavorite());
+        showTranslationViews();
     }
 
     @OnClick(R.id.btnRetry)
@@ -295,11 +365,11 @@ public class TranslationFragment extends Fragment {
             boolean activated = mIvTranslationFavorite.isActivated();
             if (activated) {
                 mCurrentItem.setIsFavorite(false);
-                Utils.DB.updateHistoryItem(getContext(), mCurrentItem);
+                DBManager.updateHistoryItem(getContext(), mCurrentItem);
                 mIvTranslationFavorite.setActivated(false);
             } else {
                 mCurrentItem.setIsFavorite(true);
-                Utils.DB.updateHistoryItem(getContext(), mCurrentItem);
+                DBManager.updateHistoryItem(getContext(), mCurrentItem);
                 mIvTranslationFavorite.setActivated(true);
             }
         }

@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
 public class InternalFavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -49,7 +49,7 @@ public class InternalFavoritesFragment extends Fragment implements LoaderManager
         View view = inflater.inflate(R.layout.fragment_internal_favorites, container, false);
         ButterKnife.bind(this, view);
 
-        Cursor favoritesCursor = Utils.DB.getFavoriteHistoryItemsCursor(getContext());
+        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
         initializeRecyclerView(mAdapter);
 
@@ -81,7 +81,7 @@ public class InternalFavoritesFragment extends Fragment implements LoaderManager
         if (!isVisibleToUser) {
             Context context = getContext();
             if (context != null && mAdapter != null) {
-                Cursor favoritesCursor = Utils.DB.getFavoriteHistoryItemsCursor(context);
+                Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(context);
                 mAdapter.swapCursor(favoritesCursor);
             }
         }

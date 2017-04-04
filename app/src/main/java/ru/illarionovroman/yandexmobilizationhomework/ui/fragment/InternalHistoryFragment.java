@@ -2,7 +2,6 @@ package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,7 +18,7 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
 public class InternalHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -47,7 +46,7 @@ public class InternalHistoryFragment extends Fragment implements LoaderManager.L
 
         mRvInternalHistory.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        Cursor historyCursor = Utils.DB.getAllHistoryItemsCursor(getContext());
+        Cursor historyCursor = DBManager.getAllHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), historyCursor);
         initializeRecyclerView(mAdapter);
 

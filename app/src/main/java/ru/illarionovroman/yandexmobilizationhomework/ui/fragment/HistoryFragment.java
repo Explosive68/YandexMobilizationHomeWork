@@ -15,7 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.InternalPagerAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
 public class HistoryFragment extends Fragment {
@@ -93,7 +93,7 @@ public class HistoryFragment extends Fragment {
                 .setTitle(R.string.history_title)
                 .setMessage(R.string.dialog_delete_history_message)
                 .setPositiveButton(android.R.string.yes, ((dialog1, which) -> {
-                    Utils.DB.deleteAllHistory(getContext());
+                    DBManager.deleteAllHistory(getContext());
                 }))
                 .setNegativeButton(android.R.string.cancel, ((dialog1, which) -> {
                     // Do nothing
@@ -107,7 +107,7 @@ public class HistoryFragment extends Fragment {
                 .setTitle(R.string.favorites_title)
                 .setMessage(R.string.dialog_delete_favorites_message)
                 .setPositiveButton(android.R.string.yes, ((dialog1, which) -> {
-                    Utils.DB.deleteAllFavorites(getContext());
+                    DBManager.deleteAllFavorites(getContext());
                 }))
                 .setNegativeButton(android.R.string.cancel, ((dialog1, which) -> {
                     // Do nothing

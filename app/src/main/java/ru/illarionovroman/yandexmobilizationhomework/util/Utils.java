@@ -1,9 +1,6 @@
 package ru.illarionovroman.yandexmobilizationhomework.util;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
@@ -14,105 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
-import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
 
 public class Utils {
 
     // Use LinkedHashMap to save items order
     private static LinkedHashMap<String,String> sLanguagesMap = new LinkedHashMap<>();
-
-    public static class DB {
-        private static final String WHERE_ARG_PLACEHOLDER = "=?";
-
-        public static Cursor getAllHistoryItemsCursor(Context context) {
-            return context.getContentResolver().query(
-                    Contract.HistoryEntry.CONTENT_URI_HISTORY,
-                    null,
-                    null,
-                    null,
-                    Contract.HistoryEntry.DATE);
-        }
-
-        public static Cursor getFavoriteHistoryItemsCursor(Context context) {
-            return context.getContentResolver().query(
-                    Contract.HistoryEntry.CONTENT_URI_FAVORITES,
-                    null,
-                    null,
-                    null,
-                    Contract.HistoryEntry.DATE);
-        }
-
-        public static HistoryItem getHistoryItemByWord(Context context, String word) {
-            HistoryItem item = null;
-
-            Uri searchWordUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
-                    .appendPath(word).build();
-            Cursor cursor =  context.getContentResolver().query(
-                    searchWordUri,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            if (cursor != null) {
-                if (cursor.moveToNext()) {
-                    item = new HistoryItem(cursor);
-                }
-                cursor.close();
-            }
-            return item;
-        }
-
-        public static HistoryItem getHistoryItemById(Context context, long id) {
-            HistoryItem item = null;
-
-            String strId = String.valueOf(id);
-            Uri searchIdUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
-                    .appendPath(strId).build();
-            Cursor cursor =  context.getContentResolver().query(
-                    searchIdUri,
-                    null,
-                    null,
-                    null,
-                    null);
-
-            if (cursor != null) {
-                if (cursor.moveToNext()) {
-                    item = new HistoryItem(cursor);
-                }
-                cursor.close();
-            }
-            return item;
-        }
-
-        public static long addHistoryItem(Context context, HistoryItem item) {
-            Uri uri = context.getContentResolver().insert(
-                    Contract.HistoryEntry.CONTENT_URI_HISTORY, item.toContentValues());
-            return ContentUris.parseId(uri);
-        }
-
-        public static int deleteAllHistory(Context context) {
-            Uri uri = Contract.HistoryEntry.CONTENT_URI_HISTORY;
-            int deletedCount = context.getContentResolver().delete(uri, null, null);
-            return deletedCount;
-        }
-
-        public static int deleteAllFavorites(Context context) {
-            Uri uri = Contract.HistoryEntry.CONTENT_URI_FAVORITES;
-            int deletedCount = context.getContentResolver().delete(uri, null, null);
-            return deletedCount;
-        }
-
-        public static int updateHistoryItem(Context context, HistoryItem item) {
-            String where = Contract.HistoryEntry._ID + WHERE_ARG_PLACEHOLDER;
-            String[] args = new String[]{String.valueOf(item.getId())};
-            int updatedCount = context.getContentResolver()
-                    .update(Contract.HistoryEntry.CONTENT_URI_HISTORY, item.toContentValues(), where, args);
-            return updatedCount;
-        }
-    }
 
     // Lazy one-time initialization
     public static LinkedHashMap<String, String> getLanguagesMap(Context context) {

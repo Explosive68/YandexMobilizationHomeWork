@@ -13,8 +13,8 @@ import android.widget.ToggleButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 
 
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {
@@ -58,7 +58,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             } else {
                 item.setIsFavorite(false);
             }
-            int updatedCount = Utils.DB.updateHistoryItem(mContext, item);
+            int updatedCount = DBManager.updateHistoryItem(mContext, item);
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
         // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)

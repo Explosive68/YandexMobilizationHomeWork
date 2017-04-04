@@ -15,7 +15,7 @@ public class TranslationResponse {
     private String mLang;
     @SerializedName("text")
     @Expose
-    private List<String> translations = new ArrayList<>();
+    private List<String> mTranslations = new ArrayList<>();
 
     public Integer getCode() {
         return mCode;
@@ -34,11 +34,11 @@ public class TranslationResponse {
     }
 
     public List<String> getTranslations() {
-        return translations;
+        return mTranslations;
     }
 
     public void setTranslations(List<String> translations) {
-        this.translations = translations;
+        this.mTranslations = translations;
     }
 
 }
