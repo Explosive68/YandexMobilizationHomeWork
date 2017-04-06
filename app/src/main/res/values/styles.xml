@@ -6,6 +6,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppActionBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:elevation">4dp</item>
     </style>
 
     <style name="WordInputActionImage">
@@ -23,33 +32,33 @@
 
     <style name="TextRegular">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/colorTextBlack</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
     </style>
 
     <style name="TextHint">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/colorTextGrey</item>
+        <item name="android:textColor">@color/colorSecondaryText</item>
     </style>
 
     <style name="TextSmall">
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/colorTextBlack</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
     </style>
 
     <style name="TextTranslated">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/colorTextBlack</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
     </style>
 
     <style name="TextActionBar">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/text_size_action_bar</item>
         <item name="android:textColor">@color/colorTextActionBar</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
 
     <style name="TextLanguageSelectionItem">
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/colorTextBlack</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
 
@@ -72,6 +81,14 @@
 
     <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="InternalTabsTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_action_bar</item>
+        <item name="android:textColor">@color/colorTextActionBar</item>
+        <item name="android:textStyle"></item>
     </style>
 
 </resources>

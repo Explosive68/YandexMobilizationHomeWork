@@ -6,6 +6,8 @@
     android:orientation="vertical"
     tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment">
 
+    <include layout="@layout/actionbar_translation" />
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -64,16 +66,16 @@
             android:id="@+id/pbLoading"
             android:layout_width="@dimen/progress_bar_size"
             android:layout_height="@dimen/progress_bar_size"
-            android:visibility="gone"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/llTranslationButtons"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="true"
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/ivTranslationSpeaker"
@@ -101,28 +103,28 @@
             style="@style/TextTranslated"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/margin_half"
-            android:layout_toStartOf="@id/llTranslationButtons" />
+            android:layout_toStartOf="@id/llTranslationButtons"
+            android:padding="@dimen/margin_half" />
 
         <LinearLayout
             android:id="@+id/llTranslationError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/margin_full"
-            android:paddingStart="@dimen/margin_double"
-            android:paddingEnd="@dimen/margin_double"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:visibility="gone"
-            android:gravity="center_horizontal">
+            android:paddingEnd="@dimen/margin_double"
+            android:paddingStart="@dimen/margin_double"
+            android:paddingTop="@dimen/margin_full"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tvTranslationErrorTitle"
                 style="@style/TextRegular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/tvTranslationErrorText"
@@ -130,15 +132,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_half"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
             <Button
                 android:id="@+id/btnRetry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/retry"
+                android:layout_gravity="center"
                 android:layout_marginTop="@dimen/margin_half"
-                android:layout_gravity="center"/>
+                android:text="@string/retry" />
         </LinearLayout>
 
     </RelativeLayout>

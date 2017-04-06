@@ -1,11 +1,12 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.activity;
 
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import java.lang.annotation.Retention;
@@ -16,7 +17,6 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -45,80 +45,81 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        initializeActivity(savedInstanceState);
+        initializeActivity();
     }
 
-    private void initializeActivity(Bundle savedInstanceState) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowCustomEnabled(true);
-            if (savedInstanceState != null) {
-                @FragmentPosition int position = savedInstanceState.getInt(MAIN_PAGER_POSITION,
-                        FragmentPosition.TRANSLATION);
-                //updateActionBar(position);
-            }
-        }
+    private void initializeActivity() {
         initializePagerAndTabs();
     }
 
     private void initializePagerAndTabs() {
         MainPagerAdapter mainAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
         mPager.setAdapter(mainAdapter);
-
-        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                //updateActionBar(position);
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-            @Override
-            public void onPageScrollStateChanged(int state) {}
-        });
-
-        // Keep all screens up all the time
+        // Keep all screens up all the time to provide smooth animations
         mPager.setOffscreenPageLimit(2);
-
         mTabLayout.setupWithViewPager(mPager);
-        setTabLayoutIcons(mTabLayout, R.array.main_pager_icons);
+        setBottomTabLayoutIcons(mTabLayout, R.array.main_pager_icons);
     }
 
-    private void setTabLayoutIcons(TabLayout tabLayout, int drawableIdsArrayId) {
+    /**
+     * Full setup of bottom navigation icons
+     * @param tabLayout Target TabLayout
+     * @param drawableIdsArrayId Resource id of xml array containing drawable ids
+     */
+    private void setBottomTabLayoutIcons(TabLayout tabLayout, int drawableIdsArrayId) {
         TypedArray imageResIds = getResources().obtainTypedArray(drawableIdsArrayId);
         if (tabLayout.getTabCount() != imageResIds.length()) {
             throw new IllegalStateException("Tabs count must be equal to icons amount");
         }
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(imageResIds.getResourceId(i, -1));
-        }
-        imageResIds.recycle();
-    }
 
-    private void updateActionBar(@FragmentPosition int newPosition) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            switch (newPosition) {
-                case FragmentPosition.TRANSLATION:
-                    actionBar.setCustomView(R.layout.actionbar_translation);
-                    break;
-                case FragmentPosition.HISTORY:
-                    try {
-                        actionBar.setCustomView(R.layout.actionbar_history);
-                        MainPagerAdapter adapter = ((MainPagerAdapter) mPager.getAdapter());
-                        HistoryFragment fragment = (HistoryFragment) adapter.getRegisteredFragment(newPosition);
-                        fragment.onFragmentSelected();
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case FragmentPosition.SETTINGS:
-                    actionBar.setCustomView(R.layout.actionbar_settings);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unacceptable fragment position: " + newPosition);
+        // Set icons with colors for all tabs, considering tab selection state
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            if (tab != null) {
+                int imageId = imageResIds.getResourceId(i, -1);
+                if (imageId == -1) {
+                    throw new IllegalStateException("Icon from xml array was not found");
+                }
+                Drawable drawable = ContextCompat.getDrawable(this, imageId);
+
+                int color;
+                if (tab.isSelected()) {
+                    color = R.color.colorBottomIconSelected;
+                } else {
+                    color = R.color.colorBottomIcon;
+                }
+                drawable.setColorFilter(ContextCompat.getColor(this, color),
+                        PorterDuff.Mode.SRC_ATOP);
+
+                tab.setIcon(drawable);
             }
         }
+        imageResIds.recycle();
+
+        // Change tab icon color on selection/deselection
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int selectedTabIconColor = ContextCompat.getColor(MainActivity.this, R.color.colorBottomIconSelected);
+                Drawable icon = tab.getIcon();
+                if (icon != null) {
+                    icon.setColorFilter(selectedTabIconColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int tabIconColor = ContextCompat.getColor(MainActivity.this, R.color.colorBottomIcon);
+                Drawable icon = tab.getIcon();
+                if (icon != null) {
+                    icon.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
     }
 
     @Override
@@ -131,5 +132,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(MAIN_PAGER_POSITION, mPager.getCurrentItem());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mTabLayout != null) {
+            mTabLayout.clearOnTabSelectedListeners();
+        }
     }
 }

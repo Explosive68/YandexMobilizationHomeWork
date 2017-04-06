@@ -1,12 +1,16 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment">
+
+    <include layout="@layout/actionbar_history" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpInternal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</FrameLayout>
+        android:layout_height="match_parent" />
+
+    <!-- Corresponding Tab Layout is in actionbar_history.xml-->
+</LinearLayout>

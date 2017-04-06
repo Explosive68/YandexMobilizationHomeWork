@@ -27,13 +27,11 @@ public class HistoryFragment extends Fragment {
     private static final int POSITION_HISTORY = 0;
     private static final int POSITION_FAVORITES = 1;
 
-    @Nullable
     @BindView(R.id.tlInternal)
     TabLayout mInternalTabLayout;
     @BindView(R.id.vpInternal)
     ViewPager mInternalPager;
 
-    @Nullable
     @BindView(R.id.ivDelete)
     ImageView mIvDelete;
 
@@ -50,22 +48,14 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setCustomView(R.layout.actionbar_translation);
-        }
-
-        initPagerAndTabs();
-        setOnDeleteClickListener();
-
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        restoreState(savedInstanceState);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initPagerAndTabs();
+        setOnDeleteClickListener();
     }
 
     private void initPagerAndTabs() {
@@ -73,38 +63,22 @@ public class HistoryFragment extends Fragment {
             getActivity().getActionBar().setCustomView(R.layout.actionbar_history);
         }
 
-
         // It is important to use CHILD FragmentManager
         InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());
         mInternalPager.setAdapter(internalAdapter);
-
-        //mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
-        if (mInternalTabLayout != null) {
-            mInternalTabLayout.setupWithViewPager(mInternalPager);
-        }
+        mInternalTabLayout.setupWithViewPager(mInternalPager);
     }
 
     private void setOnDeleteClickListener() {
-        ImageView mIvDelete = ButterKnife.findById(getActivity(), R.id.ivDelete);
-        if (mIvDelete != null) {
-            mIvDelete.setOnClickListener(imageView -> {
-                int currentPosition = mInternalPager.getCurrentItem();
-                if (currentPosition == POSITION_HISTORY) {
-                    showDeleteHistoryDialog();
-                } else {
-                    showDeleteFavoritesDialog();
-                }
-            });
-        }
-    }
-
-    private void restoreState(Bundle savedInstanceState) {
-        // FIXME: Not working :(
-        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_SELECTED_PAGE)) {
-            mInternalPager.setCurrentItem(savedInstanceState
-                    .getInt(BUNDLE_SELECTED_PAGE, POSITION_HISTORY));
-        }
+        mIvDelete.setOnClickListener(imageView -> {
+            int currentPosition = mInternalPager.getCurrentItem();
+            if (currentPosition == POSITION_HISTORY) {
+                showDeleteHistoryDialog();
+            } else {
+                showDeleteFavoritesDialog();
+            }
+        });
     }
 
     public void showDeleteHistoryDialog() {
@@ -136,11 +110,6 @@ public class HistoryFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mInternalPager != null) {
@@ -154,10 +123,5 @@ public class HistoryFragment extends Fragment {
         if (mInternalPager != null) {
             mInternalPager.clearOnPageChangeListeners();
         }
-    }
-
-    public void onFragmentSelected() {
-        mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
-        mInternalTabLayout.setupWithViewPager(mInternalPager);
     }
 }

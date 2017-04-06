@@ -14,15 +14,11 @@ import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFrag
 
 
 public class MainPagerAdapter extends FragmentPagerAdapter {
-    private SparseArray<Fragment> mRegisteredFragments = new SparseArray<>();
-
     private int[] mImageResIds;
-    private Context mContext;
 
     public MainPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
-        mContext = context;
-        mImageResIds = mContext.getResources().getIntArray(R.array.main_pager_icons);
+        mImageResIds = context.getResources().getIntArray(R.array.main_pager_icons);
     }
 
     @Override
@@ -39,22 +35,5 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return mImageResIds.length;
-    }
-
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        Fragment fragment = (Fragment) super.instantiateItem(container, position);
-        mRegisteredFragments.put(position, fragment);
-        return fragment;
-    }
-
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        mRegisteredFragments.remove(position);
-        super.destroyItem(container, position, object);
-    }
-
-    public Fragment getRegisteredFragment(int position) {
-        return mRegisteredFragments.get(position);
     }
 }

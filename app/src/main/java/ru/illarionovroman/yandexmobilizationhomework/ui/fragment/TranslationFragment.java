@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,9 +85,12 @@ public class TranslationFragment extends Fragment {
     @BindView(R.id.ivTranslationFullscreen)
     ImageView mIvTranslationFullscreen;
 
-    private TextView mTvLanguageFrom;
-    private TextView mTvLanguageTo;
-    private ImageView mIvSwapLanguages;
+    @BindView(R.id.tvLanguageFrom)
+    TextView mTvLanguageFrom;
+    @BindView(R.id.tvLanguageTo)
+    TextView mTvLanguageTo;
+    @BindView(R.id.ivSwapLanguages)
+    ImageView mIvSwapLanguages;
 
     private CompositeDisposable mDisposables;
     private HistoryItem mCurrentItem;
@@ -109,17 +110,12 @@ public class TranslationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setCustomView(R.layout.actionbar_translation);
-        }
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         initializeFragment();
     }
 
@@ -131,45 +127,36 @@ public class TranslationFragment extends Fragment {
     }
 
     private void initializeActionBarItems() {
-        mTvLanguageFrom = ButterKnife.findById(getActivity(), R.id.tvLanguageFrom);
-        mTvLanguageTo = ButterKnife.findById(getActivity(), R.id.tvLanguageTo);
-        mIvSwapLanguages = ButterKnife.findById(getActivity(), R.id.ivSwapLanguages);
         setActionBarClickListeners();
     }
 
     private void setActionBarClickListeners() {
-        if (mTvLanguageFrom != null) {
-            mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
-                Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-                intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
-                intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
-                startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
-            });
-        }
+        mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
+            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
+            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
+            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
+        });
 
-        if (mTvLanguageTo != null) {
-            mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
-                Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-                intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
-                intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
-                startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
-            });
-        }
+        mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
+            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
+            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
+            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
+        });
 
-        if (mIvSwapLanguages != null) {
-            mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
-                // Swap actionBar items
-                String buf = mTvLanguageFrom.getText().toString();
-                mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
-                mTvLanguageTo.setText(buf);
+        mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
+            // Swap actionBar items
+            String buf = mTvLanguageFrom.getText().toString();
+            mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
+            mTvLanguageTo.setText(buf);
 
-                // Insert translation to input
-                String translation = mTvTranslation.getText().toString();
-                if (!TextUtils.isEmpty(translation)) {
-                    mEtWordInput.setText(translation);
-                }
-            });
-        }
+            // Insert translation to input
+            String translation = mTvTranslation.getText().toString();
+            if (!TextUtils.isEmpty(translation)) {
+                mEtWordInput.setText(translation);
+            }
+        });
     }
 
     /**
