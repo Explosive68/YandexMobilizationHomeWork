@@ -1,13 +1,12 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.activity;
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,14 +14,14 @@ import java.lang.annotation.RetentionPolicy;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
+import ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.SettingsFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BOTTOM_NAVIGATION_POSITION = "BOTTOM_NAVIGATION_POSITION";
+    private static final String MAIN_PAGER_POSITION = "MAIN_PAGER_POSITION";
 
     /**
      * Android's enum of possible fragment positions
@@ -35,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
         int SETTINGS = 2;
     }
 
-    @BindView(R.id.bnvMain)
-    BottomNavigationView mBnvMain;
-
-    private @FragmentPosition int mCurrentFragmentPosition = FragmentPosition.TRANSLATION;
+    @BindView(R.id.vpMain)
+    NonSwipeableViewPager mPager;
+    @BindView(R.id.tlMain)
+    TabLayout mTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,91 +49,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeActivity(Bundle savedInstanceState) {
-
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowCustomEnabled(true);
+            if (savedInstanceState != null) {
+                @FragmentPosition int position = savedInstanceState.getInt(MAIN_PAGER_POSITION,
+                        FragmentPosition.TRANSLATION);
+                //updateActionBar(position);
+            }
         }
+        initializePagerAndTabs();
+    }
 
-        if (savedInstanceState != null) {
-            @FragmentPosition int restoredPosition = savedInstanceState.getInt(BOTTOM_NAVIGATION_POSITION,
-                    FragmentPosition.TRANSLATION);
-            replaceFragmentAndUpdateActionBar(restoredPosition, false);
-        } else {
-            replaceFragmentAndUpdateActionBar(FragmentPosition.TRANSLATION, false);
+    private void initializePagerAndTabs() {
+        MainPagerAdapter mainAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
+        mPager.setAdapter(mainAdapter);
 
-        }
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                //updateActionBar(position);
+            }
 
-        mBnvMain.setOnNavigationItemSelectedListener(this::navigateToItem);
-        mBnvMain.setOnNavigationItemReselectedListener(item -> {
-            // Do nothing
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            @Override
+            public void onPageScrollStateChanged(int state) {}
         });
+
+        // Keep all screens up all the time
+        mPager.setOffscreenPageLimit(2);
+
+        mTabLayout.setupWithViewPager(mPager);
+        setTabLayoutIcons(mTabLayout, R.array.main_pager_icons);
     }
 
-    /**
-     * Method for navigation - performs replacing of fragments and ActionBar's layout
-     *
-     * @param menuItem which fragment to show
-     * @return true - if menu has been processed successfully,<br>
-     * false - otherwise
-     */
-    private boolean navigateToItem(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.action_translate:
-                replaceFragmentAndUpdateActionBar(FragmentPosition.TRANSLATION);
-                return true;
-            case R.id.action_history:
-                replaceFragmentAndUpdateActionBar(FragmentPosition.HISTORY);
-                return true;
-            case R.id.action_settings:
-                replaceFragmentAndUpdateActionBar(FragmentPosition.SETTINGS);
-                return true;
-            default:
-                return false;
+    private void setTabLayoutIcons(TabLayout tabLayout, int drawableIdsArrayId) {
+        TypedArray imageResIds = getResources().obtainTypedArray(drawableIdsArrayId);
+        if (tabLayout.getTabCount() != imageResIds.length()) {
+            throw new IllegalStateException("Tabs count must be equal to icons amount");
         }
-    }
-
-    private void replaceFragmentAndUpdateActionBar(@FragmentPosition int newPosition,
-                                                   boolean isAnimated) {
-        replaceFragment(newPosition, isAnimated);
-        updateActionBar(newPosition);
-        mCurrentFragmentPosition = newPosition;
-    }
-
-    private void replaceFragmentAndUpdateActionBar(@FragmentPosition int newPosition) {
-        replaceFragmentAndUpdateActionBar(newPosition, true);
-    }
-
-    /**
-     * Replaces fragments with calculated animation direction
-     *
-     * @param newPosition position of fragment to show
-     */
-    private void replaceFragment(@FragmentPosition int newPosition, boolean isAnimated) {
-        Fragment newFragment;
-        switch (newPosition) {
-            case FragmentPosition.TRANSLATION:
-                newFragment = TranslationFragment.newInstance();
-                break;
-            case FragmentPosition.HISTORY:
-                newFragment = HistoryFragment.newInstance();
-                break;
-            case FragmentPosition.SETTINGS:
-                newFragment = SettingsFragment.newInstance();
-                break;
-            default:
-                throw new IllegalArgumentException("Unacceptable fragment position: " + newPosition);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            tabLayout.getTabAt(i).setIcon(imageResIds.getResourceId(i, -1));
         }
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if (isAnimated) {
-            AnimationDirection animDirection = getAnimationDirection(newPosition,
-                    mCurrentFragmentPosition);
-            ft.setCustomAnimations(animDirection.getEnter(), animDirection.getExit(),
-                    animDirection.getPopEnter(), animDirection.getPopExit());
-        }
-        ft.replace(R.id.flFragmentContainer, newFragment, newFragment.getClass().toString());
-        ft.commit();
+        imageResIds.recycle();
     }
 
     private void updateActionBar(@FragmentPosition int newPosition) {
@@ -145,7 +103,14 @@ public class MainActivity extends AppCompatActivity {
                     actionBar.setCustomView(R.layout.actionbar_translation);
                     break;
                 case FragmentPosition.HISTORY:
-                    actionBar.setCustomView(R.layout.actionbar_history);
+                    try {
+                        actionBar.setCustomView(R.layout.actionbar_history);
+                        MainPagerAdapter adapter = ((MainPagerAdapter) mPager.getAdapter());
+                        HistoryFragment fragment = (HistoryFragment) adapter.getRegisteredFragment(newPosition);
+                        fragment.onFragmentSelected();
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case FragmentPosition.SETTINGS:
                     actionBar.setCustomView(R.layout.actionbar_settings);
@@ -156,68 +121,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Calculates animation direction for replacing fragments
-     *
-     * @return {@link AnimationDirection}
-     */
-    private AnimationDirection getAnimationDirection(@FragmentPosition int newPosition,
-                                                     @FragmentPosition int currentPosition) {
-        if (currentPosition < newPosition) {
-            return AnimationDirection.FROM_RIGHT_TO_LEFT;
-        } else {
-            return AnimationDirection.FROM_LEFT_TO_RIGHT;
-        }
-    }
-
-    /**
-     * Enum to store possible animation directions with their resources for 'enter' and 'exit'
-     */
-    private enum AnimationDirection {
-        FROM_LEFT_TO_RIGHT(R.anim.enter_from_left, R.anim.exit_to_right,
-                R.anim.enter_from_left, R.anim.exit_to_right),
-        FROM_RIGHT_TO_LEFT(R.anim.enter_from_right, R.anim.exit_to_left,
-                R.anim.enter_from_right, R.anim.exit_to_left);
-
-        private int mEnter;
-        private int mExit;
-        private int mPopEnter;
-        private int mPopExit;
-
-        AnimationDirection(int enter, int exit, int popEnter, int popExit) {
-            mEnter = enter;
-            mExit = exit;
-            mPopEnter = popEnter;
-            mPopExit = popExit;
-        }
-
-        public int getEnter() {
-            return mEnter;
-        }
-
-        public int getExit() {
-            return mExit;
-        }
-
-        public int getPopEnter() {
-            return mPopEnter;
-        }
-
-        public int getPopExit() {
-            return mPopExit;
-        }
-    }
-
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mBnvMain.setSelectedItemId(
-                savedInstanceState.getInt(BOTTOM_NAVIGATION_POSITION, FragmentPosition.TRANSLATION));
+        mPager.setCurrentItem(savedInstanceState.getInt(MAIN_PAGER_POSITION));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(BOTTOM_NAVIGATION_POSITION, mCurrentFragmentPosition);
+        outState.putInt(MAIN_PAGER_POSITION, mPager.getCurrentItem());
     }
 }

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -91,6 +94,8 @@ public class TranslationFragment extends Fragment {
     private CompositeDisposable mDisposables;
     private HistoryItem mCurrentItem;
 
+    private Unbinder mUnbinder;
+
     public TranslationFragment() {
     }
 
@@ -103,9 +108,19 @@ public class TranslationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
-        ButterKnife.bind(this, view);
-        initializeFragment();
+        mUnbinder = ButterKnife.bind(this, view);
+
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setCustomView(R.layout.actionbar_translation);
+        }
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initializeFragment();
     }
 
     private void initializeFragment() {
@@ -123,32 +138,38 @@ public class TranslationFragment extends Fragment {
     }
 
     private void setActionBarClickListeners() {
-        mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
-            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
-            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
-            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
-        });
+        if (mTvLanguageFrom != null) {
+            mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
+                Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+                intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
+                intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
+                startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
+            });
+        }
 
-        mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
-            Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
-            intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
-            startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
-        });
+        if (mTvLanguageTo != null) {
+            mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
+                Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
+                intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
+                intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
+                startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
+            });
+        }
 
-        mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
-            // Swap actionBar items
-            String buf = mTvLanguageFrom.getText().toString();
-            mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
-            mTvLanguageTo.setText(buf);
+        if (mIvSwapLanguages != null) {
+            mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
+                // Swap actionBar items
+                String buf = mTvLanguageFrom.getText().toString();
+                mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
+                mTvLanguageTo.setText(buf);
 
-            // Insert translation to input
-            String translation = mTvTranslation.getText().toString();
-            if (!TextUtils.isEmpty(translation)) {
-                mEtWordInput.setText(translation);
-            }
-        });
+                // Insert translation to input
+                String translation = mTvTranslation.getText().toString();
+                if (!TextUtils.isEmpty(translation)) {
+                    mEtWordInput.setText(translation);
+                }
+            });
+        }
     }
 
     /**
@@ -511,6 +532,12 @@ public class TranslationFragment extends Fragment {
         mTvTranslationErrorTitle.setText(errorTitle);
         mTvTranslationErrorText.setText(errorText);
         mLlTranslationError.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
     }
 
     @Override

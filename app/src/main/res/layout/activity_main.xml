@@ -12,21 +12,20 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <FrameLayout
-            android:id="@+id/flFragmentContainer"
+        <ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager
+            android:id="@+id/vpMain"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:background="@android:color/white"/>
 
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/bnvMain"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tlMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="?android:attr/windowBackground"
-            app:itemIconTint="@drawable/nav_item_color_state"
-            app:itemTextColor="@drawable/nav_item_color_state"
-            app:menu="@menu/menu_bottom_navigation"/>
+            app:tabMode="fixed"
+            app:tabIndicatorHeight="4dp"
+            app:tabIndicatorColor="#fdd835"/>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

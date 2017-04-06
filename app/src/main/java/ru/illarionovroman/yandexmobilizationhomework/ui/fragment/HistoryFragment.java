@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,20 +51,35 @@ public class HistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         ButterKnife.bind(this, view);
 
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setCustomView(R.layout.actionbar_translation);
+        }
+
         initPagerAndTabs();
         setOnDeleteClickListener();
-        restoreState(savedInstanceState);
 
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        restoreState(savedInstanceState);
+    }
+
     private void initPagerAndTabs() {
+        if (getActivity() != null && getActivity().getActionBar() != null) {
+            getActivity().getActionBar().setCustomView(R.layout.actionbar_history);
+        }
+
+
         // It is important to use CHILD FragmentManager
         InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());
         mInternalPager.setAdapter(internalAdapter);
 
-        mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
+        //mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
         if (mInternalTabLayout != null) {
             mInternalTabLayout.setupWithViewPager(mInternalPager);
         }
@@ -70,14 +87,16 @@ public class HistoryFragment extends Fragment {
 
     private void setOnDeleteClickListener() {
         ImageView mIvDelete = ButterKnife.findById(getActivity(), R.id.ivDelete);
-        mIvDelete.setOnClickListener(imageView -> {
-            int currentPosition = mInternalPager.getCurrentItem();
-            if (currentPosition == POSITION_HISTORY) {
-                showDeleteHistoryDialog();
-            } else {
-                showDeleteFavoritesDialog();
-            }
-        });
+        if (mIvDelete != null) {
+            mIvDelete.setOnClickListener(imageView -> {
+                int currentPosition = mInternalPager.getCurrentItem();
+                if (currentPosition == POSITION_HISTORY) {
+                    showDeleteHistoryDialog();
+                } else {
+                    showDeleteFavoritesDialog();
+                }
+            });
+        }
     }
 
     private void restoreState(Bundle savedInstanceState) {
@@ -135,5 +154,10 @@ public class HistoryFragment extends Fragment {
         if (mInternalPager != null) {
             mInternalPager.clearOnPageChangeListeners();
         }
+    }
+
+    public void onFragmentSelected() {
+        mInternalTabLayout = ButterKnife.findById(getActivity(), R.id.tlInternal);
+        mInternalTabLayout.setupWithViewPager(mInternalPager);
     }
 }
