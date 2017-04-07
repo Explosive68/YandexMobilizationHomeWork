@@ -1,5 +1,7 @@
 package ru.illarionovroman.yandexmobilizationhomework.network;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -33,7 +35,11 @@ public class ApiManager {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        OkHttpClient httpClient = new OkHttpClient().newBuilder()
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient().newBuilder();
+        if (BuildConfig.DEBUG) {
+            okHttpBuilder.addNetworkInterceptor(new StethoInterceptor());
+        }
+        OkHttpClient httpClient = okHttpBuilder
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
