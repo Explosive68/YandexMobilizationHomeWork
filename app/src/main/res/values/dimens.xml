@@ -7,8 +7,13 @@
 
     <dimen name="image_size_normal">40dp</dimen>
 
+    <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_normal">16sp</dimen>
+
+    <dimen name="text_size_hint">14sp</dimen>
     <dimen name="text_size_action_bar">18sp</dimen>
+    <dimen name="text_size_list_item">18sp</dimen>
+    <dimen name="text_size_translation">20sp</dimen>
 
     <dimen name="progress_bar_size">48dp</dimen>
 

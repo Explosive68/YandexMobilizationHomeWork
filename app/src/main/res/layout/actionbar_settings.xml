@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/AppActionBar">
+<android.support.design.widget.AppBarLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/AppBarLayout">
 
-    <TextView
-        style="@style/TextActionBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:paddingStart="@dimen/margin_full"
-        android:text="@string/actionbar_title_settings" />
-</FrameLayout>
+    <android.support.v7.widget.Toolbar
+        style="@style/AppToolbar">
+
+        <TextView
+            style="@style/TextActionBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="@dimen/margin_full"
+            android:text="@string/actionbar_title_settings" />
+    </android.support.v7.widget.Toolbar>
+</android.support.design.widget.AppBarLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextSmall">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+    </style>
+
+    <style name="TextHint">
+        <item name="android:textSize">@dimen/text_size_hint</item>
+        <item name="android:textColor">@color/colorSecondaryText</item>
+    </style>
+
+    <style name="TextRegular">
+        <item name="android:textSize">@dimen/text_size_normal</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+    </style>
+
+    <style name="TextTranslated">
+        <item name="android:textSize">@dimen/text_size_translation</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+    </style>
+
+    <style name="TextActionBar">
+        <item name="android:textSize">@dimen/text_size_action_bar</item>
+        <item name="android:textColor">@color/colorTextActionBar</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <style name="TextLanguageSelectionItem">
+        <item name="android:textSize">@dimen/text_size_list_item</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+</resources>
