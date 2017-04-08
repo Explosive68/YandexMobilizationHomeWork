@@ -56,10 +56,6 @@ public class HistoryFragment extends BaseFragment {
     }
 
     private void initPagerAndTabs() {
-        if (getActivity() != null && getActivity().getActionBar() != null) {
-            getActivity().getActionBar().setCustomView(R.layout.actionbar_history);
-        }
-
         // It is important to use CHILD FragmentManager
         InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());

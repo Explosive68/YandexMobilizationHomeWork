@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
@@ -26,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -41,7 +41,6 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
-import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
 import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
@@ -115,13 +114,13 @@ public class TranslationFragment extends BaseFragment {
     }
 
     private void initializeFragment() {
-        initializeActionBarItems();
+        initializeActionBar();
 
         mDisposables = new CompositeDisposable();
         mDisposables.add(createDisposableUserInputWatcher());
     }
 
-    private void initializeActionBarItems() {
+    private void initializeActionBar() {
         setActionBarClickListeners();
     }
 
@@ -268,12 +267,45 @@ public class TranslationFragment extends BaseFragment {
         return historyItemSingle;
     }
 
-    private void handleTranslationSuccess(HistoryItem item) {
-        mCurrentItem = item;
-        showHistoryItemTranslation(item);
-        Toast.makeText(getContext(), "id = " + item.getId(), Toast.LENGTH_SHORT).show();
+    /**
+     * Load item with given id from DB in background, then pass it to UI
+     * @param itemId Id of item to load from DB
+     */
+    public void loadAndShowHistoryItem(long itemId) {
+        Observable.just(itemId)
+                .map(id -> {
+                    HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
+                    return item;
+                })
+                .subscribeOn(Schedulers.single())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleTranslationSuccess);
     }
 
+    /**
+     * Update current item, toolbar items and show successful screen state
+     * @param item {@link HistoryItem} to show
+     */
+    private void handleTranslationSuccess(HistoryItem item) {
+        if (item != null) {
+            mCurrentItem = item;
+
+            String languageFrom = Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom());
+            String languageTo = Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo());
+            mTvLanguageFrom.setText(languageFrom);
+            mTvLanguageTo.setText(languageTo);
+
+            showHistoryItemTranslation(item);
+        } else {
+            Timber.wtf("Item can't be null in successful case");
+        }
+    }
+
+    /**
+     * Method for processing all kinds of errors that may appear during data loading.
+     * It recognizes type of error and shows corresponding localized text to UI
+     * @param error Throwable to analyze
+     */
     private void handleTranslationError(Throwable error) {
         showTranslationViews();
 
@@ -306,39 +338,6 @@ public class TranslationFragment extends BaseFragment {
     }
 
     /**
-     * Use this method in background thread only
-     * @param wordToTranslate
-     * @return {@link HistoryItem}
-     */
-    private HistoryItem getHistoryItemFromServer(String wordToTranslate) {
-        String langFromTo = buildTranslationLangParam();
-
-        // Perform blocking network request
-        Single<TranslationResponse> translationResponseObservable = ApiManager
-                .getApiInterfaceInstance().getTranslation(wordToTranslate, langFromTo, null);
-        TranslationResponse response = translationResponseObservable.blockingGet();
-
-        // May be this is overhead to use builder here, but let it be just in case
-        StringBuilder translationBuilder = new StringBuilder();
-        for (int i = 0; i < response.getTranslations().size(); i++) {
-            translationBuilder.append(response.getTranslations().get(i));
-        }
-
-        // Create incomplete item
-        HistoryItem item = new HistoryItem(
-                wordToTranslate,
-                translationBuilder.toString(),
-                getCurrentCodeLanguageFrom(),
-                getCurrentCodeLanguageTo()
-        );
-        // Write it to DB
-        long id = DBManager.addHistoryItem(getContext(), item);
-        // Now we can get the completed item
-        HistoryItem resultItem = DBManager.getHistoryItemById(getContext(), id);
-        return resultItem;
-    }
-
-    /**
      * Method for building parameter for translation request using currently selected languages.
      * @return E.g.: "ru-en", "en-ru", etc.
      */
@@ -357,17 +356,17 @@ public class TranslationFragment extends BaseFragment {
     }
 
     @OnClick(R.id.btnRetry)
-    public void retry() {
+    void retry() {
         updateHistoryItem(mEtWordInput.getText().toString());
     }
 
     @OnClick(R.id.ivWordClean)
-    public void cleanWordInput() {
+    void cleanWordInput() {
         mEtWordInput.setText("");
     }
 
     @OnClick(R.id.ivTranslationFavorite)
-    public void toggleTranslationFavorite() {
+    void toggleTranslationFavorite() {
         if (mCurrentItem != null) {
             boolean activated = mIvTranslationFavorite.isActivated();
             if (activated) {
@@ -383,7 +382,7 @@ public class TranslationFragment extends BaseFragment {
     }
 
     @OnClick(R.id.ivTranslationShare)
-    public void shareTranslation() {
+    void shareTranslation() {
         String translation = mTvTranslation.getText().toString();
         if (TextUtils.isEmpty(translation)) {
             return;
@@ -401,7 +400,7 @@ public class TranslationFragment extends BaseFragment {
     }
 
     @OnClick(R.id.ivTranslationFullscreen)
-    public void showFullScreen() {
+    void showFullScreen() {
         startActivity(new Intent(getContext(), FullscreenActivity.class));
     }
 

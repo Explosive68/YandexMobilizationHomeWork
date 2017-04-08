@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.tlMain)
     TabLayout mTabLayout;
 
+    private MainPagerAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializePagerAndTabs() {
-        MainPagerAdapter mainAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
-        mPager.setAdapter(mainAdapter);
+        mAdapter = new MainPagerAdapter(this, getSupportFragmentManager());
+        mPager.setAdapter(mAdapter);
         // Keep all screens up all the time to provide smooth animations
         mPager.setOffscreenPageLimit(2);
         mTabLayout.setupWithViewPager(mPager);
@@ -140,5 +143,16 @@ public class MainActivity extends AppCompatActivity {
         if (mTabLayout != null) {
             mTabLayout.clearOnTabSelectedListeners();
         }
+    }
+
+    /**
+     * This method is gonna be called from list adapter, then we delegate it to translation fragment,
+     * telling it to show this item
+     */
+    public void onListItemClicked(long itemId) {
+        mPager.setCurrentItem(FragmentPosition.TRANSLATION, true);
+        TranslationFragment fragment = (TranslationFragment) mAdapter
+                .getRegisteredFragment(FragmentPosition.TRANSLATION);
+        fragment.loadAndShowHistoryItem(itemId);
     }
 }

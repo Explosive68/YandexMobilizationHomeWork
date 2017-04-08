@@ -17,8 +17,8 @@ public class HistoryItem implements Parcelable {
     private long mId = UNSPECIFIED_ID;
     private String mWord;
     private String mTranslation;
-    private String mLanguageFrom;
-    private String mLanguageTo;
+    private String mLanguageCodeFrom;
+    private String mLanguageCodeTo;
     private String mDate = null;
     private int mIsFavorite = -1;
     
@@ -29,16 +29,16 @@ public class HistoryItem implements Parcelable {
     public HistoryItem(String word, String translation, String languageFrom, String languageTo) {
         this.mWord = word;
         this.mTranslation = translation;
-        this.mLanguageFrom = languageFrom;
-        this.mLanguageTo = languageTo;
+        this.mLanguageCodeFrom = languageFrom;
+        this.mLanguageCodeTo = languageTo;
     }
 
     public HistoryItem(Cursor c) {
         this.mId = c.getLong(c.getColumnIndex(Contract.HistoryEntry._ID));
         this.mWord  = c.getString(c.getColumnIndex(Contract.HistoryEntry.WORD));
         this.mTranslation  = c.getString(c.getColumnIndex(Contract.HistoryEntry.TRANSLATION));
-        this.mLanguageFrom  = c.getString(c.getColumnIndex(Contract.HistoryEntry.LANGUAGE_FROM));
-        this.mLanguageTo  = c.getString(c.getColumnIndex(Contract.HistoryEntry.LANGUAGE_TO));
+        this.mLanguageCodeFrom = c.getString(c.getColumnIndex(Contract.HistoryEntry.LANGUAGE_FROM));
+        this.mLanguageCodeTo = c.getString(c.getColumnIndex(Contract.HistoryEntry.LANGUAGE_TO));
         this.mDate  = c.getString(c.getColumnIndex(Contract.HistoryEntry.DATE));
         this.mIsFavorite  = c.getInt(c.getColumnIndex(Contract.HistoryEntry.IS_FAVORITE));
     }
@@ -47,8 +47,8 @@ public class HistoryItem implements Parcelable {
         this.mId = in.readLong();
         this.mWord = in.readString();
         this.mTranslation = in.readString();
-        this.mLanguageFrom = in.readString();
-        this.mLanguageTo = in.readString();
+        this.mLanguageCodeFrom = in.readString();
+        this.mLanguageCodeTo = in.readString();
         this.mDate = in.readString();
         this.mIsFavorite = in.readInt();
     }
@@ -63,8 +63,8 @@ public class HistoryItem implements Parcelable {
         dest.writeLong(this.mId);
         dest.writeString(this.mWord);
         dest.writeString(this.mTranslation);
-        dest.writeString(this.mLanguageFrom);
-        dest.writeString(this.mLanguageTo);
+        dest.writeString(this.mLanguageCodeFrom);
+        dest.writeString(this.mLanguageCodeTo);
         dest.writeString(this.mDate);
         dest.writeInt(this.mIsFavorite);
     }
@@ -88,8 +88,8 @@ public class HistoryItem implements Parcelable {
         }
         cv.put(Contract.HistoryEntry.WORD, this.mWord);
         cv.put(Contract.HistoryEntry.TRANSLATION, this.mTranslation);
-        cv.put(Contract.HistoryEntry.LANGUAGE_FROM, this.mLanguageFrom);
-        cv.put(Contract.HistoryEntry.LANGUAGE_TO, this.mLanguageTo);
+        cv.put(Contract.HistoryEntry.LANGUAGE_FROM, this.mLanguageCodeFrom);
+        cv.put(Contract.HistoryEntry.LANGUAGE_TO, this.mLanguageCodeTo);
         if (this.mDate != null) {
             cv.put(Contract.HistoryEntry.DATE, this.mDate);
         }
@@ -111,40 +111,20 @@ public class HistoryItem implements Parcelable {
         return mWord;
     }
 
-    public void setWord(String mWord) {
-        this.mWord = mWord;
-    }
-
     public String getTranslation() {
         return mTranslation;
     }
 
-    public void setTranslation(String mTranslation) {
-        this.mTranslation = mTranslation;
+    public String getLanguageCodeFrom() {
+        return mLanguageCodeFrom;
     }
 
-    public String getLanguageFrom() {
-        return mLanguageFrom;
-    }
-
-    public void setLanguageFrom(String mLanguageFrom) {
-        this.mLanguageFrom = mLanguageFrom;
-    }
-
-    public String getLanguageTo() {
-        return mLanguageTo;
-    }
-
-    public void setLanguageTo(String mLanguageTo) {
-        this.mLanguageTo = mLanguageTo;
+    public String getLanguageCodeTo() {
+        return mLanguageCodeTo;
     }
 
     public String getDate() {
         return mDate;
-    }
-
-    public void setDate(String mDate) {
-        this.mDate = mDate;
     }
 
     public boolean getIsFavorite() {

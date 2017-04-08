@@ -15,6 +15,8 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
+import timber.log.Timber;
 
 
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {
@@ -44,11 +46,10 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
         holder.itemView.setTag(item.getId());
         holder.tvOriginalWord.setText(item.getWord());
         holder.tvTranslation.setText(item.getTranslation());
-        holder.tvTranslationDirection.setText(item.getLanguageFrom() + " - " + item.getLanguageTo());
         String translationDirection = String.format(
                 mContext.getString(R.string.language_from_to),
-                item.getLanguageFrom(),
-                item.getLanguageTo());
+                item.getLanguageCodeFrom(),
+                item.getLanguageCodeTo());
         holder.tvTranslationDirection.setText(translationDirection);
 
         holder.tbFavorite.setChecked(item.getIsFavorite());
@@ -61,10 +62,14 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             int updatedCount = DBManager.updateHistoryItem(mContext, item);
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
-        // TODO: Implement view onClick behaviour (open Translation fragment with passed in _id)
+
+        // Send item id straight to activity when clicked
         holder.itemView.setOnClickListener(holderItemView -> {
-            Toast.makeText(mContext, "tag = " + holder.itemView.getTag() +
-                    ", date = " + item.getDate(), Toast.LENGTH_SHORT).show();
+            if (mContext instanceof MainActivity) {
+                ((MainActivity) mContext).onListItemClicked(item.getId());
+            } else {
+                Timber.wtf("Context is not MainActivity. Item click does not working!");
+            }
         });
     }
 
