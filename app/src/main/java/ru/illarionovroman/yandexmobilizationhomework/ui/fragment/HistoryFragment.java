@@ -18,7 +18,7 @@ import ru.illarionovroman.yandexmobilizationhomework.adapter.InternalPagerAdapte
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends BaseFragment {
 
     private static final String BUNDLE_SELECTED_PAGE = "BUNDLE_SELECTED_PAGE";
 
@@ -45,7 +45,6 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
-        ButterKnife.bind(this, view);
         return view;
     }
 

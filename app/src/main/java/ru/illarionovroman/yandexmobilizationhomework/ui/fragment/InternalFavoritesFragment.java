@@ -23,7 +23,7 @@ import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
-public class InternalFavoritesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InternalFavoritesFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int FAVORITES_LOADER_ID = 2;
 
@@ -42,20 +42,21 @@ public class InternalFavoritesFragment extends Fragment implements LoaderManager
         return fragment;
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_internal_favorites, container, false);
-        ButterKnife.bind(this, view);
+        return view;
+    }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
         initializeRecyclerView(mAdapter);
 
         getActivity().getSupportLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
-
-        return view;
     }
 
     private void initializeRecyclerView(HistoryCursorAdapter adapter) {

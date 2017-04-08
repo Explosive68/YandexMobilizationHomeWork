@@ -2,7 +2,7 @@ package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,14 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
 
-public class InternalHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class InternalHistoryFragment extends BaseFragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int HISTORY_LOADER_ID = 1;
 
@@ -42,8 +42,12 @@ public class InternalHistoryFragment extends Fragment implements LoaderManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_internal_history, container, false);
-        ButterKnife.bind(this, view);
+        return view;
+    }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         mRvInternalHistory.setLayoutManager(new LinearLayoutManager(getContext()));
 
         Cursor historyCursor = DBManager.getAllHistoryItemsCursor(getContext());
@@ -51,8 +55,6 @@ public class InternalHistoryFragment extends Fragment implements LoaderManager.L
         initializeRecyclerView(mAdapter);
 
         getActivity().getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null, this);
-
-        return view;
     }
 
     private void initializeRecyclerView(HistoryCursorAdapter adapter) {

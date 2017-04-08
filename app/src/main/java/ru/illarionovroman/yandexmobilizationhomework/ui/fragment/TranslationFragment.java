@@ -50,7 +50,7 @@ import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
 
-public class TranslationFragment extends Fragment {
+public class TranslationFragment extends BaseFragment {
 
     public static final int REQUEST_CODE_LANGUAGE_FROM = 1;
     public static final int REQUEST_CODE_LANGUAGE_TO = 2;
@@ -95,8 +95,6 @@ public class TranslationFragment extends Fragment {
     private CompositeDisposable mDisposables;
     private HistoryItem mCurrentItem;
 
-    private Unbinder mUnbinder;
-
     public TranslationFragment() {
     }
 
@@ -109,7 +107,6 @@ public class TranslationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translation, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -519,12 +516,6 @@ public class TranslationFragment extends Fragment {
         mTvTranslationErrorTitle.setText(errorTitle);
         mTvTranslationErrorText.setText(errorText);
         mLlTranslationError.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
     @Override
