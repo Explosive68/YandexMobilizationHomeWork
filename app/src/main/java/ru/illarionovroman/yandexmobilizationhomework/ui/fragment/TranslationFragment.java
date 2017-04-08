@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +21,11 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -247,8 +245,12 @@ public class TranslationFragment extends BaseFragment {
                 .map(translationResponse -> {
                     // Pull data from response
                     StringBuilder translationBuilder = new StringBuilder();
-                    for (int i = 0; i < translationResponse.getTranslations().size(); i++) {
-                        translationBuilder.append(translationResponse.getTranslations().get(i));
+                    List<String> translations = translationResponse.getTranslations();
+                    for (int i = 0; i < translations.size(); i++) {
+                        translationBuilder.append(translations.get(i));
+                        if (i != translations.size() - 1) {
+                            translationBuilder.append("\n");
+                        }
                     }
                     // Create incomplete item
                     HistoryItem item = new HistoryItem(
