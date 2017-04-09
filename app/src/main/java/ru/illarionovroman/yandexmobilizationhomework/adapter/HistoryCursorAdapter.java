@@ -62,7 +62,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
                 view.setActivated(true);
                 item.setIsFavorite(true);
             }
-            int updatedCount = DBManager.updateHistoryItem(mContext, item);
+            int updatedCount = DBManager.updateHistoryItemWithId(mContext, item);
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
 
@@ -95,14 +95,21 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             return null;
         }
 
-        Cursor temp = mCursor;
+        this.mCursor = c;
+        this.notifyDataSetChanged();
+
+        return c;
+    }
+
+    public Cursor swapCursorWithoutNotify(Cursor c) {
+        // check if this cursor is the same as the previous cursor (mCursor)
+        if (mCursor == c) {
+            return null;
+        }
+
         this.mCursor = c;
 
-        //check if this is a valid cursor, then update the cursor
-        //if (c != null) {
-            this.notifyDataSetChanged();
-        //}
-        return temp;
+        return c;
     }
 
     class HistoryViewHolder extends RecyclerView.ViewHolder {

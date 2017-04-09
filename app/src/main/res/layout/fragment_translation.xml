@@ -48,7 +48,7 @@
             android:gravity="top"
             android:inputType="textMultiLine"
             android:scrollbars="vertical"
-            android:text="@string/test_text"
+            android:text=""
             android:hint="@string/translation_input_hint"
             app:layout_constraintBottom_toTopOf="@+id/ivWordClean"
             app:layout_constraintLeft_toLeftOf="parent"

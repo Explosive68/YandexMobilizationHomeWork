@@ -68,14 +68,7 @@ public class InternalHistoryFragment extends BaseFragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader cursorLoader = new CursorLoader(
-                getContext(),
-                Contract.HistoryEntry.CONTENT_URI_HISTORY,
-                null,
-                null,
-                null,
-                Contract.HistoryEntry.DATE + " DESC");
-        return cursorLoader;
+        return DBManager.getHistoryCursorLoader(getContext());
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.content.CursorLoader;
 
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
@@ -12,6 +13,28 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
  */
 public class DBManager {
     private static final String WHERE_ARG_PLACEHOLDER = "=?";
+
+    public static CursorLoader getHistoryCursorLoader(Context context) {
+        CursorLoader cursorLoader = new CursorLoader(
+                context,
+                Contract.HistoryEntry.CONTENT_URI_HISTORY,
+                null,
+                null,
+                null,
+                Contract.HistoryEntry.DATE + " DESC");
+        return cursorLoader;
+    }
+
+    public static CursorLoader getFavoriteCursorLoader(Context context) {
+        CursorLoader cursorLoader = new CursorLoader(
+                context,
+                Contract.HistoryEntry.CONTENT_URI_FAVORITES,
+                null,
+                null,
+                null,
+                Contract.HistoryEntry.DATE + " DESC");
+        return cursorLoader;
+    }
 
     public static Cursor getAllHistoryItemsCursor(Context context) {
         return context.getContentResolver().query(
@@ -95,7 +118,7 @@ public class DBManager {
         return deletedCount;
     }
 
-    public static int updateHistoryItem(Context context, HistoryItem item) {
+    public static int updateHistoryItemWithId(Context context, HistoryItem item) {
         Uri idUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
                 .appendPath(String.valueOf(item.getId()))
                 .build();

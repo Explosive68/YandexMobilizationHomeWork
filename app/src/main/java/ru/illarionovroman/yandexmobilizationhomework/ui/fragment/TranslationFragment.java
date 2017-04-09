@@ -477,12 +477,14 @@ public class TranslationFragment extends BaseFragment {
             boolean activated = mIvTranslationFavorite.isActivated();
             if (activated) {
                 mCurrentItem.setIsFavorite(false);
-                DBManager.updateHistoryItem(getContext(), mCurrentItem);
                 mIvTranslationFavorite.setActivated(false);
             } else {
                 mCurrentItem.setIsFavorite(true);
-                DBManager.updateHistoryItem(getContext(), mCurrentItem);
                 mIvTranslationFavorite.setActivated(true);
+            }
+            int updatedCount = DBManager.updateHistoryItemWithId(getContext(), mCurrentItem);
+            if (updatedCount == 0) {
+                DBManager.addHistoryItem(getContext(), mCurrentItem);
             }
         }
     }

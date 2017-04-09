@@ -19,7 +19,7 @@
     <string name="language_selection_title_to">Translation language</string>
 
     <string name="translation_share_intent_title">Send translation using application</string>
-    <string name="translation_input_hint">Enter word or sentence to translate</string>
+    <string name="translation_input_hint">Enter a word or sentence for translation</string>
 
     <string name="default_language_from">English</string>
     <string name="default_language_to">Russian</string>
