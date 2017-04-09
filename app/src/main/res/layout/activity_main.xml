@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager
+        <ru.illarionovroman.yandexmobilizationhomework.view.NonSwipeableViewPager
             android:id="@+id/vpMain"
             android:layout_width="match_parent"
             android:layout_height="0px"

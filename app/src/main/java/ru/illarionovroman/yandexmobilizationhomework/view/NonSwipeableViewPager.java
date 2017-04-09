@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.adapter;
+package ru.illarionovroman.yandexmobilizationhomework.view;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

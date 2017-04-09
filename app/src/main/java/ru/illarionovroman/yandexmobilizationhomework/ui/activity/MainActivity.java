@@ -16,7 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.adapter.NonSwipeableViewPager;
+import ru.illarionovroman.yandexmobilizationhomework.view.NonSwipeableViewPager;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
 
 
