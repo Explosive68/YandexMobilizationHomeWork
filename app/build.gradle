@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
+def supportLibVersion = '25.3.0' //variable to keep support libs consistent
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
