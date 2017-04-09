@@ -14,6 +14,8 @@ import ru.illarionovroman.yandexmobilizationhomework.BuildConfig;
 
 public class ApiManager {
 
+    private static final String TRANSLATOR_END_POINT = "https://translate.yandex.net/api/v1.5/tr.json/";
+
     private static TranslatorInterface sTranslatorInterface;
     private static Retrofit sRetrofit;
 
@@ -48,7 +50,7 @@ public class ApiManager {
                 .build();
 
         Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(BuildConfig.TRANSLATOR_END_POINT)
+                .baseUrl(TRANSLATOR_END_POINT)
                 .client(httpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create());
