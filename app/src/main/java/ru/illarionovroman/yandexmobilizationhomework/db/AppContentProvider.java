@@ -146,14 +146,15 @@ public class AppContentProvider extends ContentProvider {
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         int matchCode = sUriMatcher.match(uri);
-        Uri returnUri;
+        Uri idUri = uri;
 
         switch (matchCode) {
             case HISTORY: {
                 long id = db.insert(Contract.HistoryEntry.TABLE_NAME, null, values);
                 if (id > 0) {
-                    returnUri = ContentUris.withAppendedId(
+                    idUri = ContentUris.withAppendedId(
                             Contract.HistoryEntry.CONTENT_URI_HISTORY, id);
+                    getContext().getContentResolver().notifyChange(idUri, null);
                 } else {
                     throw new SQLException("Failed to insert row into " + uri);
                 }
@@ -163,9 +164,7 @@ public class AppContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
-
-        return returnUri;
+        return idUri;
     }
 
     @Override
@@ -216,10 +215,20 @@ public class AppContentProvider extends ContentProvider {
         int updatedCount = 0;
         int matchCode = sUriMatcher.match(uri);
         switch (matchCode) {
-            case HISTORY:
+            case HISTORY: {
                 updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
                         selection, selectionArgs);
                 break;
+            }
+            case HISTORY_WITH_ID: {
+                String idToUpdate = uri.getLastPathSegment();
+                String mSelection = Contract.HistoryEntry._ID + "=?";
+                String[] mSelectionArgs = new String[]{idToUpdate};
+
+                updatedCount = db.update(Contract.HistoryEntry.TABLE_NAME, values,
+                        mSelection, mSelectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

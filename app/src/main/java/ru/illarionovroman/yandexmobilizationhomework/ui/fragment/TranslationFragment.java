@@ -1,8 +1,12 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -36,6 +40,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.HttpException;
 import ru.illarionovroman.yandexmobilizationhomework.R;
+import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
@@ -91,6 +96,28 @@ public class TranslationFragment extends BaseFragment {
 
     private CompositeDisposable mDisposables;
     private HistoryItem mCurrentItem;
+
+    /**
+     * If some changes of currently displayed item have been registered - update it
+     */
+    private ContentObserver mDbObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            long id = -1;
+            try {
+                id = ContentUris.parseId(uri);
+            } catch (NumberFormatException ignore) {
+            }
+            if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
+                loadAndShowHistoryItem(mCurrentItem.getId());
+            }
+        }
+    };
 
     public TranslationFragment() {
     }
@@ -206,8 +233,11 @@ public class TranslationFragment extends BaseFragment {
                     @Override
                     public Single<HistoryItem> apply(String word) throws Exception {
                         // Try to find this word in database
-                        HistoryItem historyItem = DBManager.getHistoryItemByWord(getContext(),
-                                word);
+                        HistoryItem historyItem = DBManager.getHistoryItemByWordAndLangs(
+                                getContext(),
+                                word,
+                                getCurrentCodeLanguageFrom(),
+                                getCurrentCodeLanguageTo());
                         if (historyItem == null) {
                             historyItem = new HistoryItem();
                         }
@@ -289,6 +319,7 @@ public class TranslationFragment extends BaseFragment {
     private void handleTranslationSuccess(HistoryItem item) {
         if (item != null) {
             mCurrentItem = item;
+            refreshItemObserver(item.getId());
 
             String languageFrom = Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom());
             String languageTo = Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo());
@@ -335,6 +366,33 @@ public class TranslationFragment extends BaseFragment {
         }
 
         error.printStackTrace();
+    }
+
+    /**
+     * Watch for changes of item with specific id
+     * @param itemId Id of item to watch for
+     */
+    private void registerIdObserver(long itemId) {
+        Uri idUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
+                .appendPath(String.valueOf(itemId))
+                .build();
+        getActivity().getContentResolver().registerContentObserver(idUri, false,
+                mDbObserver);
+    }
+
+    private void unregisterIdObserver() {
+        if (mDbObserver != null) {
+            getActivity().getContentResolver().unregisterContentObserver(mDbObserver);
+        }
+    }
+
+    /**
+     * Update Id of the item to observe
+     * @param itemId
+     */
+    private void refreshItemObserver(long itemId) {
+        unregisterIdObserver();
+        registerIdObserver(itemId);
     }
 
     /**
@@ -525,5 +583,6 @@ public class TranslationFragment extends BaseFragment {
         if (mDisposables != null) {
             mDisposables.clear();
         }
+        unregisterIdObserver();
     }
 }

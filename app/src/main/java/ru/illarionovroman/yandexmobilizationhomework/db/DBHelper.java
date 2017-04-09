@@ -28,7 +28,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 HistoryEntry.LANGUAGE_TO + " CHARACTER(2) NOT NULL, " +
                 HistoryEntry.DATE + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                 HistoryEntry.IS_FAVORITE + " INTEGER DEFAULT 0, " +
-                "UNIQUE (" + HistoryEntry.WORD + ") ON CONFLICT REPLACE" +
+                "UNIQUE (" +
+                HistoryEntry.WORD + ", " +
+                HistoryEntry.LANGUAGE_FROM + ", " +
+                HistoryEntry.LANGUAGE_TO +
+                ") ON CONFLICT REPLACE" +
                 ");";
         db.execSQL(SQL_CREATE_HISTORY_TABLE);
     }

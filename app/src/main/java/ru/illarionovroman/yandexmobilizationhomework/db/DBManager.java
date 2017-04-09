@@ -31,13 +31,14 @@ public class DBManager {
                 Contract.HistoryEntry.DATE);
     }
 
-    public static HistoryItem getHistoryItemByWord(Context context, String word) {
+    public static HistoryItem getHistoryItemByWordAndLangs(Context context, String word,
+                                                           String languageFrom, String languageTo) {
         HistoryItem item = null;
-        String selection = Contract.HistoryEntry.WORD + WHERE_ARG_PLACEHOLDER;
-        String[] selectionArgs = new String[]{word};
+        String selection = Contract.HistoryEntry.WORD + WHERE_ARG_PLACEHOLDER + " AND " +
+                Contract.HistoryEntry.LANGUAGE_FROM + WHERE_ARG_PLACEHOLDER + " AND " +
+                Contract.HistoryEntry.LANGUAGE_TO + WHERE_ARG_PLACEHOLDER;
+        String[] selectionArgs = new String[]{word, languageFrom, languageTo};
 
-        /*Uri searchWordUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
-                .appendPath(word).build();*/
         Cursor cursor =  context.getContentResolver().query(
                 Contract.HistoryEntry.CONTENT_URI_HISTORY,
                 null,
@@ -95,10 +96,11 @@ public class DBManager {
     }
 
     public static int updateHistoryItem(Context context, HistoryItem item) {
-        String where = Contract.HistoryEntry._ID + WHERE_ARG_PLACEHOLDER;
-        String[] args = new String[]{String.valueOf(item.getId())};
+        Uri idUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
+                .appendPath(String.valueOf(item.getId()))
+                .build();
         int updatedCount = context.getContentResolver()
-                .update(Contract.HistoryEntry.CONTENT_URI_HISTORY, item.toContentValues(), where, args);
+                .update(idUri, item.toContentValues(), null, null);
         return updatedCount;
     }
 }
