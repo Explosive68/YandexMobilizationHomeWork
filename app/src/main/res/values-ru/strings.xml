@@ -19,6 +19,7 @@
     <string name="language_selection_title_to">Язык перевода</string>
 
     <string name="translation_share_intent_title">Отправить перевод с помощью</string>
+    <string name="translation_input_hint">Введите слово или предложение для перевода</string>
 
     <string name="default_language_from">Русский</string>
     <string name="default_language_to">Английский</string>
