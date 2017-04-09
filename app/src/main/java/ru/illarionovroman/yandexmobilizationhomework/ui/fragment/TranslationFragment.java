@@ -48,6 +48,7 @@ import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorRespo
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
+import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
 import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
@@ -59,6 +60,8 @@ public class TranslationFragment extends BaseFragment {
 
     public static final String EXTRA_CURRENT_LANGUAGE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_CURRENT_LANGUAGE";
     public static final String EXTRA_REQUEST_CODE = "ru.illarionovroman.yandexmobilizationhomework.ui.fragments.TranslationFragment.EXTRA_REQUEST_CODE";
+
+    public static final String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
     public static final int USER_INPUT_UPDATE_TIMEOUT_SECONDS = 2;
@@ -137,7 +140,24 @@ public class TranslationFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        restoreInstanceState(savedInstanceState);
         initializeFragment();
+    }
+
+    private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
+                mCurrentItem = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
+                showHistoryItemTranslation(mCurrentItem);
+            }
+        } else {
+            long itemId = Prefs.getLastUsedItemId(getContext());
+            if (itemId != -1) {
+                // Preload in UI thread to show ready data
+                HistoryItem item = DBManager.getHistoryItemById(getContext(), itemId);
+                handleTranslationSuccess(item);
+            }
+        }
     }
 
     private void initializeFragment() {
@@ -188,6 +208,7 @@ public class TranslationFragment extends BaseFragment {
     @NonNull
     private Disposable createDisposableUserInputWatcher() {
         return RxTextView.textChanges(mEtWordInput)
+                .skipInitialValue()
                 // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
                 .map(String::valueOf)
                 .map(String::trim)
@@ -407,6 +428,9 @@ public class TranslationFragment extends BaseFragment {
     }
 
     private void showHistoryItemTranslation(HistoryItem item) {
+        mTvLanguageFrom.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom()));
+        mTvLanguageTo.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo()));
+
         mEtWordInput.setText(item.getWord());
         mTvTranslation.setText(item.getTranslation());
         mIvTranslationFavorite.setActivated(item.getIsFavorite());
@@ -578,11 +602,20 @@ public class TranslationFragment extends BaseFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (mDisposables != null) {
             mDisposables.clear();
         }
         unregisterIdObserver();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mCurrentItem != null) {
+            outState.putParcelable(ARG_CURRENT_ITEM, mCurrentItem);
+            Prefs.putLastUsedItemId(getContext(), mCurrentItem.getId());
+        }
     }
 }
