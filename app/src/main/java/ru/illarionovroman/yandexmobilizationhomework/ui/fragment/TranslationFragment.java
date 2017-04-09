@@ -98,6 +98,10 @@ public class TranslationFragment extends BaseFragment {
     ImageView mIvSwapLanguages;
 
     private CompositeDisposable mDisposables;
+
+    /**
+     * Always use {@link #setCurrentItem(HistoryItem)} to change this field
+     */
     private HistoryItem mCurrentItem;
 
     /**
@@ -117,7 +121,7 @@ public class TranslationFragment extends BaseFragment {
             } catch (NumberFormatException ignore) {
             }
             if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadAndShowHistoryItem(mCurrentItem.getId());
+                loadItemFromDB(id);
             }
         }
     };
@@ -147,8 +151,9 @@ public class TranslationFragment extends BaseFragment {
     private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
-                mCurrentItem = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
-                showHistoryItemTranslation(mCurrentItem);
+                HistoryItem item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
+                setCurrentItem(item);
+                fillAndShowTranslationViews(item);
             }
         } else {
             long itemId = Prefs.getLastUsedItemId(getContext());
@@ -192,10 +197,11 @@ public class TranslationFragment extends BaseFragment {
             mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
             mTvLanguageTo.setText(buf);
 
-            // Insert translation to input
+            // Translate word from translation
             String translation = mTvTranslation.getText().toString();
             if (!TextUtils.isEmpty(translation)) {
-                mEtWordInput.setText(translation);
+                loadItemFromDatabaseOrNetwork(translation,
+                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
             }
         });
     }
@@ -225,20 +231,22 @@ public class TranslationFragment extends BaseFragment {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::updateHistoryItem);
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(inputText,
+                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
     }
 
     /**
      * We use reactivex.Single here,
      * since there could be either just one resulting item or failure
      */
-    private void updateHistoryItem(String wordToTranslate) {
+    private void loadItemFromDatabaseOrNetwork(String wordToTranslate, String langCodeFrom,
+                                               String langCodeTo) {
         showLoading();
 
-        Single<HistoryItem> historyItemObservable =
-                createHistoryItemUpdateSingle(wordToTranslate);
+        Single<HistoryItem> historyItemSingle =
+                createHistoryItemUpdateSingle(wordToTranslate, langCodeFrom, langCodeTo);
 
-        mDisposables.add(historyItemObservable
+        mDisposables.add(historyItemSingle
                 .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
     }
 
@@ -246,9 +254,13 @@ public class TranslationFragment extends BaseFragment {
      * The common scheme is as follows: at first, we are trying to get translation from DB,
      * if there is no such translation that we are looking for, then try to get it from the server
      * @param wordToTranslate
+     * @param langCodeFrom Language code to translate from
+     * @param langCodeTo Language code to translate to
      * @return
      */
-    private Single<HistoryItem> createHistoryItemUpdateSingle(final String wordToTranslate) {
+    private Single<HistoryItem> createHistoryItemUpdateSingle(final String wordToTranslate,
+                                                              final String langCodeFrom,
+                                                              final String langCodeTo) {
         return Single.just(wordToTranslate)
                 .flatMap(new Function<String, Single<HistoryItem>>() {
                     @Override
@@ -257,8 +269,8 @@ public class TranslationFragment extends BaseFragment {
                         HistoryItem historyItem = DBManager.getHistoryItemByWordAndLangs(
                                 getContext(),
                                 word,
-                                getCurrentCodeLanguageFrom(),
-                                getCurrentCodeLanguageTo());
+                                langCodeFrom,
+                                langCodeTo);
                         if (historyItem == null) {
                             historyItem = new HistoryItem();
                         }
@@ -273,7 +285,8 @@ public class TranslationFragment extends BaseFragment {
                             return Single.just(historyItem);
                         } else {
                             // If not found - do network request
-                            return createHistoryItemFromNetworkSingle(wordToTranslate);
+                            return createHistoryItemFromNetworkSingle(wordToTranslate,
+                                    langCodeFrom, langCodeTo);
                         }
                     }
                 })
@@ -287,7 +300,9 @@ public class TranslationFragment extends BaseFragment {
      * Perform network request, transform response to desired HistoryItem. This is reachable
      * only through DB write and read to obtain autogenerated item's ID and Date
      */
-    private Single<HistoryItem> createHistoryItemFromNetworkSingle(String wordToTranslate) {
+    private Single<HistoryItem> createHistoryItemFromNetworkSingle(String wordToTranslate,
+                                                                   String langCodeFrom,
+                                                                   String langCodeTo) {
         String langFromTo = buildTranslationLangParam();
 
         Single<HistoryItem> historyItemSingle = ApiManager.getApiInterfaceInstance()
@@ -306,8 +321,8 @@ public class TranslationFragment extends BaseFragment {
                     HistoryItem item = new HistoryItem(
                             wordToTranslate,
                             translationBuilder.toString(),
-                            getCurrentCodeLanguageFrom(),
-                            getCurrentCodeLanguageTo()
+                            langCodeFrom,
+                            langCodeTo
                     );
                     // Write it to DB
                     long id = DBManager.addHistoryItem(getContext(), item);
@@ -322,7 +337,7 @@ public class TranslationFragment extends BaseFragment {
      * Load item with given id from DB in background, then pass it to UI
      * @param itemId Id of item to load from DB
      */
-    public void loadAndShowHistoryItem(long itemId) {
+    public void loadItemFromDB(long itemId) {
         Observable.just(itemId)
                 .map(id -> {
                     HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
@@ -339,17 +354,21 @@ public class TranslationFragment extends BaseFragment {
      */
     private void handleTranslationSuccess(HistoryItem item) {
         if (item != null) {
-            mCurrentItem = item;
-            refreshItemObserver(item.getId());
-
-            String languageFrom = Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom());
-            String languageTo = Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo());
-            mTvLanguageFrom.setText(languageFrom);
-            mTvLanguageTo.setText(languageTo);
-
-            showHistoryItemTranslation(item);
+            setCurrentItem(item);
+            fillAndShowTranslationViews(item);
         } else {
             Timber.wtf("Item can't be null in successful case");
+        }
+    }
+
+    /**
+     * Replace current item with new one and update observer
+     * @param item New {@link HistoryItem} to replace the old one
+     */
+    private void setCurrentItem(HistoryItem item) {
+        if (item != null) {
+            mCurrentItem = item;
+            refreshItemObserver(item.getId());
         }
     }
 
@@ -370,7 +389,7 @@ public class TranslationFragment extends BaseFragment {
                 ResponseBody errorBody = ((HttpException) error).response().errorBody();
                 ErrorResponse errorResponse = errorConverter.convert(errorBody);
                 // Use code to show localized error
-                handleError(errorResponse.getCode(), errorResponse.getMessage());
+                localizeAndShowErrorByCode(errorResponse.getCode(), errorResponse.getMessage());
             } catch (IOException ex) {
                 showError(getString(R.string.error_title_unknown),
                         getString(R.string.error_text_unknown));
@@ -427,19 +446,24 @@ public class TranslationFragment extends BaseFragment {
                 codeLangFrom, codeLangTo);
     }
 
-    private void showHistoryItemTranslation(HistoryItem item) {
+    private void fillAndShowTranslationViews(HistoryItem item) {
+        fillTranslationViews(item);
+        showTranslationViews();
+    }
+
+    private void fillTranslationViews(HistoryItem item) {
         mTvLanguageFrom.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom()));
         mTvLanguageTo.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo()));
 
         mEtWordInput.setText(item.getWord());
         mTvTranslation.setText(item.getTranslation());
         mIvTranslationFavorite.setActivated(item.getIsFavorite());
-        showTranslationViews();
     }
 
     @OnClick(R.id.btnRetry)
     void retry() {
-        updateHistoryItem(mEtWordInput.getText().toString());
+        loadItemFromDatabaseOrNetwork(mEtWordInput.getText().toString(),
+                getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
     }
 
     @OnClick(R.id.ivWordClean)
@@ -489,7 +513,8 @@ public class TranslationFragment extends BaseFragment {
     /**
      * Method for showing a localized error message by its code
      */
-    private void handleError(@ResponseErrorCodes int errorCode, @Nullable String errorMessage) {
+    private void localizeAndShowErrorByCode(@ResponseErrorCodes int errorCode,
+                                            @Nullable String errorMessage) {
         showTranslationViews();
 
         switch (errorCode) {
@@ -522,7 +547,7 @@ public class TranslationFragment extends BaseFragment {
                         getString(R.string.error_text_unknown));
                 break;
         }
-        Timber.d("handleError: errorCode=" + errorCode + ", msg=" + errorMessage);
+        Timber.d("localizeAndShowErrorByCode: errorCode=" + errorCode + ", msg=" + errorMessage);
     }
 
     /**
@@ -539,7 +564,8 @@ public class TranslationFragment extends BaseFragment {
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            updateHistoryItem(mEtWordInput.getText().toString());
+            loadItemFromDatabaseOrNetwork(mEtWordInput.getText().toString(),
+                    getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
