@@ -19,7 +19,7 @@ public class DBManager {
                 null,
                 null,
                 null,
-                Contract.HistoryEntry.DATE);
+                Contract.HistoryEntry.DATE + " DESC");
     }
 
     public static Cursor getFavoriteHistoryItemsCursor(Context context) {
@@ -28,7 +28,7 @@ public class DBManager {
                 null,
                 null,
                 null,
-                Contract.HistoryEntry.DATE);
+                Contract.HistoryEntry.DATE + " DESC");
     }
 
     public static HistoryItem getHistoryItemByWordAndLangs(Context context, String word,

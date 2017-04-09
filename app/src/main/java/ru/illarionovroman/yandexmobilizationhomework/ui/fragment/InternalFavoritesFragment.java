@@ -96,7 +96,7 @@ public class InternalFavoritesFragment extends BaseFragment implements LoaderMan
                 null,
                 null,
                 null,
-                Contract.HistoryEntry.DATE);
+                Contract.HistoryEntry.DATE + " DESC");
         return cursorLoader;
     }
 

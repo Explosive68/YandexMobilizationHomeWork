@@ -74,7 +74,7 @@ public class InternalHistoryFragment extends BaseFragment
                 null,
                 null,
                 null,
-                Contract.HistoryEntry.DATE);
+                Contract.HistoryEntry.DATE + " DESC");
         return cursorLoader;
     }
 
