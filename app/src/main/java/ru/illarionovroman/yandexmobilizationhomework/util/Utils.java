@@ -7,7 +7,11 @@ import android.text.TextUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
@@ -23,15 +27,30 @@ public class Utils {
         if (sLanguagesMap.isEmpty()) {
             String[] rawLangArray = context.getResources()
                     .getStringArray(R.array.language_codes_names);
+
             LinkedHashMap<String, String> languagesMap = new LinkedHashMap<>(rawLangArray.length);
 
             for (String rawItem : rawLangArray) {
                 String[] splittedItem = rawItem.split(AppConstants.LANGUAGE_SPLIT_SYMBOL);
                 languagesMap.put(splittedItem[0], splittedItem[1]);
             }
+
+            orderMapByValue(languagesMap, String::compareTo);
             sLanguagesMap = languagesMap;
         }
         return sLanguagesMap;
+    }
+
+    private static <K,V> void orderMapByValue(LinkedHashMap<K,V> map,
+                                              final Comparator<? super V> comp) {
+        List<Map.Entry<K,V>> entries = new ArrayList<>(map.entrySet());
+
+        Collections.sort(entries, (o1, o2) -> comp.compare(o1.getValue(), o2.getValue()));
+
+        map.clear();
+        for (Map.Entry<K,V> entry : entries) {
+            map.put(entry.getKey(), entry.getValue());
+        }
     }
 
     public static String getLangNameByCode(Context context, String langCode) {
