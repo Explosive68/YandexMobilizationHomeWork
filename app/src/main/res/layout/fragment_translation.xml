@@ -85,7 +85,7 @@
             <ImageView
                 android:id="@+id/ivTranslationFavorite"
                 style="@style/TranslationActionImage"
-                android:src="@drawable/ic_favorite_toggle_activated" />
+                android:src="@drawable/ic_favorite_selector" />
 
             <ImageView
                 android:id="@+id/ivTranslationShare"

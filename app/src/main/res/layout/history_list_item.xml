@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/history_list_item_height"
     android:orientation="horizontal">
 
-    <ToggleButton
-        android:id="@+id/tbFavorite"
-        android:layout_width="@dimen/image_size_normal"
-        android:layout_height="@dimen/image_size_normal"
-        android:background="@drawable/ic_favorite_toggle"
-        android:layout_marginStart="@dimen/margin_half"
-        android:layout_marginEnd="@dimen/margin_half"
+    <ImageView
+        android:id="@+id/ivFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/margin_full"
+        android:src="@drawable/ic_favorite_selector"
         android:textOff=""
-        android:textOn=""
-        android:layout_gravity="center"/>
+        android:textOn="" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvOriginalWord"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:lines="1"
-            tools:text="Original"/>
+            tools:text="Original" />
 
         <TextView
             android:id="@+id/tvTranslation"
@@ -40,17 +40,18 @@
             android:ellipsize="end"
             android:lines="1"
             android:paddingTop="@dimen/margin_quarter"
-            tools:text="Translation"/>
+            tools:text="Translation" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvTranslationDirection"
-        android:layout_width="wrap_content"
+        style="@style/TextTranslationDirection"
+        android:layout_width="@dimen/history_item_direction_width"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center_vertical|start"
         android:layout_weight="0"
         android:gravity="center_vertical|start"
-        android:textAllCaps="true"
-        android:paddingEnd="@dimen/margin_full"
-        tools:text="EN - RU"/>
+        android:lines="1"
+        android:ellipsize="end"
+        tools:text="ENG - RUS" />
 </LinearLayout>

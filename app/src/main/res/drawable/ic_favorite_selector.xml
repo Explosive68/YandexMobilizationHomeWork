@@ -2,6 +2,6 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/ic_favorite_on"
         android:state_activated="true" />
-    <item android:drawable="@drawable/ic_favorite"
+    <item android:drawable="@drawable/ic_favorite_off"
         android:state_activated="false"/>
 </selector>

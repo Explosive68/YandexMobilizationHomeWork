@@ -6,9 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,9 +52,9 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
                 item.getLanguageCodeTo());
         holder.tvTranslationDirection.setText(translationDirection);
 
-        holder.tbFavorite.setChecked(item.getIsFavorite());
-        holder.tbFavorite.setOnClickListener(view -> {
-            if (((ToggleButton) view).isChecked()) {
+        holder.ivFavorite.setActivated(item.getIsFavorite());
+        holder.ivFavorite.setOnClickListener(view -> {
+            if (((ImageView) view).isActivated()) {
                 item.setIsFavorite(true);
             } else {
                 item.setIsFavorite(false);
@@ -104,8 +104,8 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
 
     class HistoryViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.tbFavorite)
-        ToggleButton tbFavorite;
+        @BindView(R.id.ivFavorite)
+        ImageView ivFavorite;
         @BindView(R.id.tvOriginalWord)
         TextView tvOriginalWord;
         @BindView(R.id.tvTranslation)

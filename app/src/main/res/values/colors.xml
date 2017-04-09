@@ -4,14 +4,24 @@
     <color name="colorPrimaryDark">#F57C00</color>
     <color name="colorAccent">#009688</color>
 
+    <color name="colorMainBackground">@android:color/white</color>
+
     <color name="colorPrimaryText">#212121</color>
     <color name="colorSecondaryText">#757575</color>
     <color name="colorTextActionBar">@android:color/white</color>
+    <color name="colorTextHistoryTab">#99FFFFFF</color>
+    <color name="colorTextHistoryTabSelected">@android:color/white</color>
 
-    <color name="colorBottomDivider">#e0e0e0</color>
-    <color name="colorBottomBackground">@android:color/white</color>
+    <color name="colorBottomDivider">#E0E0E0</color>
+    <color name="colorBottomBackground">@color/colorMainBackground</color>
     <color name="colorBottomIconSelected">@android:color/black</color>
-    <color name="colorBottomIcon">@color/colorPrimary</color>
+    <color name="colorBottomIcon">@android:color/darker_gray</color>
+
+    <color name="colorFavoriteButtonOn">@color/colorPrimary</color>
+    <color name="colorFavoriteButtonOff">@color/colorPrimary</color>
+
+    <color name="colorBottomTabIndicator">@color/colorPrimary</color>
+    <color name="colorHistoryTabIndicator">#BBFFFFFF</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>

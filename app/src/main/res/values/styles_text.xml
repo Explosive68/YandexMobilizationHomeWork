@@ -31,4 +31,10 @@
         <item name="android:textColor">@color/colorPrimaryText</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
+
+    <style name="TextTranslationDirection">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/colorSecondaryText</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
 </resources>

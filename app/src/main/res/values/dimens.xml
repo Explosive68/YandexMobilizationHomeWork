@@ -15,8 +15,13 @@
     <dimen name="text_size_list_item">18sp</dimen>
     <dimen name="text_size_translation">20sp</dimen>
 
+    <dimen name="tab_indicator_height_bottom">4dp</dimen>
+    <dimen name="tab_indicator_height_history">3dp</dimen>
+
     <dimen name="progress_bar_size">48dp</dimen>
 
     <dimen name="list_item_height">48dp</dimen>
     <dimen name="history_list_item_height">72dp</dimen>
+
+    <dimen name="history_item_direction_width">64dp</dimen>
 </resources>

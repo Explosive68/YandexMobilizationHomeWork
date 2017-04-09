@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/AppBarLayout">
 
-    <android.support.v7.widget.Toolbar
-        style="@style/AppToolbar">
+    <android.support.v7.widget.Toolbar style="@style/AppToolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -17,9 +16,11 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 app:tabMode="fixed"
-                app:tabSelectedTextColor="@color/colorTextActionBar"
+                app:tabIndicatorColor="@color/colorHistoryTabIndicator"
+                app:tabIndicatorHeight="@dimen/tab_indicator_height_history"
                 app:tabTextAppearance="@android:style/TextAppearance.Medium"
-                app:tabTextColor="@color/colorTextActionBar" />
+                app:tabTextColor="@color/colorTextHistoryTab"
+                app:tabSelectedTextColor="@color/colorTextHistoryTabSelected" />
 
             <ImageView
                 android:id="@+id/ivDelete"
