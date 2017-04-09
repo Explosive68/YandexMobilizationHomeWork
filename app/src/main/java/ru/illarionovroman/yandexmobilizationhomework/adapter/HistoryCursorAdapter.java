@@ -54,10 +54,13 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
 
         holder.ivFavorite.setActivated(item.getIsFavorite());
         holder.ivFavorite.setOnClickListener(view -> {
-            if (((ImageView) view).isActivated()) {
-                item.setIsFavorite(true);
-            } else {
+            boolean activated = view.isActivated();
+            if (activated) {
+                view.setActivated(false);
                 item.setIsFavorite(false);
+            } else {
+                view.setActivated(true);
+                item.setIsFavorite(true);
             }
             int updatedCount = DBManager.updateHistoryItem(mContext, item);
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
