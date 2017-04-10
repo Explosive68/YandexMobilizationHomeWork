@@ -23,7 +23,8 @@
             style="@style/WordInputActionImage"
             android:src="@drawable/ic_mic"
             app:layout_constraintRight_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="0dp"/>
 
         <ImageView
             android:id="@+id/ivWordSpeaker"
@@ -35,7 +36,7 @@
 
         <ImageView
             android:id="@+id/ivWordClean"
-            style="@style/WordInputActionImage"
+            style="@style/CleanWordActionImage"
             android:src="@drawable/ic_cross"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="parent" />
@@ -44,7 +45,7 @@
             android:id="@+id/etWordInput"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/margin_half"
+            android:padding="@dimen/margin_half"
             android:background="@android:color/transparent"
             android:gravity="top"
             android:hint="@string/translation_input_hint"
@@ -82,7 +83,8 @@
             <ImageView
                 android:id="@+id/ivTranslationSpeaker"
                 style="@style/TranslationActionImage"
-                android:src="@drawable/ic_speaker" />
+                android:src="@drawable/ic_speaker"
+                android:layout_marginTop="0dp"/>
 
             <ImageView
                 android:id="@+id/ivTranslationFavorite"

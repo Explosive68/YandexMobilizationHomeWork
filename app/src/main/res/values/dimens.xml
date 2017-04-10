@@ -5,7 +5,7 @@
     <dimen name="margin_half">8dp</dimen>
     <dimen name="margin_quarter">4dp</dimen>
 
-    <dimen name="image_size_normal">40dp</dimen>
+    <dimen name="image_size_normal">32dp</dimen>
 
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_normal">16sp</dimen>
