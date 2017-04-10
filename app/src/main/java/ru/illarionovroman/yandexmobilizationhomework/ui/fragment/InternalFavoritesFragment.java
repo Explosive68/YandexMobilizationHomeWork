@@ -23,6 +23,8 @@ import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapte
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
+import static ru.illarionovroman.yandexmobilizationhomework.db.DBManager.getFavoriteHistoryItemsCursor;
+
 
 public class InternalFavoritesFragment extends BaseFragment {
 
@@ -31,6 +33,9 @@ public class InternalFavoritesFragment extends BaseFragment {
 
     private HistoryCursorAdapter mAdapter;
 
+    /**
+     * Is fragment visible right now. We need it to decide whether to show data change immediately
+     */
     private boolean mIsVisible = false;
 
     private ContentObserver mFavoritesObserver = new ContentObserver(new Handler()) {
@@ -41,43 +46,52 @@ public class InternalFavoritesFragment extends BaseFragment {
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            // Update favorites list, performing db load in background
-            Single.just(1)
-                    .map(integer -> DBManager.getFavoriteHistoryItemsCursor(getContext()))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(cursor -> {
-                        // Check whether at least one element exists
-                        if (cursor.moveToFirst()) {
-                            if (!mIsVisible) {
-                                // If screen is not visible right now - update immediately
-                                mAdapter.swapCursor(cursor);
-                            } else {
-                                // Otherwise, analyze URI: is it specific item change?
-                                long id = -1;
-                                try {
-                                    id = ContentUris.parseId(uri);
-                                } catch (NumberFormatException ignore) {
-                                }
-
-                                if (id != -1) {
-                                    // If yes - update adapter's data,
-                                    // but do not delete item from list for now
-                                    mAdapter.swapCursorWithoutNotify(cursor);
-                                } else {
-                                    // If it is generic favorite list change - update data
-                                    // and display it right now
-                                    mAdapter.swapCursor(cursor);
-                                }
-                            }
-                        } else {
-                            // No elements? Seems like someone pressed
-                            // "Delete all history/favorites" button, show changes instantly
-                            mAdapter.swapCursor(null);
-                        }
-                    });
+            updateAdapterCursor(mAdapter, uri, mIsVisible);
         }
     };
+
+    /**
+     * Update favorites list, performing db load in background
+     *
+     * @param adapter       {@link HistoryCursorAdapter} to change
+     * @param uri           {@link Uri}, which gives us information whether that was single item
+     *                      or general data change
+     * @param isVisible Is this fragment visible to user right now
+     */
+    private void updateAdapterCursor(HistoryCursorAdapter adapter, Uri uri, boolean isVisible) {
+        Single<Cursor> cursorSingle = Single.create(emitter -> {
+            Cursor cursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
+            emitter.onSuccess(cursor);
+        });
+
+        cursorSingle
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(cursor -> {
+                    // Analyze URI: is it specific item change?
+                    long id = -1;
+                    try {
+                        id = ContentUris.parseId(uri);
+                    } catch (NumberFormatException ignore) {
+                    }
+
+                    if (id == -1) {
+                        // If it is generic Favorites list change - update data
+                        // and display it right now
+                        adapter.swapCursor(cursor);
+                    } else {
+                        // If it is a specific item change
+                        if (isVisible) {
+                            // If list is visible right now - update adapter's data,
+                            // but do not delete item from list
+                            adapter.swapCursorWithoutNotify(cursor);
+                        } else {
+                            // If list is invisible - update data and display it
+                            adapter.swapCursor(cursor);
+                        }
+                    }
+                });
+    }
 
     public InternalFavoritesFragment() {
     }
@@ -97,7 +111,8 @@ public class InternalFavoritesFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
+
+        Cursor favoritesCursor = getFavoriteHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
         initializeRecyclerView(mAdapter);
 
@@ -126,7 +141,7 @@ public class InternalFavoritesFragment extends BaseFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         mIsVisible = isVisibleToUser;
-        // Whenever visibility changes - always notify adapter, to be sure it's showing actual data
+        // When fragment hides - show previously changed data
         if (mAdapter != null && !mIsVisible) {
             mAdapter.notifyDataSetChanged();
         }
