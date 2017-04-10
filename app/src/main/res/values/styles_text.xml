@@ -37,4 +37,16 @@
         <item name="android:textColor">@color/colorSecondaryText</item>
         <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="TextListEmptyMessage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:textSize">@dimen/text_size_list_empty_msg</item>
+        <item name="android:textColor">@color/colorTextListEmptyMessage</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/margin_double</item>
+        <item name="android:paddingEnd">@dimen/margin_double</item>
+    </style>
 </resources>

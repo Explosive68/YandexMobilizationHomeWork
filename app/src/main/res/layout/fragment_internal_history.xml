@@ -9,4 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <TextView
+        android:id="@+id/tvHistoryEmpty"
+        style="@style/TextListEmptyMessage"
+        android:text="@string/history_is_empty"/>
 </FrameLayout>

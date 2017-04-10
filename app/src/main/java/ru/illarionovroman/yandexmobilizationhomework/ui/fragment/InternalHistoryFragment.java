@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import ru.illarionovroman.yandexmobilizationhomework.R;
@@ -27,6 +28,8 @@ public class InternalHistoryFragment extends BaseFragment
 
     @BindView(R.id.rvInternalHistory)
     RecyclerView mRvInternalHistory;
+    @BindView(R.id.tvHistoryEmpty)
+    TextView mTvHistoryEmpty;
 
     private HistoryCursorAdapter mAdapter;
 
@@ -78,10 +81,21 @@ public class InternalHistoryFragment extends BaseFragment
         } else {
             mAdapter.swapCursor(null);
         }
+        setListEmptyState(cursor.getCount());
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    private void setListEmptyState(int itemsCount) {
+        if (itemsCount > 0) {
+            mRvInternalHistory.setVisibility(View.VISIBLE);
+            mTvHistoryEmpty.setVisibility(View.GONE);
+        } else {
+            mRvInternalHistory.setVisibility(View.GONE);
+            mTvHistoryEmpty.setVisibility(View.VISIBLE);
+        }
     }
 }

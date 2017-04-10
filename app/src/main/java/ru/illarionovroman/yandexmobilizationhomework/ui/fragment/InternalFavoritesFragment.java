@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import io.reactivex.Single;
@@ -23,13 +24,13 @@ import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapte
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 
-import static ru.illarionovroman.yandexmobilizationhomework.db.DBManager.getFavoriteHistoryItemsCursor;
-
 
 public class InternalFavoritesFragment extends BaseFragment {
 
     @BindView(R.id.rvInternalFavorite)
     RecyclerView mRvInternalFavorite;
+    @BindView(R.id.tvFavoritesEmpty)
+    TextView mTvFavoritesEmpty;
 
     private HistoryCursorAdapter mAdapter;
 
@@ -79,6 +80,7 @@ public class InternalFavoritesFragment extends BaseFragment {
                         // If it is generic Favorites list change - update data
                         // and display it right now
                         adapter.swapCursor(cursor);
+                        setListEmptyState(cursor.getCount());
                     } else {
                         // If it is a specific item change
                         if (isVisible) {
@@ -88,6 +90,7 @@ public class InternalFavoritesFragment extends BaseFragment {
                         } else {
                             // If list is invisible - update data and display it
                             adapter.swapCursor(cursor);
+                            setListEmptyState(cursor.getCount());
                         }
                     }
                 });
@@ -112,9 +115,10 @@ public class InternalFavoritesFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Cursor favoritesCursor = getFavoriteHistoryItemsCursor(getContext());
+        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
         initializeRecyclerView(mAdapter);
+        setListEmptyState(mAdapter.getItemCount());
 
         getContext().getContentResolver().registerContentObserver(
                 Contract.HistoryEntry.CONTENT_URI_FAVORITES, true, mFavoritesObserver);
@@ -137,6 +141,16 @@ public class InternalFavoritesFragment extends BaseFragment {
         }
     }
 
+    private void setListEmptyState(int itemsCount) {
+        if (itemsCount > 0) {
+            mRvInternalFavorite.setVisibility(View.VISIBLE);
+            mTvFavoritesEmpty.setVisibility(View.GONE);
+        } else {
+            mRvInternalFavorite.setVisibility(View.GONE);
+            mTvFavoritesEmpty.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -144,6 +158,7 @@ public class InternalFavoritesFragment extends BaseFragment {
         // When fragment hides - show previously changed data
         if (mAdapter != null && !mIsVisible) {
             mAdapter.notifyDataSetChanged();
+            setListEmptyState(mAdapter.getItemCount());
         }
     }
 }

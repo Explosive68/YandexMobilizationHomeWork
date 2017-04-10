@@ -11,6 +11,7 @@
     <color name="colorTextActionBar">@android:color/white</color>
     <color name="colorTextHistoryTab">#99FFFFFF</color>
     <color name="colorTextHistoryTabSelected">@android:color/white</color>
+    <color name="colorTextListEmptyMessage">#55212121</color>
 
     <color name="colorBottomDivider">#E0E0E0</color>
     <color name="colorBottomBackground">@color/colorMainBackground</color>

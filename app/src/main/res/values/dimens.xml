@@ -14,6 +14,7 @@
     <dimen name="text_size_action_bar">18sp</dimen>
     <dimen name="text_size_list_item">18sp</dimen>
     <dimen name="text_size_translation">20sp</dimen>
+    <dimen name="text_size_list_empty_msg">24sp</dimen>
 
     <dimen name="tab_indicator_height_bottom">4dp</dimen>
     <dimen name="tab_indicator_height_history">3dp</dimen>
