@@ -14,9 +14,24 @@
     </style>
 
     <style name="ActionImage">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/image_size_action</item>
+        <item name="android:layout_height">@dimen/image_size_action</item>
         <item name="android:padding">@dimen/margin_half</item>
+    </style>
+
+    <style name="WordInputActionImage" parent="ActionImage">
+    </style>
+
+    <style name="TranslationActionImage" parent="ActionImage">
+        <item name="android:layout_marginTop">@dimen/margin_half</item>
+    </style>
+
+    <style name="WordInputActionImageLand" parent="WordInputActionImage">
+        <item name="android:layout_marginTop">@dimen/margin_quarter</item>
+    </style>
+
+    <style name="TranslationActionImageLand" parent="TranslationActionImage">
+        <item name="android:layout_marginTop">@dimen/margin_quarter</item>
     </style>
 
     <style name="CleanWordActionImage">
@@ -26,29 +41,6 @@
         <item name="android:paddingBottom">@dimen/margin_quarter</item>
         <item name="android:paddingEnd">@dimen/margin_half</item>
         <item name="android:paddingTop">@dimen/margin_quarter</item>
-    </style>
-
-    <style name="WordInputActionImage" parent="ActionImage">
-        <item name="android:layout_marginTop">@dimen/margin_quarter</item>
-        <item name="android:layout_marginLeft">@dimen/margin_quarter</item>
-        <item name="android:layout_marginBottom">@dimen/margin_quarter</item>
-        <item name="android:layout_marginRight">0dp</item>
-    </style>
-
-    <style name="WordInputActionImageLandscape" parent="WordInputActionImage">
-        <item name="android:layout_marginTop">@dimen/margin_half</item>
-    </style>
-
-    <style name="TranslationActionImage" parent="ActionImage">
-        <item name="android:layout_marginTop">@dimen/margin_quarter</item>
-        <item name="android:layout_marginLeft">@dimen/margin_quarter</item>
-        <item name="android:layout_marginBottom">@dimen/margin_quarter</item>
-        <item name="android:layout_marginRight">0dp</item>
-    </style>
-
-    <style name="TranslationActionImageLandscape" parent="TranslationActionImage">
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
