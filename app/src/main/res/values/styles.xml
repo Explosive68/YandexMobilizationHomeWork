@@ -17,6 +17,7 @@
         <item name="android:layout_width">@dimen/image_size_action</item>
         <item name="android:layout_height">@dimen/image_size_action</item>
         <item name="android:padding">@dimen/margin_half</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
 
     <style name="WordInputActionImage" parent="ActionImage">
