@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.view.NonSwipeableViewPager;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationFragment;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -153,6 +153,6 @@ public class MainActivity extends AppCompatActivity {
         mPager.setCurrentItem(FragmentPosition.TRANSLATION, true);
         TranslationFragment fragment = (TranslationFragment) mAdapter
                 .getRegisteredFragment(FragmentPosition.TRANSLATION);
-        fragment.loadItemFromDB(itemId);
+        fragment.loadAndShowItemFromDB(itemId);
     }
 }

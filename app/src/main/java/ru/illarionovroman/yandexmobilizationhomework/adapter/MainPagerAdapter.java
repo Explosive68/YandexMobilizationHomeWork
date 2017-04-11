@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.HistoryFragment;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.SettingsFragment;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationFragment;
 
 
 public class MainPagerAdapter extends FragmentPagerAdapter {

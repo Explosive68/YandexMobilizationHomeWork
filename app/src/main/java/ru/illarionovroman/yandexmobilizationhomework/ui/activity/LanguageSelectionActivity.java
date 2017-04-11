@@ -15,7 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.LanguageSelectionAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.TranslationFragment;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationFragment;
 
 
 public class LanguageSelectionActivity extends AppCompatActivity

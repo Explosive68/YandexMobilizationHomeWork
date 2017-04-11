@@ -1,4 +1,4 @@
-package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
+package ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation;
 
 import android.app.Activity;
 import android.content.ContentUris;
@@ -7,7 +7,6 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,13 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.widget.RxTextView;
-
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -34,7 +29,6 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -48,6 +42,7 @@ import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorRespo
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.BaseFragment;
 import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
 import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
@@ -64,7 +59,7 @@ public class TranslationFragment extends BaseFragment {
     public static final String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
-    public static final int USER_INPUT_UPDATE_TIMEOUT_SECONDS = 2;
+
 
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
@@ -121,7 +116,7 @@ public class TranslationFragment extends BaseFragment {
             } catch (NumberFormatException ignore) {
             }
             if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadItemFromDB(id);
+                loadAndShowItemFromDB(id);
             }
         }
     };
@@ -167,9 +162,18 @@ public class TranslationFragment extends BaseFragment {
 
     private void initializeFragment() {
         initializeActionBar();
+        initializeInputWatcher();
+    }
 
+    private void initializeInputWatcher() {
         mDisposables = new CompositeDisposable();
-        mDisposables.add(createDisposableUserInputWatcher());
+        Observable<String> inputWatcher = TranslationHelper.createInputWatcher(
+                mEtWordInput, mCurrentItem);
+        Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(inputText,
+                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
+        mDisposables.add(inputDisposable);
     }
 
     private void initializeActionBar() {
@@ -207,35 +211,6 @@ public class TranslationFragment extends BaseFragment {
     }
 
     /**
-     * Rx watcher for user input in the EditText. After every valid update initiates translation
-     * loading procedure
-     * @return
-     */
-    @NonNull
-    private Disposable createDisposableUserInputWatcher() {
-        return RxTextView.textChanges(mEtWordInput)
-                .skipInitialValue()
-                // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
-                .map(String::valueOf)
-                .map(String::trim)
-                .distinctUntilChanged()
-                .debounce(USER_INPUT_UPDATE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .filter(inputText -> !TextUtils.isEmpty(inputText))
-                .filter(inputText -> {
-                    // Don't pass if the same item is currently displayed
-                    if (mCurrentItem != null && inputText.equals(mCurrentItem.getWord())) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(inputText,
-                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
-    }
-
-    /**
      * We use reactivex.Single here,
      * since there could be either just one resulting item or failure
      */
@@ -243,102 +218,19 @@ public class TranslationFragment extends BaseFragment {
                                                String langCodeTo) {
         showLoading();
 
-        Single<HistoryItem> historyItemSingle =
-                createHistoryItemUpdateSingle(wordToTranslate, langCodeFrom, langCodeTo);
+        Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(),
+                wordToTranslate, langCodeFrom, langCodeTo);
 
         mDisposables.add(historyItemSingle
                 .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
     }
 
     /**
-     * The common scheme is as follows: at first, we are trying to get translation from DB,
-     * if there is no such translation that we are looking for, then try to get it from the server
-     * @param wordToTranslate
-     * @param langCodeFrom Language code to translate from
-     * @param langCodeTo Language code to translate to
-     * @return
-     */
-    private Single<HistoryItem> createHistoryItemUpdateSingle(final String wordToTranslate,
-                                                              final String langCodeFrom,
-                                                              final String langCodeTo) {
-        return Single.just(wordToTranslate)
-                .flatMap(new Function<String, Single<HistoryItem>>() {
-                    @Override
-                    public Single<HistoryItem> apply(String word) throws Exception {
-                        // Try to find this word in database
-                        HistoryItem historyItem = DBManager.getHistoryItemByWordAndLangs(
-                                getContext(),
-                                word,
-                                langCodeFrom,
-                                langCodeTo);
-                        if (historyItem == null) {
-                            historyItem = new HistoryItem();
-                        }
-                        return Single.just(historyItem);
-                    }
-                })
-                .flatMap(new Function<HistoryItem, Single<HistoryItem>>() {
-                    @Override
-                    public Single<HistoryItem> apply(HistoryItem historyItem) throws Exception {
-                        if (historyItem.getId() != HistoryItem.UNSPECIFIED_ID) {
-                            // If found in DB - just return
-                            return Single.just(historyItem);
-                        } else {
-                            // If not found - do network request
-                            return createHistoryItemFromNetworkSingle(wordToTranslate,
-                                    langCodeFrom, langCodeTo);
-                        }
-                    }
-                })
-                // Do the work with DB and network in another thread
-                .subscribeOn(Schedulers.io())
-                // Show result in ui thread
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    /**
-     * Perform network request, transform response to desired HistoryItem. This is reachable
-     * only through DB write and read to obtain autogenerated item's ID and Date
-     */
-    private Single<HistoryItem> createHistoryItemFromNetworkSingle(String wordToTranslate,
-                                                                   String langCodeFrom,
-                                                                   String langCodeTo) {
-        String langFromTo = buildTranslationLangParam();
-
-        Single<HistoryItem> historyItemSingle = ApiManager.getApiInterfaceInstance()
-                .getTranslation(wordToTranslate, langFromTo, null)
-                .map(translationResponse -> {
-                    // Pull data from response
-                    StringBuilder translationBuilder = new StringBuilder();
-                    List<String> translations = translationResponse.getTranslations();
-                    for (int i = 0; i < translations.size(); i++) {
-                        translationBuilder.append(translations.get(i));
-                        if (i != translations.size() - 1) {
-                            translationBuilder.append("\n");
-                        }
-                    }
-                    // Create incomplete item
-                    HistoryItem item = new HistoryItem(
-                            wordToTranslate,
-                            translationBuilder.toString(),
-                            langCodeFrom,
-                            langCodeTo
-                    );
-                    // Write it to DB
-                    long id = DBManager.addHistoryItem(getContext(), item);
-                    // Now we can get the completed item
-                    HistoryItem resultItem = DBManager.getHistoryItemById(getContext(), id);
-                    return resultItem;
-                });
-        return historyItemSingle;
-    }
-
-    /**
      * Load item with given id from DB in background, then pass it to UI
      * @param itemId Id of item to load from DB
      */
-    public void loadItemFromDB(long itemId) {
-        Observable.just(itemId)
+    public void loadAndShowItemFromDB(long itemId) {
+        Single.just(itemId)
                 .map(id -> {
                     HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
                     return item;
@@ -433,17 +325,6 @@ public class TranslationFragment extends BaseFragment {
     private void refreshItemObserver(long itemId) {
         unregisterIdObserver();
         registerIdObserver(itemId);
-    }
-
-    /**
-     * Method for building parameter for translation request using currently selected languages.
-     * @return E.g.: "ru-en", "en-ru", etc.
-     */
-    private String buildTranslationLangParam() {
-        String codeLangFrom = getCurrentCodeLanguageFrom();
-        String codeLangTo = getCurrentCodeLanguageTo();
-        return getString(R.string.translate_query_param_language_from_to,
-                codeLangFrom, codeLangTo);
     }
 
     private void fillAndShowTranslationViews(HistoryItem item) {
