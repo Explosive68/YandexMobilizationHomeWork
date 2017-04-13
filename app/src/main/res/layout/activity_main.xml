@@ -30,10 +30,11 @@
             android:id="@+id/tlMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabBackground="@color/colorBottomBackground"
+            app:tabBackground="?android:attr/selectableItemBackground"
             app:tabIndicatorColor="@color/colorBottomTabIndicator"
             app:tabIndicatorHeight="@dimen/tab_indicator_height_bottom"
-            app:tabMode="fixed" />
+            app:tabMode="fixed"
+            android:background="@color/colorBottomBackground"/>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
