@@ -49,4 +49,15 @@
         <item name="android:paddingStart">@dimen/margin_double</item>
         <item name="android:paddingEnd">@dimen/margin_double</item>
     </style>
+
+    <style name="TextFullscreen">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/colorTextFullscreen</item>
+        <item name="android:textSize">@dimen/text_size_fullscreen</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">@dimen/margin_full</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
 </resources>

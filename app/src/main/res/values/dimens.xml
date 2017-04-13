@@ -6,6 +6,7 @@
     <dimen name="margin_quarter">4dp</dimen>
 
     <dimen name="image_size_action">40dp</dimen>
+    <dimen name="image_size_close_fullscreen">40dp</dimen>
 
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_normal">16sp</dimen>
@@ -15,6 +16,7 @@
     <dimen name="text_size_list_item">18sp</dimen>
     <dimen name="text_size_translation">20sp</dimen>
     <dimen name="text_size_list_empty_msg">24sp</dimen>
+    <dimen name="text_size_fullscreen">42sp</dimen>
 
     <dimen name="tab_indicator_height_bottom">4dp</dimen>
     <dimen name="tab_indicator_height_history">3dp</dimen>

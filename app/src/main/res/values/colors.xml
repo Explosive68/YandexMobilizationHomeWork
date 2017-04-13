@@ -5,6 +5,7 @@
     <color name="colorAccent">#009688</color>
 
     <color name="colorMainBackground">@android:color/white</color>
+    <color name="colorFullscreenBackground">#EEFF9800</color>
 
     <color name="colorPrimaryText">#212121</color>
     <color name="colorSecondaryText">#757575</color>
@@ -12,6 +13,7 @@
     <color name="colorTextHistoryTab">#99FFFFFF</color>
     <color name="colorTextHistoryTabSelected">@android:color/white</color>
     <color name="colorTextListEmptyMessage">#55212121</color>
+    <color name="colorTextFullscreen">#99FFFFFF</color>
 
     <color name="colorBottomDivider">#E0E0E0</color>
     <color name="colorBottomBackground">@color/colorMainBackground</color>

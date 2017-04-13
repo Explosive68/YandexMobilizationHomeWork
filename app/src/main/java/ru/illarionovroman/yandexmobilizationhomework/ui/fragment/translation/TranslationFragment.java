@@ -400,7 +400,9 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationFullscreen)
     void showFullScreen() {
-        startActivity(new Intent(getContext(), FullscreenActivity.class));
+        Intent intent = new Intent(getContext(), FullscreenActivity.class);
+        intent.putExtra(FullscreenActivity.EXTRA_FULLSCREEN_TEXT, mTvTranslation.getText());
+        startActivity(intent);
     }
 
     /**
