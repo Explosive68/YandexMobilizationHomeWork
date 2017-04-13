@@ -9,7 +9,7 @@ import ru.illarionovroman.yandexmobilizationhomework.network.response.SupportedL
 import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
 
 
-public interface TranslatorInterface {
+public interface RestApi {
 
     /**
      * @param languageCode Generally, it's 2 or 3 letter language code (ISO 639-1 or ISO 639-2)

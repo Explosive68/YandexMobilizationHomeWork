@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.UnknownHostException;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.Observable;
@@ -33,11 +35,12 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.HttpException;
+import retrofit2.Retrofit;
+import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
-import ru.illarionovroman.yandexmobilizationhomework.network.ApiManager;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
@@ -59,7 +62,6 @@ public class TranslationFragment extends BaseFragment {
     public static final String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
-
 
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
@@ -91,6 +93,9 @@ public class TranslationFragment extends BaseFragment {
     TextView mTvLanguageTo;
     @BindView(R.id.ivSwapLanguages)
     ImageView mIvSwapLanguages;
+
+    @Inject
+    Retrofit mRetrofit;
 
     private CompositeDisposable mDisposables;
 
@@ -140,6 +145,8 @@ public class TranslationFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         restoreInstanceState(savedInstanceState);
+        // Inject retrofit
+        ((MobilizationApp) getContext().getApplicationContext()).getNetworkComponent().inject(this);
         initializeFragment();
     }
 
@@ -171,7 +178,7 @@ public class TranslationFragment extends BaseFragment {
                 mEtWordInput, mCurrentItem);
         Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(inputText,
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRetrofit, inputText,
                         getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
         mDisposables.add(inputDisposable);
     }
@@ -204,7 +211,7 @@ public class TranslationFragment extends BaseFragment {
             // Translate word from translation
             String translation = mTvTranslation.getText().toString();
             if (!TextUtils.isEmpty(translation)) {
-                loadItemFromDatabaseOrNetwork(translation,
+                loadItemFromDatabaseOrNetwork(mRetrofit, translation,
                         getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
             }
         });
@@ -214,12 +221,13 @@ public class TranslationFragment extends BaseFragment {
      * We use reactivex.Single here,
      * since there could be either just one resulting item or failure
      */
-    private void loadItemFromDatabaseOrNetwork(String wordToTranslate, String langCodeFrom,
+    private void loadItemFromDatabaseOrNetwork(Retrofit retrofit, String wordToTranslate,
+                                               String langCodeFrom,
                                                String langCodeTo) {
         showLoading();
 
         Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(),
-                wordToTranslate, langCodeFrom, langCodeTo);
+                retrofit, wordToTranslate, langCodeFrom, langCodeTo);
 
         mDisposables.add(historyItemSingle
                 .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
@@ -275,9 +283,8 @@ public class TranslationFragment extends BaseFragment {
         if (error instanceof HttpException) {
             try {
                 // Get real error code
-                Converter<ResponseBody, ErrorResponse> errorConverter = ApiManager
-                        .getRetrofitInstance()
-                        .responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+                Converter<ResponseBody, ErrorResponse> errorConverter =
+                        mRetrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
                 ResponseBody errorBody = ((HttpException) error).response().errorBody();
                 ErrorResponse errorResponse = errorConverter.convert(errorBody);
                 // Use code to show localized error
@@ -343,7 +350,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.btnRetry)
     void retry() {
-        loadItemFromDatabaseOrNetwork(mEtWordInput.getText().toString(),
+        loadItemFromDatabaseOrNetwork(mRetrofit, mEtWordInput.getText().toString(),
                 getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
     }
 
@@ -447,7 +454,7 @@ public class TranslationFragment extends BaseFragment {
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            loadItemFromDatabaseOrNetwork(mEtWordInput.getText().toString(),
+            loadItemFromDatabaseOrNetwork(mRetrofit, mEtWordInput.getText().toString(),
                     getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
