@@ -344,6 +344,9 @@ public class TranslationFragment extends BaseFragment {
         mTvLanguageTo.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo()));
 
         mEtWordInput.setText(item.getWord());
+        if (mEtWordInput.hasFocus()) {
+            mEtWordInput.setSelection(mEtWordInput.getText().length());
+        }
         mTvTranslation.setText(item.getTranslation());
         mIvTranslationFavorite.setActivated(item.getIsFavorite());
     }
