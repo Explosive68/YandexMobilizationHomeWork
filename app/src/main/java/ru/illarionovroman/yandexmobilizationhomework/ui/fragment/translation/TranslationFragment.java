@@ -48,6 +48,7 @@ import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelecti
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.BaseFragment;
 import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
 import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
+import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
 
@@ -125,7 +126,7 @@ public class TranslationFragment extends BaseFragment {
             } catch (NumberFormatException ignore) {
             }
             if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadAndShowItemFromDB(id);
+                loadAndShowItemFromDB(id, false);
             }
         }
     };
@@ -240,14 +241,19 @@ public class TranslationFragment extends BaseFragment {
     /**
      * Load item with given id from DB in background, then pass it to UI
      * @param itemId Id of item to load from DB
+     * @param updateDate Whether to update date of item or not
      */
-    public void loadAndShowItemFromDB(long itemId) {
+    public void loadAndShowItemFromDB(long itemId, boolean updateDate) {
         Single.just(itemId)
                 .map(id -> {
                     HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
+                    if (updateDate) {
+                        item.setDate(Utils.getCurrentFormattedDateUtc());
+                        DBManager.updateHistoryItemWithId(getContext(), item);
+                    }
                     return item;
                 })
-                .subscribeOn(Schedulers.single())
+                .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleTranslationSuccess);
     }

@@ -19,6 +19,8 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 @Singleton
 public class Languages {
 
+    private static final String LANGUAGE_SPLIT_SYMBOL = ":";
+
     private LinkedHashMap<String,String> mLanguagesMap = new LinkedHashMap<>();
 
     @Inject
@@ -29,7 +31,7 @@ public class Languages {
         LinkedHashMap<String, String> languagesMap = new LinkedHashMap<>(rawLangArray.length);
 
         for (String rawItem : rawLangArray) {
-            String[] splittedItem = rawItem.split(AppConstants.LANGUAGE_SPLIT_SYMBOL);
+            String[] splittedItem = rawItem.split(LANGUAGE_SPLIT_SYMBOL);
             languagesMap.put(splittedItem[0], splittedItem[1]);
         }
 

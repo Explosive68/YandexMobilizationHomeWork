@@ -68,6 +68,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
         });
 
         holder.itemView.setOnClickListener(holderItemView -> {
+            // Send item id to InternalFragment -> MainActivity -> TranslationFragment
             mOnClickListener.onListItemClicked(item.getId());
         });
     }

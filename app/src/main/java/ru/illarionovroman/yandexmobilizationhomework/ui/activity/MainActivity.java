@@ -153,6 +153,6 @@ public class MainActivity extends AppCompatActivity {
         mPager.setCurrentItem(FragmentPosition.TRANSLATION, true);
         TranslationFragment fragment = (TranslationFragment) mAdapter
                 .getRegisteredFragment(FragmentPosition.TRANSLATION);
-        fragment.loadAndShowItemFromDB(itemId);
+        fragment.loadAndShowItemFromDB(itemId, true);
     }
 }

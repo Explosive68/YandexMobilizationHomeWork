@@ -127,6 +127,10 @@ public class HistoryItem implements Parcelable {
         return mDate;
     }
 
+    public void setDate(String date) {
+        this.mDate = date;
+    }
+
     public boolean getIsFavorite() {
         return mIsFavorite == 1;
     }
