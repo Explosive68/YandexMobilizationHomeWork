@@ -11,10 +11,13 @@ import android.widget.TextView;
 
 import java.util.LinkedHashMap;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 import ru.illarionovroman.yandexmobilizationhomework.R;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
+import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
 
 
 public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelectionAdapter.LanguageViewHolder> {
@@ -24,11 +27,14 @@ public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelec
     private String mCurrentLangCode;
     private OnListItemClickListener mOnClickListener;
 
+    @Inject
+    Languages mLanguages;
+
     public LanguageSelectionAdapter(Context context, String currentLangCode,
                                     OnListItemClickListener listener) {
         mContext = context;
-        LinkedHashMap<String, String> languages = Utils.getLanguagesMap(mContext);
-        mLangEntriesArray = languages.entrySet().toArray();
+        ((MobilizationApp) context.getApplicationContext()).getAppComponent().inject(this);
+        mLangEntriesArray = mLanguages.getLanguagesMap().entrySet().toArray();
         mCurrentLangCode = currentLangCode;
         mOnClickListener = listener;
     }

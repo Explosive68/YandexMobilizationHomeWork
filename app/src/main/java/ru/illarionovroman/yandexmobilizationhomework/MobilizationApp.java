@@ -4,21 +4,23 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 
-import ru.illarionovroman.yandexmobilizationhomework.dagger.component.DaggerNetworkComponent;
-import ru.illarionovroman.yandexmobilizationhomework.dagger.component.NetworkComponent;
+import ru.illarionovroman.yandexmobilizationhomework.dagger.component.AppComponent;
+import ru.illarionovroman.yandexmobilizationhomework.dagger.component.DaggerAppComponent;
+import ru.illarionovroman.yandexmobilizationhomework.dagger.module.AppContextModule;
 import ru.illarionovroman.yandexmobilizationhomework.dagger.module.NetworkModule;
 import timber.log.Timber;
 
 
 public class MobilizationApp extends Application {
 
-    private NetworkComponent mNetworkComponent;
+    private AppComponent mAppComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mNetworkComponent = DaggerNetworkComponent.builder()
+        mAppComponent = DaggerAppComponent.builder()
+                .appContextModule(new AppContextModule(getApplicationContext()))
                 .networkModule(new NetworkModule())
                 .build();
 
@@ -28,7 +30,7 @@ public class MobilizationApp extends Application {
         }
     }
 
-    public NetworkComponent getNetworkComponent() {
-        return mNetworkComponent;
+    public AppComponent getAppComponent() {
+        return mAppComponent;
     }
 }

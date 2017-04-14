@@ -46,8 +46,8 @@ import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseEr
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.BaseFragment;
+import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
 import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
-import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
 
@@ -98,6 +98,8 @@ public class TranslationFragment extends BaseFragment {
     RestApi mRestApi;
     @Inject
     Gson mGson;
+    @Inject
+    Languages mLanguages;
 
     private CompositeDisposable mDisposables;
 
@@ -146,9 +148,9 @@ public class TranslationFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Inject network dependencies and languages
+        ((MobilizationApp) getContext().getApplicationContext()).getAppComponent().inject(this);
         restoreInstanceState(savedInstanceState);
-        // Inject retrofit
-        ((MobilizationApp) getContext().getApplicationContext()).getNetworkComponent().inject(this);
         initializeFragment();
     }
 
@@ -340,8 +342,8 @@ public class TranslationFragment extends BaseFragment {
     }
 
     private void fillTranslationViews(HistoryItem item) {
-        mTvLanguageFrom.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeFrom()));
-        mTvLanguageTo.setText(Utils.getLangNameByCode(getContext(), item.getLanguageCodeTo()));
+        mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
+        mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
 
         mEtWordInput.setText(item.getWord());
         if (mEtWordInput.hasFocus()) {
@@ -453,7 +455,7 @@ public class TranslationFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             String resultLangCode = data.getStringExtra(LanguageSelectionActivity.EXTRA_RESULT);
-            String selectedLangName = Utils.getLangNameByCode(getContext(), resultLangCode);
+            String selectedLangName = mLanguages.getLangNameByCode(resultLangCode);
             if (requestCode == REQUEST_CODE_LANGUAGE_FROM) {
                 mTvLanguageFrom.setText(selectedLangName);
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
@@ -469,7 +471,7 @@ public class TranslationFragment extends BaseFragment {
     private String getCurrentCodeLanguageFrom() {
         if (mTvLanguageFrom != null) {
             String nameLangFrom = mTvLanguageFrom.getText().toString();
-            return Utils.getLangCodeByName(getContext(), nameLangFrom);
+            return mLanguages.getLangCodeByName(nameLangFrom);
         } else {
             return "";
         }
@@ -478,7 +480,7 @@ public class TranslationFragment extends BaseFragment {
     private String getCurrentCodeLanguageTo() {
         if (mTvLanguageTo != null) {
             String nameLangTo = mTvLanguageTo.getText().toString();
-            return Utils.getLangCodeByName(getContext(), nameLangTo);
+            return mLanguages.getLangCodeByName(nameLangTo);
         } else {
             return "";
         }
