@@ -15,18 +15,19 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
-import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
-import timber.log.Timber;
 
 
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {
 
     private Context mContext;
     private Cursor mCursor;
+    private OnListItemClickListener mOnClickListener;
 
-    public HistoryCursorAdapter(Context context, Cursor cursor) {
+    public HistoryCursorAdapter(Context context, Cursor cursor,
+                                OnListItemClickListener listener) {
         mContext = context;
         mCursor = cursor;
+        mOnClickListener = listener;
     }
 
     @Override
@@ -66,13 +67,8 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
             Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
         });
 
-        // Send item id straight to activity when clicked
         holder.itemView.setOnClickListener(holderItemView -> {
-            if (mContext instanceof MainActivity) {
-                ((MainActivity) mContext).onListItemClicked(item.getId());
-            } else {
-                Timber.wtf("Context is not MainActivity. Item click does not working!");
-            }
+            mOnClickListener.onListItemClicked(item.getId());
         });
     }
 
@@ -129,4 +125,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
         }
     }
 
+    public interface OnListItemClickListener {
+        void onListItemClicked(long itemId);
+    }
 }

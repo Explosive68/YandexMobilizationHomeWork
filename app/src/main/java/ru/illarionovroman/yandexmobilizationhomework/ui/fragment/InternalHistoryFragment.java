@@ -19,10 +19,12 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
 public class InternalHistoryFragment extends BaseFragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        HistoryCursorAdapter.OnListItemClickListener {
 
     private static final int HISTORY_LOADER_ID = 1;
 
@@ -54,7 +56,7 @@ public class InternalHistoryFragment extends BaseFragment
         mRvInternalHistory.setLayoutManager(new LinearLayoutManager(getContext()));
 
         Cursor historyCursor = DBManager.getAllHistoryItemsCursor(getContext());
-        mAdapter = new HistoryCursorAdapter(getContext(), historyCursor);
+        mAdapter = new HistoryCursorAdapter(getContext(), historyCursor, this);
         initializeRecyclerView(mAdapter);
 
         getActivity().getSupportLoaderManager().initLoader(HISTORY_LOADER_ID, null, this);
@@ -97,5 +99,10 @@ public class InternalHistoryFragment extends BaseFragment
             mRvInternalHistory.setVisibility(View.GONE);
             mTvHistoryEmpty.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onListItemClicked(long itemId) {
+        ((MainActivity) getActivity()).onListItemClicked(itemId);
     }
 }

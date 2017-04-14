@@ -23,9 +23,11 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
-public class InternalFavoritesFragment extends BaseFragment {
+public class InternalFavoritesFragment extends BaseFragment
+        implements HistoryCursorAdapter.OnListItemClickListener{
 
     @BindView(R.id.rvInternalFavorite)
     RecyclerView mRvInternalFavorite;
@@ -116,7 +118,7 @@ public class InternalFavoritesFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
-        mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor);
+        mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor, this);
         initializeRecyclerView(mAdapter);
         setListEmptyState(mAdapter.getItemCount());
 
@@ -160,5 +162,10 @@ public class InternalFavoritesFragment extends BaseFragment {
             mAdapter.notifyDataSetChanged();
             setListEmptyState(mAdapter.getItemCount());
         }
+    }
+
+    @Override
+    public void onListItemClicked(long itemId) {
+        ((MainActivity) getActivity()).onListItemClicked(itemId);
     }
 }
