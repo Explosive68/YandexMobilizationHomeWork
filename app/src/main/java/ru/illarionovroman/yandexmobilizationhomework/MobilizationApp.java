@@ -12,8 +12,6 @@ import timber.log.Timber;
 
 public class MobilizationApp extends Application {
 
-    private static final String TRANSLATOR_END_POINT = "https://translate.yandex.net/api/v1.5/tr.json/";
-
     private NetworkComponent mNetworkComponent;
 
     @Override
@@ -21,7 +19,7 @@ public class MobilizationApp extends Application {
         super.onCreate();
 
         mNetworkComponent = DaggerNetworkComponent.builder()
-                .networkModule(new NetworkModule(TRANSLATOR_END_POINT))
+                .networkModule(new NetworkModule())
                 .build();
 
         if (BuildConfig.DEBUG) {

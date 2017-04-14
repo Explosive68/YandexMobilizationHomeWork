@@ -18,8 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.net.UnknownHostException;
 
 import javax.inject.Inject;
@@ -33,14 +34,13 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
-import retrofit2.Converter;
 import retrofit2.HttpException;
-import retrofit2.Retrofit;
 import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.network.RestApi;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ErrorResponse;
 import ru.illarionovroman.yandexmobilizationhomework.network.response.ResponseErrorCodes;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity;
@@ -95,7 +95,9 @@ public class TranslationFragment extends BaseFragment {
     ImageView mIvSwapLanguages;
 
     @Inject
-    Retrofit mRetrofit;
+    RestApi mRestApi;
+    @Inject
+    Gson mGson;
 
     private CompositeDisposable mDisposables;
 
@@ -178,7 +180,7 @@ public class TranslationFragment extends BaseFragment {
                 mEtWordInput, mCurrentItem);
         Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRetrofit, inputText,
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRestApi, inputText,
                         getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
         mDisposables.add(inputDisposable);
     }
@@ -211,7 +213,7 @@ public class TranslationFragment extends BaseFragment {
             // Translate word from translation
             String translation = mTvTranslation.getText().toString();
             if (!TextUtils.isEmpty(translation)) {
-                loadItemFromDatabaseOrNetwork(mRetrofit, translation,
+                loadItemFromDatabaseOrNetwork(mRestApi, translation,
                         getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
             }
         });
@@ -221,13 +223,13 @@ public class TranslationFragment extends BaseFragment {
      * We use reactivex.Single here,
      * since there could be either just one resulting item or failure
      */
-    private void loadItemFromDatabaseOrNetwork(Retrofit retrofit, String wordToTranslate,
+    private void loadItemFromDatabaseOrNetwork(RestApi restApi, String wordToTranslate,
                                                String langCodeFrom,
                                                String langCodeTo) {
         showLoading();
 
         Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(),
-                retrofit, wordToTranslate, langCodeFrom, langCodeTo);
+                restApi, wordToTranslate, langCodeFrom, langCodeTo);
 
         mDisposables.add(historyItemSingle
                 .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
@@ -282,11 +284,9 @@ public class TranslationFragment extends BaseFragment {
 
         if (error instanceof HttpException) {
             try {
-                // Get real error code
-                Converter<ResponseBody, ErrorResponse> errorConverter =
-                        mRetrofit.responseBodyConverter(ErrorResponse.class, new Annotation[0]);
+                // Get inner Json error
                 ResponseBody errorBody = ((HttpException) error).response().errorBody();
-                ErrorResponse errorResponse = errorConverter.convert(errorBody);
+                ErrorResponse errorResponse = mGson.fromJson(errorBody.string(), ErrorResponse.class);
                 // Use code to show localized error
                 localizeAndShowErrorByCode(errorResponse.getCode(), errorResponse.getMessage());
             } catch (IOException ex) {
@@ -353,7 +353,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.btnRetry)
     void retry() {
-        loadItemFromDatabaseOrNetwork(mRetrofit, mEtWordInput.getText().toString(),
+        loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
                 getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
     }
 
@@ -459,7 +459,7 @@ public class TranslationFragment extends BaseFragment {
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            loadItemFromDatabaseOrNetwork(mRetrofit, mEtWordInput.getText().toString(),
+            loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
                     getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
         } else {
             super.onActivityResult(requestCode, resultCode, data);

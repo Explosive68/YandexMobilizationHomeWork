@@ -16,14 +16,13 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ru.illarionovroman.yandexmobilizationhomework.BuildConfig;
 import ru.illarionovroman.yandexmobilizationhomework.network.ApiKeyInsertInterceptor;
+import ru.illarionovroman.yandexmobilizationhomework.network.RestApi;
+
 
 @Module
 public class NetworkModule {
-    private String mBaseUrl;
 
-    public NetworkModule(String baseUrl) {
-        mBaseUrl = baseUrl;
-    }
+    private static final String TRANSLATOR_END_POINT = "https://translate.yandex.net/api/v1.5/tr.json/";
 
     @Provides
     @Singleton
@@ -52,10 +51,16 @@ public class NetworkModule {
     @Singleton
     Retrofit provideRetrofit(OkHttpClient okHttpClient, Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(mBaseUrl)
+                .baseUrl(TRANSLATOR_END_POINT)
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    RestApi provideRestApi(Retrofit retrofit) {
+        return retrofit.create(RestApi.class);
     }
 }
