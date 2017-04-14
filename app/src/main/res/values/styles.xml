@@ -1,8 +1,6 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -14,8 +12,10 @@
     </style>
 
     <style name="ActionImage">
-        <item name="android:layout_width">@dimen/image_size_action</item>
-        <item name="android:layout_height">@dimen/image_size_action</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxHeight">@dimen/image_size_action</item>
+        <item name="android:maxWidth">@dimen/image_size_action</item>
         <item name="android:padding">@dimen/margin_half</item>
     </style>
 
@@ -32,6 +32,7 @@
 
     <style name="TranslationActionImageLand" parent="TranslationActionImage">
         <item name="android:layout_marginTop">@dimen/margin_quarter</item>
+        <item name="android:layout_weight">1</item>
     </style>
 
     <style name="CleanWordActionImage">
