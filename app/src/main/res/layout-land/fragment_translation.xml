@@ -81,7 +81,7 @@
                 android:id="@+id/llTranslationButtons"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:orientation="vertical">
 
                 <ImageView
@@ -111,7 +111,7 @@
                 style="@style/TextTranslated"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toStartOf="@id/llTranslationButtons"
+                android:layout_toLeftOf="@id/llTranslationButtons"
                 android:padding="@dimen/margin_half" />
 
             <LinearLayout
@@ -122,8 +122,8 @@
                 android:layout_centerHorizontal="true"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:paddingEnd="@dimen/margin_double"
-                android:paddingStart="@dimen/margin_double"
+                android:paddingRight="@dimen/margin_double"
+                android:paddingLeft="@dimen/margin_double"
                 android:paddingTop="@dimen/margin_full"
                 android:visibility="gone">
 
