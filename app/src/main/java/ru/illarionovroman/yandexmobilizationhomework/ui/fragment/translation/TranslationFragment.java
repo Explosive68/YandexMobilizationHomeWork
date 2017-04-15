@@ -179,8 +179,9 @@ public class TranslationFragment extends BaseFragment {
 
     private void initializeInputWatcher() {
         mDisposables = new CompositeDisposable();
+        String currentWord = mCurrentItem != null ? mCurrentItem.getWord() : "";
         Observable<String> inputWatcher = TranslationHelper.createInputWatcher(
-                mEtWordInput, mCurrentItem);
+                mEtWordInput, currentWord);
         Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRestApi, inputText,

@@ -30,12 +30,12 @@ public class TranslationHelper {
      * Rx watcher for user input in the EditText. After every valid update initiates translation
      * loading procedure
      * @param textView {@link TextView} to watch for
-     * @param currentItem
+     * @param currentWord
      * @return {@link Observable<String>} which watches for filtered changes of passed TextView
      */
     @NonNull
     public static Observable<String> createInputWatcher(@NonNull TextView textView,
-                                                        HistoryItem currentItem) {
+                                                        String currentWord) {
         return RxTextView.textChanges(textView)
                 .skipInitialValue()
                 // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
@@ -46,7 +46,7 @@ public class TranslationHelper {
                 .filter(inputText -> !TextUtils.isEmpty(inputText))
                 .filter(inputText -> {
                     // Don't pass if the same item is currently displayed
-                    if (currentItem != null && inputText.equals(currentItem.getWord())) {
+                    if (!TextUtils.isEmpty(currentWord) && inputText.equals(currentWord)) {
                         return false;
                     } else {
                         return true;
