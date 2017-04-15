@@ -15,25 +15,23 @@ public class DBManager {
     private static final String WHERE_ARG_PLACEHOLDER = "=?";
 
     public static CursorLoader getHistoryCursorLoader(Context context) {
-        CursorLoader cursorLoader = new CursorLoader(
+        return new CursorLoader(
                 context,
                 Contract.HistoryEntry.CONTENT_URI_HISTORY,
                 null,
                 null,
                 null,
                 Contract.HistoryEntry.DATE + " DESC");
-        return cursorLoader;
     }
 
     public static CursorLoader getFavoriteCursorLoader(Context context) {
-        CursorLoader cursorLoader = new CursorLoader(
+        return new CursorLoader(
                 context,
                 Contract.HistoryEntry.CONTENT_URI_FAVORITES,
                 null,
                 null,
                 null,
                 Contract.HistoryEntry.DATE + " DESC");
-        return cursorLoader;
     }
 
     public static Cursor getAllHistoryItemsCursor(Context context) {

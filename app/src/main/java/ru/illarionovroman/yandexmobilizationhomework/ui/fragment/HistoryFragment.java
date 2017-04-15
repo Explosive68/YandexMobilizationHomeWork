@@ -3,7 +3,6 @@ package ru.illarionovroman.yandexmobilizationhomework.ui.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.InternalPagerAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;

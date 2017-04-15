@@ -278,7 +278,7 @@ public class TranslationFragment extends BaseFragment {
     private void setCurrentItem(HistoryItem item) {
         if (item != null) {
             mCurrentItem = item;
-            refreshItemObserver(item.getId());
+            replaceItemObserver(item.getId());
         }
     }
 
@@ -335,9 +335,9 @@ public class TranslationFragment extends BaseFragment {
 
     /**
      * Update Id of the item to observe
-     * @param itemId
+     * @param itemId Id of new item to observe
      */
-    private void refreshItemObserver(long itemId) {
+    private void replaceItemObserver(long itemId) {
         unregisterIdObserver();
         registerIdObserver(itemId);
     }

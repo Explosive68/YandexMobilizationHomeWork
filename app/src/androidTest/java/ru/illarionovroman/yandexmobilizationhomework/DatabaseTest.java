@@ -359,6 +359,7 @@ public class DatabaseTest {
 
         // There must be only one such table
         assertTrue(tableNameCursor.getCount() == 1);
+        tableNameCursor.close();
 
         // Query the new database and receive a Cursor
         Cursor cursor = database.query(
@@ -373,8 +374,8 @@ public class DatabaseTest {
         // Check there is no items in brand new database
         assertFalse("Database doesn't seem to have been dropped successfully when upgrading",
                 cursor.moveToFirst());
+        cursor.close();
 
-        tableNameCursor.close();
         database.close();
     }
 

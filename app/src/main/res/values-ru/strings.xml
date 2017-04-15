@@ -6,9 +6,7 @@
         <item>Избранное</item>
     </string-array>
 
-    <string name="favorites_search_hint_history">Найти в истории</string>
-    <string name="favorites_search_hint_favorites">Найти в избранном</string>
-    <string name="actionbar_title_settings">Настройки</string>
+    <string name="settings_title">Настройки</string>
     <string name="history_title">История</string>
     <string name="favorites_title">Избранное</string>
 
@@ -24,10 +22,25 @@
     <string name="default_language_from">Русский</string>
     <string name="default_language_to">Английский</string>
 
-    <string name="test_text">Пример текста</string>
+    <string name="retry">Повторить</string>
+
+    <string name="error_title_simple">Ошибка</string>
+    <string name="error_title_authorization">Ошибка авторизации</string>
+    <string name="error_text_api_key_invalid">Неправильный API-ключ</string>
+    <string name="error_text_api_key_blocked">API-ключ заблокирован</string>
+    <string name="error_title_translation">Ошибка перевода</string>
+    <string name="error_text_day_limit_exceed">Превышено суточное ограничение на объем переведенного текста</string>
+    <string name="error_text_text_size_exceed">Превышен максимально допустимый размер текста</string>
+    <string name="error_text_untranslatable">Текст не может быть переведен</string>
+    <string name="error_text_direction_unsupported">Заданное направление перевода не поддерживается</string>
+    <string name="error_title_connection">Ошибка соединения</string>
+    <string name="error_text_connection">Не удалось выполнить запрос на сервер перевода. Проверьте подключение к интернету и повторите попытку</string>
+    <string name="error_title_unknown">Ой!</string>
+    <string name="error_text_unknown">При загрузке данных возникла неизвестная ошибка</string>
+    <string name="history_is_empty">Нет переводов в истории</string>
+    <string name="favorites_is_empty">Нет переводов в избранном</string>
 
     <!-- Localized array of supported languages -->
-
     <string-array name="language_codes_names">
         <item>af:Африкаанс</item>
         <item>am:Амхарский</item>
@@ -123,23 +136,5 @@
         <item>pap:Папьяменто</item>
         <item>udm:Удмуртский</item>
     </string-array>
-
-    <string name="retry">Повторить</string>
-
-    <string name="error_title_simple">Ошибка</string>
-    <string name="error_title_authorization">Ошибка авторизации</string>
-    <string name="error_text_api_key_invalid">Неправильный API-ключ</string>
-    <string name="error_text_api_key_blocked">API-ключ заблокирован</string>
-    <string name="error_title_translation">Ошибка перевода</string>
-    <string name="error_text_day_limit_exceed">Превышено суточное ограничение на объем переведенного текста</string>
-    <string name="error_text_text_size_exceed">Превышен максимально допустимый размер текста</string>
-    <string name="error_text_untranslatable">Текст не может быть переведен</string>
-    <string name="error_text_direction_unsupported">Заданное направление перевода не поддерживается</string>
-    <string name="error_title_connection">Ошибка соединения</string>
-    <string name="error_text_connection">Не удалось выполнить запрос на сервер перевода. Проверьте подключение к интернету и повторите попытку</string>
-    <string name="error_title_unknown">Ой!</string>
-    <string name="error_text_unknown">При загрузке данных возникла неизвестная ошибка</string>
-    <string name="history_is_empty">Нет переводов в истории</string>
-    <string name="favorites_is_empty">Нет переводов в избранном</string>
 
 </resources>

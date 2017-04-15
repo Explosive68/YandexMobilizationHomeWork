@@ -16,7 +16,6 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
@@ -30,7 +29,9 @@ public class TranslationHelper {
     /**
      * Rx watcher for user input in the EditText. After every valid update initiates translation
      * loading procedure
-     * @return
+     * @param textView {@link TextView} to watch for
+     * @param currentItem
+     * @return {@link Observable<String>} which watches for filtered changes of passed TextView
      */
     @NonNull
     public static Observable<String> createInputWatcher(@NonNull TextView textView,
@@ -59,7 +60,7 @@ public class TranslationHelper {
      * @param wordToTranslate
      * @param langCodeFrom Language code to translate from
      * @param langCodeTo Language code to translate to
-     * @return
+     * @return {@link HistoryItem} from DB or network
      */
     public static Single<HistoryItem> loadHistoryItem(final Context context,
                                                       final RestApi restApi,

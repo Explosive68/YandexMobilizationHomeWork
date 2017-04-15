@@ -20,9 +20,6 @@
     <color name="colorBottomIconSelected">@android:color/black</color>
     <color name="colorBottomIcon">@android:color/darker_gray</color>
 
-    <color name="colorFavoriteButtonOn">@color/colorPrimary</color>
-    <color name="colorFavoriteButtonOff">@color/colorPrimary</color>
-
     <color name="colorBottomTabIndicator">@color/colorPrimary</color>
     <color name="colorHistoryTabIndicator">#BBFFFFFF</color>
 

@@ -13,6 +13,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:paddingLeft="@dimen/margin_full"
-            android:text="@string/actionbar_title_settings" />
+            android:text="@string/settings_title" />
     </android.support.v7.widget.Toolbar>
 </android.support.design.widget.AppBarLayout>

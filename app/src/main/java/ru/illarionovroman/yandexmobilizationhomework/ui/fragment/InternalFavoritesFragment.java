@@ -44,7 +44,7 @@ public class InternalFavoritesFragment extends BaseFragment
     private ContentObserver mFavoritesObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
+            onChange(selfChange, null);
         }
 
         @Override

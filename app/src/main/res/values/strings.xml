@@ -6,9 +6,7 @@
         <item>Favorites</item>
     </string-array>
 
-    <string name="favorites_search_hint_history">Search in history</string>
-    <string name="favorites_search_hint_favorites">Search in favorites</string>
-    <string name="actionbar_title_settings">Settings</string>
+    <string name="settings_title">Settings</string>
     <string name="history_title">History</string>
     <string name="favorites_title">Favorites</string>
 
@@ -24,12 +22,28 @@
     <string name="default_language_from">English</string>
     <string name="default_language_to">Russian</string>
 
-    <string name="test_text">Sample text</string>
     <string name="language_from_to" translatable="false">%1$s - %2$s</string>
     <string name="translate_query_param_language_from_to" translatable="false">%1$s-%2$s</string>
 
-    <!-- Localized array of supported languages -->
+    <string name="retry">Retry</string>
 
+    <string name="error_title_simple">Error</string>
+    <string name="error_title_authorization">Authorization error</string>
+    <string name="error_text_api_key_blocked">API key is blocked</string>
+    <string name="error_text_api_key_invalid">API key is invalid</string>
+    <string name="error_title_translation">Translation error</string>
+    <string name="error_text_day_limit_exceed">Day limit exceeded</string>
+    <string name="error_text_text_size_exceed">Text size exceeded</string>
+    <string name="error_text_untranslatable">Text is untranslatable</string>
+    <string name="error_text_direction_unsupported">Selected translation direction is not supported</string>
+    <string name="error_title_connection">Connection error</string>
+    <string name="error_text_connection">Failed to query the translation server. Check your internet connection and try again</string>
+    <string name="error_title_unknown">Oops!</string>
+    <string name="error_text_unknown">An unknown error occurred while loading translation data</string>
+    <string name="history_is_empty">No translations in History</string>
+    <string name="favorites_is_empty">No translations in Favorites</string>
+
+    <!-- Localized array of supported languages -->
     <string-array name="language_codes_names">
         <item>af:Afrikaans</item>
         <item>am:Amharic</item>
@@ -125,28 +139,6 @@
         <item>pap:Papiamento</item>
         <item>udm:Udmurt</item>
     </string-array>
-    <string name="title_activity_choose_language">ChooseLanguageActivity</string>
-
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="retry">Retry</string>
-
-    <string name="error_title_simple">Error</string>
-    <string name="error_title_authorization">Authorization error</string>
-    <string name="error_text_api_key_blocked">API key is blocked</string>
-    <string name="error_text_api_key_invalid">API key is invalid</string>
-    <string name="error_title_translation">Translation error</string>
-    <string name="error_text_day_limit_exceed">Day limit exceeded</string>
-    <string name="error_text_text_size_exceed">Text size exceeded</string>
-    <string name="error_text_untranslatable">Text is untranslatable</string>
-    <string name="error_text_direction_unsupported">Selected translation direction is not supported</string>
-    <string name="error_title_connection">Connection error</string>
-    <string name="error_text_connection">Failed to query the translation server. Check your internet connection and try again</string>
-    <string name="error_title_unknown">Oops!</string>
-    <string name="error_text_unknown">An unknown error occurred while loading translation data</string>
-    <string name="history_is_empty">No translations in History</string>
-    <string name="favorites_is_empty">No translations in Favorites</string>
 
 
 </resources>

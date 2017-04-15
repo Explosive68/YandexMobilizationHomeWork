@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
-import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 

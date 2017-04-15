@@ -29,7 +29,6 @@
 
         <activity
             android:name=".ui.activity.LanguageSelectionActivity"
-            android:label="@string/title_activity_choose_language"
             android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -39,7 +38,6 @@
         <activity
             android:name=".ui.activity.FullscreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen"
             android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/FullscreenTheme">
             <meta-data
