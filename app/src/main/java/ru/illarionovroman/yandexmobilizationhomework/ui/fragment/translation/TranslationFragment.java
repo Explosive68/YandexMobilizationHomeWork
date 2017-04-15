@@ -104,32 +104,11 @@ public class TranslationFragment extends BaseFragment {
 
     private CompositeDisposable mDisposables;
 
-    /**
-     * Always use {@link #setCurrentItem(HistoryItem)} to change this field
-     */
+    /** Always use {@link #setCurrentItem(HistoryItem)} to change this field */
     private HistoryItem mCurrentItem;
 
-    /**
-     * If some changes of currently displayed item have been registered - update it
-     */
-    private ContentObserver mDbObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            onChange(selfChange, null);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            long id = -1;
-            try {
-                id = ContentUris.parseId(uri);
-            } catch (NumberFormatException ignore) {
-            }
-            if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadAndShowItemFromDB(id, false);
-            }
-        }
-    };
+    /** HistoryItem updater */
+    private HistoryItemContentObserver mDbObserver = new HistoryItemContentObserver(new Handler());
 
     public TranslationFragment() {
     }
@@ -167,7 +146,7 @@ public class TranslationFragment extends BaseFragment {
             if (itemId != -1) {
                 // Preload in UI thread to show ready data
                 HistoryItem item = DBManager.getHistoryItemById(getContext(), itemId);
-                handleTranslationSuccess(item);
+                handleUpdatedHistoryItem(item);
             }
         }
     }
@@ -224,8 +203,9 @@ public class TranslationFragment extends BaseFragment {
     }
 
     /**
-     * We use reactivex.Single here,
-     * since there could be either just one resulting item or failure
+     * Perform HistoryItem loading in background. It will try to get data from DB,
+     * but if there is no such data there - then try to get it from network.
+     * In the end - show successfully retrieved data or localized error with reason.
      */
     private void loadItemFromDatabaseOrNetwork(RestApi restApi, String wordToTranslate,
                                                String langCodeFrom,
@@ -236,7 +216,7 @@ public class TranslationFragment extends BaseFragment {
                 restApi, wordToTranslate, langCodeFrom, langCodeTo);
 
         mDisposables.add(historyItemSingle
-                .subscribe(this::handleTranslationSuccess, this::handleTranslationError));
+                .subscribe(this::handleUpdatedHistoryItem, this::handleTranslationError));
     }
 
     /**
@@ -256,14 +236,14 @@ public class TranslationFragment extends BaseFragment {
                 })
                 .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleTranslationSuccess);
+                .subscribe(this::handleUpdatedHistoryItem);
     }
 
     /**
      * Update current item, toolbar items and show successful screen state
      * @param item {@link HistoryItem} to show
      */
-    private void handleTranslationSuccess(HistoryItem item) {
+    private void handleUpdatedHistoryItem(HistoryItem item) {
         if (item != null) {
             setCurrentItem(item);
             fillAndShowTranslationViews(item);
@@ -279,7 +259,7 @@ public class TranslationFragment extends BaseFragment {
     private void setCurrentItem(HistoryItem item) {
         if (item != null) {
             mCurrentItem = item;
-            replaceItemObserver(item.getId());
+            mDbObserver.replaceItemObserver(item.getId());
         }
     }
 
@@ -316,46 +296,23 @@ public class TranslationFragment extends BaseFragment {
         error.printStackTrace();
     }
 
-    /**
-     * Watch for changes of item with specific id
-     * @param itemId Id of item to watch for
-     */
-    private void registerIdObserver(long itemId) {
-        Uri idUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
-                .appendPath(String.valueOf(itemId))
-                .build();
-        getActivity().getContentResolver().registerContentObserver(idUri, false,
-                mDbObserver);
-    }
-
-    private void unregisterIdObserver() {
-        if (mDbObserver != null) {
-            getActivity().getContentResolver().unregisterContentObserver(mDbObserver);
-        }
-    }
-
-    /**
-     * Update Id of the item to observe
-     * @param itemId Id of new item to observe
-     */
-    private void replaceItemObserver(long itemId) {
-        unregisterIdObserver();
-        registerIdObserver(itemId);
-    }
-
     private void fillAndShowTranslationViews(HistoryItem item) {
         fillTranslationViews(item);
         showTranslationViews();
     }
 
     private void fillTranslationViews(HistoryItem item) {
+        // Set toolbar languages
         mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
         mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
 
+        // Set user input field. If it was focused in the moment of update - move cursor to the end
         mEtWordInput.setText(item.getWord());
         if (mEtWordInput.hasFocus()) {
             mEtWordInput.setSelection(mEtWordInput.getText().length());
         }
+
+        // Set translation text and favorite state button
         mTvTranslation.setText(item.getTranslation());
         mIvTranslationFavorite.setActivated(item.getIsFavorite());
     }
@@ -537,7 +494,9 @@ public class TranslationFragment extends BaseFragment {
         if (mDisposables != null) {
             mDisposables.clear();
         }
-        unregisterIdObserver();
+        if (mDbObserver != null) {
+            mDbObserver.unregisterIdObserver();
+        }
     }
 
     @Override
@@ -546,6 +505,56 @@ public class TranslationFragment extends BaseFragment {
         if (mCurrentItem != null) {
             outState.putParcelable(ARG_CURRENT_ITEM, mCurrentItem);
             Prefs.putLastUsedItemId(getContext(), mCurrentItem.getId());
+        }
+    }
+
+    /**
+     * ContentObserver to watch for specific HistoryItem changes and display it
+     */
+    private class HistoryItemContentObserver extends ContentObserver {
+        HistoryItemContentObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            long id = -1;
+            try {
+                id = ContentUris.parseId(uri);
+            } catch (NumberFormatException ignore) {
+            }
+            if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
+                loadAndShowItemFromDB(id, false);
+            }
+        }
+
+        /**
+         * Watch for changes of item with specific id
+         * @param itemId Id of item to watch for
+         */
+        private void registerIdObserver(long itemId) {
+            Uri idUri = Contract.HistoryEntry.CONTENT_URI_HISTORY.buildUpon()
+                    .appendPath(String.valueOf(itemId))
+                    .build();
+            getActivity().getContentResolver().registerContentObserver(idUri, false, this);
+        }
+
+        private void unregisterIdObserver() {
+            getActivity().getContentResolver().unregisterContentObserver(this);
+        }
+
+        /**
+         * Update Id of the item to observe
+         * @param itemId Id of new item to observe
+         */
+        private void replaceItemObserver(long itemId) {
+            unregisterIdObserver();
+            registerIdObserver(itemId);
         }
     }
 }
