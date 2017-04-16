@@ -25,7 +25,11 @@
     <string name="language_from_to" translatable="false">%1$s - %2$s</string>
     <string name="translate_query_param_language_from_to" translatable="false">%1$s-%2$s</string>
 
-    <string name="retry">Retry</string>
+    <string name="about_title">About</string>
+    <string name="about_text">Test task for the Yandex&#160;Mobilization project, Moscow&#160;2017</string>
+    <string name="about_created_by" translatable="false">public static String createdBy() {\n&#160;&#160;&#160;&#160;return \"Roman Illarionov\";\n}</string>
+
+    <string name="button_text_retry">Retry</string>
 
     <string name="error_title_simple">Error</string>
     <string name="error_title_authorization">Authorization error</string>
@@ -139,6 +143,4 @@
         <item>pap:Papiamento</item>
         <item>udm:Udmurt</item>
     </string-array>
-
-
 </resources>

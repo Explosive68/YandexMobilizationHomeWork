@@ -22,7 +22,10 @@
     <string name="default_language_from">Русский</string>
     <string name="default_language_to">Английский</string>
 
-    <string name="retry">Повторить</string>
+    <string name="about_title">О программе</string>
+    <string name="about_text">Тестовое задание для проекта Яндекса&#160;\"Мобилизация\", Москва&#160;2017</string>
+
+    <string name="button_text_retry">Повторить</string>
 
     <string name="error_title_simple">Ошибка</string>
     <string name="error_title_authorization">Ошибка авторизации</string>
@@ -136,5 +139,4 @@
         <item>pap:Папьяменто</item>
         <item>udm:Удмуртский</item>
     </string-array>
-
 </resources>

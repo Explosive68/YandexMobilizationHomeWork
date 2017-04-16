@@ -7,10 +7,22 @@
 
     <include layout="@layout/actionbar_settings" />
 
-    <TextView
-        android:id="@+id/tvSettings"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello Settings fragment" />
+        android:orientation="vertical"
+        android:divider="@drawable/divider"
+        android:showDividers="end">
 
+        <LinearLayout
+            android:id="@+id/llAbout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_item_height_big">
+            <TextView
+                style="@style/TextListItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/about_title" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

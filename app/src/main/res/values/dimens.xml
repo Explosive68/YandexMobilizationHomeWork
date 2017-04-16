@@ -7,6 +7,7 @@
 
     <dimen name="image_size_action">40dp</dimen>
     <dimen name="image_size_close_fullscreen">40dp</dimen>
+    <dimen name="image_size_logo_yandex">200dp</dimen>
 
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_normal">16sp</dimen>
@@ -17,6 +18,8 @@
     <dimen name="text_size_translation">20sp</dimen>
     <dimen name="text_size_list_empty_msg">24sp</dimen>
     <dimen name="text_size_fullscreen">42sp</dimen>
+    <dimen name="text_size_about_text">20sp</dimen>
+    <dimen name="text_size_about_created_by">18sp</dimen>
 
     <dimen name="tab_indicator_height_bottom">4dp</dimen>
     <dimen name="tab_indicator_height_history">3dp</dimen>
@@ -24,6 +27,7 @@
     <dimen name="progress_bar_size">48dp</dimen>
 
     <dimen name="list_item_height">48dp</dimen>
+    <dimen name="list_item_height_big">56dp</dimen>
     <dimen name="history_list_item_height">72dp</dimen>
 
     <dimen name="history_item_direction_width">64dp</dimen>

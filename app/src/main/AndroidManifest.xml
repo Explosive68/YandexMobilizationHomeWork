@@ -44,6 +44,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity" />
         </activity>
+        <activity android:name=".ui.activity.AboutActivity"></activity>
     </application>
 
 </manifest>

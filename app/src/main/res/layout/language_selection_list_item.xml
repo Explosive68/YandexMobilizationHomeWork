@@ -8,13 +8,10 @@
 
     <TextView
         android:id="@+id/tvLanguageName"
-        style="@style/TextLanguageSelectionItem"
+        style="@style/TextListItem"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
         android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/margin_full"
         tools:text="LanguageName" />
 
     <ImageView

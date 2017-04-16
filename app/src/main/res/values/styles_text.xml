@@ -26,10 +26,12 @@
         <item name="android:layout_centerVertical">true</item>
     </style>
 
-    <style name="TextLanguageSelectionItem">
+    <style name="TextListItem">
         <item name="android:textSize">@dimen/text_size_list_item</item>
         <item name="android:textColor">@color/colorPrimaryText</item>
         <item name="android:layout_centerVertical">true</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingLeft">@dimen/margin_full</item>
     </style>
 
     <style name="TextTranslationDirection">
@@ -59,5 +61,20 @@
         <item name="android:textStyle">bold</item>
         <item name="android:padding">@dimen/margin_full</item>
         <item name="android:layout_centerInParent">true</item>
+    </style>
+
+    <style name="TextAboutText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/text_size_about_text</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+    </style>
+
+    <style name="TextAboutCreatedBy">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/text_size_about_created_by</item>
+        <item name="android:textColor">@color/colorSecondaryText</item>
+        <item name="android:layout_marginTop">@dimen/margin_half</item>
     </style>
 </resources>
