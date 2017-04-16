@@ -1,9 +1,22 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorFullscreenBackground"
     tools:context="ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/tvFullscreenText"
+            style="@style/TextFullscreen"
+            android:keepScreenOn="true"/>
+    </ScrollView>
 
     <ImageView
         android:id="@+id/ivCloseFullscreen"
@@ -12,11 +25,5 @@
         android:src="@drawable/ic_cross_white"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/margin_full"/>
-
-    <TextView
-        android:id="@+id/tvFullscreenText"
-        style="@style/TextFullscreen"
-        android:keepScreenOn="true" />
-
+        android:layout_margin="@dimen/margin_full" />
 </RelativeLayout>

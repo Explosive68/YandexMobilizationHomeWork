@@ -100,13 +100,20 @@
                 android:src="@drawable/ic_fullscreen" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvTranslation"
-            style="@style/TextTranslated"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toLeftOf="@id/llTranslationButtons"
-            android:padding="@dimen/margin_half" />
+            android:padding="@dimen/margin_half"
+            android:scrollbars="vertical"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/tvTranslation"
+                style="@style/TextTranslated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
 
         <LinearLayout
             android:id="@+id/llTranslationError"
@@ -144,7 +151,5 @@
                 android:layout_marginTop="@dimen/margin_half"
                 android:text="@string/button_text_retry" />
         </LinearLayout>
-
     </RelativeLayout>
-
 </LinearLayout>
