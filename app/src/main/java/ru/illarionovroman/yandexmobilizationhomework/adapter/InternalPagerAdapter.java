@@ -14,12 +14,9 @@ public class InternalPagerAdapter extends FragmentPagerAdapter {
 
     private String[] mTabTitles;
 
-    private Context mContext;
-
     public InternalPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
-        mContext = context;
-        mTabTitles = mContext.getResources().getStringArray(R.array.internal_tabs);
+        mTabTitles = context.getResources().getStringArray(R.array.internal_tabs);
     }
 
     @Override

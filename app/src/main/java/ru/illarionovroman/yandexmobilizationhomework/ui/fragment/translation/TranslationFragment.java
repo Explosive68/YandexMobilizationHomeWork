@@ -129,7 +129,7 @@ public class TranslationFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Inject network dependencies and languages
-        ((MobilizationApp) getContext().getApplicationContext()).getAppComponent().inject(this);
+        MobilizationApp.get(getContext()).getAppComponent().inject(this);
         restoreInstanceState(savedInstanceState);
         initializeFragment();
     }

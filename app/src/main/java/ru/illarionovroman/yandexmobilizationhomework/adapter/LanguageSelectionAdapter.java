@@ -33,7 +33,7 @@ public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelec
     public LanguageSelectionAdapter(Context context, String currentLangCode,
                                     OnListItemClickListener listener) {
         mContext = context;
-        ((MobilizationApp) context.getApplicationContext()).getAppComponent().inject(this);
+        MobilizationApp.get(context).getAppComponent().inject(this);
         mLangEntriesArray = mLanguages.getLanguagesMap().entrySet().toArray();
         mCurrentLangCode = currentLangCode;
         mOnClickListener = listener;

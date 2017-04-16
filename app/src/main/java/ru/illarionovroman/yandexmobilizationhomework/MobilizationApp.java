@@ -1,6 +1,7 @@
 package ru.illarionovroman.yandexmobilizationhomework;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.facebook.stetho.Stetho;
 
@@ -32,5 +33,9 @@ public class MobilizationApp extends Application {
 
     public AppComponent getAppComponent() {
         return mAppComponent;
+    }
+
+    public static MobilizationApp get(Context context) {
+        return ((MobilizationApp)context.getApplicationContext());
     }
 }

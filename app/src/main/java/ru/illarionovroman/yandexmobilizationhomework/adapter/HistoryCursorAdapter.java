@@ -86,27 +86,21 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
      * When data changes and a re-query occurs, this function swaps the old Cursor
      * with a newly updated Cursor (Cursor c) that is passed in.
      */
-    public Cursor swapCursor(Cursor c) {
+    public void swapCursor(Cursor c) {
         // check if this cursor is the same as the previous cursor (mCursor)
         if (mCursor == c) {
-            return null;
+            return;
         }
-
         this.mCursor = c;
         this.notifyDataSetChanged();
-
-        return c;
     }
 
-    public Cursor swapCursorWithoutNotify(Cursor c) {
+    public void swapCursorWithoutNotify(Cursor c) {
         // check if this cursor is the same as the previous cursor (mCursor)
         if (mCursor == c) {
-            return null;
+            return;
         }
-
         this.mCursor = c;
-
-        return c;
     }
 
     class HistoryViewHolder extends RecyclerView.ViewHolder {
