@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.content.CursorLoader;
 
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
@@ -18,16 +19,6 @@ public class DBManager {
         return new CursorLoader(
                 context,
                 Contract.HistoryEntry.CONTENT_URI_HISTORY,
-                null,
-                null,
-                null,
-                Contract.HistoryEntry.DATE + " DESC");
-    }
-
-    public static CursorLoader getFavoriteCursorLoader(Context context) {
-        return new CursorLoader(
-                context,
-                Contract.HistoryEntry.CONTENT_URI_FAVORITES,
                 null,
                 null,
                 null,
@@ -52,7 +43,7 @@ public class DBManager {
                 Contract.HistoryEntry.DATE + " DESC");
     }
 
-    public static HistoryItem getHistoryItemByWordAndLangs(Context context, String word,
+    public static @Nullable HistoryItem getHistoryItemByWordAndLangs(Context context, String word,
                                                            String languageFrom, String languageTo) {
         HistoryItem item = null;
         String selection = Contract.HistoryEntry.WORD + WHERE_ARG_PLACEHOLDER + " AND " +
@@ -76,7 +67,7 @@ public class DBManager {
         return item;
     }
 
-    public static HistoryItem getHistoryItemById(Context context, long id) {
+    public static @Nullable HistoryItem getHistoryItemById(Context context, long id) {
         HistoryItem item = null;
 
         String strId = String.valueOf(id);

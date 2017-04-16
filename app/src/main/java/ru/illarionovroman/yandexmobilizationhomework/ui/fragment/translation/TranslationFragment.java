@@ -243,7 +243,7 @@ public class TranslationFragment extends BaseFragment {
      * Update current item, toolbar items and show successful screen state
      * @param item {@link HistoryItem} to show
      */
-    private void handleUpdatedHistoryItem(HistoryItem item) {
+    private void handleUpdatedHistoryItem(@Nullable HistoryItem item) {
         if (item != null) {
             setCurrentItem(item);
             fillAndShowTranslationViews(item);
@@ -293,7 +293,7 @@ public class TranslationFragment extends BaseFragment {
             Timber.e(error, "Not HTTP translation error! Message: " + error.getMessage());
         }
 
-        error.printStackTrace();
+        Timber.e(error);
     }
 
     private void fillAndShowTranslationViews(HistoryItem item) {
