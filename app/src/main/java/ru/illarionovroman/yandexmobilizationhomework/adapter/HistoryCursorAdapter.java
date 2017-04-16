@@ -63,8 +63,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
                 view.setActivated(true);
                 item.setIsFavorite(true);
             }
-            int updatedCount = DBManager.updateHistoryItemWithId(mContext, item);
-            Toast.makeText(mContext, "updatedCount =" + updatedCount, Toast.LENGTH_SHORT).show();
+            DBManager.updateHistoryItemWithId(mContext, item);
         });
 
         holder.itemView.setOnClickListener(holderItemView -> {
