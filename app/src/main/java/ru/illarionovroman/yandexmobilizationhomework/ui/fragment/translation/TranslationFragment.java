@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -64,21 +65,21 @@ public class TranslationFragment extends BaseFragment {
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
 
+    //region Views binding
+    //----------------------------------------------------------------------------------------------
+    /** User input views */
     @BindView(R.id.etWordInput)
     EditText mEtWordInput;
+    @BindView(R.id.ivWordMic)
+    ImageView mIvWorkMic;
+    @BindView(R.id.ivWordSpeaker)
+    ImageView mIvWordSpeaker;
+
+    /** Translation views */
     @BindView(R.id.tvTranslation)
     TextView mTvTranslation;
     @BindView(R.id.llTranslationButtons)
     LinearLayout mLlTranslationButtons;
-    @BindView(R.id.llTranslationError)
-    LinearLayout mLlTranslationError;
-    @BindView(R.id.tvTranslationErrorTitle)
-    TextView mTvTranslationErrorTitle;
-    @BindView(R.id.tvTranslationErrorText)
-    TextView mTvTranslationErrorText;
-    @BindView(R.id.pbLoading)
-    ProgressBar mPbLoading;
-
     @BindView(R.id.ivTranslationSpeaker)
     ImageView mIvTranslationSpeaker;
     @BindView(R.id.ivTranslationFavorite)
@@ -88,12 +89,27 @@ public class TranslationFragment extends BaseFragment {
     @BindView(R.id.ivTranslationFullscreen)
     ImageView mIvTranslationFullscreen;
 
+    /** Error views */
+    @BindView(R.id.llTranslationError)
+    LinearLayout mLlTranslationError;
+    @BindView(R.id.tvTranslationErrorTitle)
+    TextView mTvTranslationErrorTitle;
+    @BindView(R.id.tvTranslationErrorText)
+    TextView mTvTranslationErrorText;
+
+    /** Progress bar */
+    @BindView(R.id.pbLoading)
+    ProgressBar mPbLoading;
+
+    /** ActionBar views */
     @BindView(R.id.tvLanguageFrom)
     TextView mTvLanguageFrom;
     @BindView(R.id.tvLanguageTo)
     TextView mTvLanguageTo;
     @BindView(R.id.ivSwapLanguages)
     ImageView mIvSwapLanguages;
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
     @Inject
     RestApi mRestApi;
@@ -107,7 +123,7 @@ public class TranslationFragment extends BaseFragment {
     /** Always use {@link #setCurrentItem(HistoryItem)} to change this field */
     private HistoryItem mCurrentItem;
 
-    /** HistoryItem updater */
+    /** Current HistoryItem updater */
     private HistoryItemContentObserver mDbObserver = new HistoryItemContentObserver(new Handler());
 
     public TranslationFragment() {
@@ -118,6 +134,8 @@ public class TranslationFragment extends BaseFragment {
         return fragment;
     }
 
+    //region Lifecycle methods
+    //----------------------------------------------------------------------------------------------
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -134,6 +152,30 @@ public class TranslationFragment extends BaseFragment {
         initializeFragment();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mCurrentItem != null) {
+            outState.putParcelable(ARG_CURRENT_ITEM, mCurrentItem);
+            Prefs.putLastUsedItemId(getContext(), mCurrentItem.getId());
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mDisposables != null) {
+            mDisposables.clear();
+        }
+        if (mDbObserver != null) {
+            mDbObserver.unregisterIdObserver();
+        }
+    }
+    //----------------------------------------------------------------------------------------------
+    //endregion
+
+    //region Initialization methods
+    //----------------------------------------------------------------------------------------------
     private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
@@ -201,7 +243,11 @@ public class TranslationFragment extends BaseFragment {
             }
         });
     }
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
+    //region Data loaders
+    //----------------------------------------------------------------------------------------------
     /**
      * Perform HistoryItem loading in background. It will try to get data from DB,
      * but if there is no such data there - then try to get it from network.
@@ -238,7 +284,11 @@ public class TranslationFragment extends BaseFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleUpdatedHistoryItem);
     }
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
+    //region Result data/error handlers
+    //----------------------------------------------------------------------------------------------
     /**
      * Update current item, toolbar items and show successful screen state
      * @param item {@link HistoryItem} to show
@@ -261,6 +311,31 @@ public class TranslationFragment extends BaseFragment {
             mCurrentItem = item;
             mDbObserver.replaceItemObserver(item.getId());
         }
+    }
+
+    private void fillAndShowTranslationViews(HistoryItem item) {
+        fillTranslationViews(item);
+        showTranslationViews();
+    }
+
+    /**
+     * Get data from item and put it in corresponding views
+     * @param item {@link HistoryItem} to get data from
+     */
+    private void fillTranslationViews(HistoryItem item) {
+        // Set toolbar languages
+        mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
+        mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
+
+        // Set user input field. If it was focused in the moment of update - move cursor to the end
+        mEtWordInput.setText(item.getWord());
+        if (mEtWordInput.hasFocus()) {
+            mEtWordInput.setSelection(mEtWordInput.getText().length());
+        }
+
+        // Set translation text and favorite state button
+        mTvTranslation.setText(item.getTranslation());
+        mIvTranslationFavorite.setActivated(item.getIsFavorite());
     }
 
     /**
@@ -296,88 +371,11 @@ public class TranslationFragment extends BaseFragment {
         Timber.e(error);
     }
 
-    private void fillAndShowTranslationViews(HistoryItem item) {
-        fillTranslationViews(item);
-        showTranslationViews();
-    }
-
-    private void fillTranslationViews(HistoryItem item) {
-        // Set toolbar languages
-        mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
-        mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
-
-        // Set user input field. If it was focused in the moment of update - move cursor to the end
-        mEtWordInput.setText(item.getWord());
-        if (mEtWordInput.hasFocus()) {
-            mEtWordInput.setSelection(mEtWordInput.getText().length());
-        }
-
-        // Set translation text and favorite state button
-        mTvTranslation.setText(item.getTranslation());
-        mIvTranslationFavorite.setActivated(item.getIsFavorite());
-    }
-
-    @OnClick(R.id.btnRetry)
-    void retry() {
-        loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
-                getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
-    }
-
-    @OnClick(R.id.ivWordClean)
-    void cleanWordInput() {
-        mEtWordInput.setText("");
-    }
-
-    @OnClick(R.id.ivTranslationFavorite)
-    void toggleTranslationFavorite() {
-        if (mCurrentItem != null) {
-            boolean activated = mIvTranslationFavorite.isActivated();
-            if (activated) {
-                mCurrentItem.setIsFavorite(false);
-                mIvTranslationFavorite.setActivated(false);
-            } else {
-                mCurrentItem.setIsFavorite(true);
-                mIvTranslationFavorite.setActivated(true);
-            }
-            int updatedCount = DBManager.updateHistoryItemWithId(getContext(), mCurrentItem);
-            if (updatedCount == 0) {
-                DBManager.addHistoryItem(getContext(), mCurrentItem);
-            }
-        }
-    }
-
-    @OnClick(R.id.ivTranslationShare)
-    void shareTranslation() {
-        String translation = mTvTranslation.getText().toString();
-        if (TextUtils.isEmpty(translation)) {
-            return;
-        }
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, translation);
-
-        Intent chooser = Intent.createChooser(shareIntent,
-                getString(R.string.translation_share_intent_title));
-
-        if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
-            getContext().startActivity(chooser);
-        }
-    }
-
-    @OnClick(R.id.ivTranslationFullscreen)
-    void showFullScreen() {
-        Intent intent = new Intent(getContext(), FullscreenActivity.class);
-        intent.putExtra(FullscreenActivity.EXTRA_FULLSCREEN_TEXT, mTvTranslation.getText());
-        startActivity(intent);
-    }
-
     /**
      * Method for showing a localized error message by its code
      */
     private void localizeAndShowErrorByCode(@ResponseErrorCodes int errorCode,
                                             @Nullable String errorMessage) {
-        showTranslationViews();
-
         switch (errorCode) {
             case ResponseErrorCodes.API_KEY_BLOCKED:
                 showError(getString(R.string.error_title_authorization),
@@ -410,6 +408,90 @@ public class TranslationFragment extends BaseFragment {
         }
         Timber.d("localizeAndShowErrorByCode: errorCode=" + errorCode + ", msg=" + errorMessage);
     }
+    //----------------------------------------------------------------------------------------------
+    //endregion
+
+    //region Button clicks
+    //----------------------------------------------------------------------------------------------
+    @OnClick(R.id.ivWordMic)
+    void captureTextFromVoice() {
+        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.ivWordSpeaker)
+    void sayWordInputAloud() {
+        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.ivWordClean)
+    void cleanWordInput() {
+        mEtWordInput.setText("");
+    }
+
+    @OnClick(R.id.ivTranslationSpeaker)
+    void sayTranslationAloud() {
+        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.ivTranslationFavorite)
+    void toggleTranslationFavoriteState() {
+        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+            return;
+        }
+        if (mCurrentItem != null) {
+            boolean activated = mIvTranslationFavorite.isActivated();
+            if (activated) {
+                mCurrentItem.setIsFavorite(false);
+                mIvTranslationFavorite.setActivated(false);
+            } else {
+                mCurrentItem.setIsFavorite(true);
+                mIvTranslationFavorite.setActivated(true);
+            }
+            int updatedCount = DBManager.updateHistoryItemWithId(getContext(), mCurrentItem);
+            if (updatedCount == 0) {
+                DBManager.addHistoryItem(getContext(), mCurrentItem);
+            }
+        }
+    }
+
+    @OnClick(R.id.ivTranslationShare)
+    void shareTranslation() {
+        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+            return;
+        }
+        String translation = mTvTranslation.getText().toString();
+        if (TextUtils.isEmpty(translation)) {
+            return;
+        }
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, translation);
+
+        Intent chooser = Intent.createChooser(shareIntent,
+                getString(R.string.translation_share_intent_title));
+
+        if (shareIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            getContext().startActivity(chooser);
+        }
+    }
+
+    @OnClick(R.id.ivTranslationFullscreen)
+    void gotoFullScreenActivity() {
+        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+            return;
+        }
+        Intent intent = new Intent(getContext(), FullscreenActivity.class);
+        intent.putExtra(FullscreenActivity.EXTRA_FULLSCREEN_TEXT, mTvTranslation.getText());
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.btnRetry)
+    void retry() {
+        loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
+                getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+    }
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
     /**
      * Method for processing language selection
@@ -432,6 +514,9 @@ public class TranslationFragment extends BaseFragment {
         }
     }
 
+    /**
+     * Helper method to get the language code FROM which to translate
+     */
     private String getCurrentCodeLanguageFrom() {
         if (mTvLanguageFrom != null) {
             String nameLangFrom = mTvLanguageFrom.getText().toString();
@@ -441,6 +526,9 @@ public class TranslationFragment extends BaseFragment {
         }
     }
 
+    /**
+     * Helper method to get the language code TO which to translate
+     */
     private String getCurrentCodeLanguageTo() {
         if (mTvLanguageTo != null) {
             String nameLangTo = mTvLanguageTo.getText().toString();
@@ -450,6 +538,8 @@ public class TranslationFragment extends BaseFragment {
         }
     }
 
+    //region View state change methods
+    //----------------------------------------------------------------------------------------------
     private void showLoading() {
         mPbLoading.setVisibility(View.VISIBLE);
         mTvTranslation.setVisibility(View.GONE);
@@ -487,26 +577,8 @@ public class TranslationFragment extends BaseFragment {
         mTvTranslationErrorText.setText(errorText);
         mLlTranslationError.setVisibility(View.VISIBLE);
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mDisposables != null) {
-            mDisposables.clear();
-        }
-        if (mDbObserver != null) {
-            mDbObserver.unregisterIdObserver();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mCurrentItem != null) {
-            outState.putParcelable(ARG_CURRENT_ITEM, mCurrentItem);
-            Prefs.putLastUsedItemId(getContext(), mCurrentItem.getId());
-        }
-    }
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
     /**
      * ContentObserver to watch for specific HistoryItem changes and display it

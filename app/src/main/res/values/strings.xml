@@ -46,6 +46,7 @@
     <string name="error_text_unknown">An unknown error occurred while loading translation data</string>
     <string name="history_is_empty">No translations in History</string>
     <string name="favorites_is_empty">No translations in Favorites</string>
+    <string name="not_implemented">This feature is not implemented yet :(</string>
 
     <!-- Localized array of supported languages -->
     <string-array name="language_codes_names">

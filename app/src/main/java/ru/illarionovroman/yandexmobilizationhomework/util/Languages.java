@@ -21,8 +21,15 @@ public class Languages {
 
     private static final String LANGUAGE_SPLIT_SYMBOL = ":";
 
+    /** LinkedHashMap implementation is used for order saving */
     private LinkedHashMap<String,String> mLanguagesMap = new LinkedHashMap<>();
 
+    /**
+     * Get languages array from localized xml resource, parse it and sort by value.
+     * I don't like this approach personally, and it will be reworked if there is time left.
+     * It should be changed to DB storage with network synchronization. It looks good in my mind,
+     * but it must be tested in practice to know for sure.
+     */
     @Inject
     public Languages(Context appContext) {
         String[] rawLangArray = appContext.getResources()
