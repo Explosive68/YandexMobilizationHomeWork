@@ -33,7 +33,6 @@
 
     <style name="TranslationActionImageLand" parent="TranslationActionImage">
         <item name="android:layout_marginTop">@dimen/margin_quarter</item>
-        <item name="android:layout_weight">1</item>
     </style>
 
     <style name="CleanWordActionImage">

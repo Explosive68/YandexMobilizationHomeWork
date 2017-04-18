@@ -110,13 +110,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@id/llTranslationButtons"
-                android:padding="@dimen/margin_half"
                 android:scrollbars="vertical"
                 android:fillViewport="true">
 
                 <TextView
                     android:id="@+id/tvTranslation"
                     style="@style/TextTranslated"
+                    android:padding="@dimen/margin_half"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </ScrollView>
