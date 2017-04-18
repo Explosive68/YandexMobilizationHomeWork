@@ -435,7 +435,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationFavorite)
     void toggleTranslationFavoriteState() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+        if (TextUtils.isEmpty(mTvTranslation.getText().toString())) {
             return;
         }
         if (mCurrentItem != null) {
@@ -456,9 +456,6 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationShare)
     void shareTranslation() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
-            return;
-        }
         String translation = mTvTranslation.getText().toString();
         if (TextUtils.isEmpty(translation)) {
             return;
@@ -477,7 +474,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationFullscreen)
     void gotoFullScreenActivity() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+        if (TextUtils.isEmpty(mTvTranslation.getText().toString())) {
             return;
         }
         Intent intent = new Intent(getContext(), FullscreenActivity.class);
