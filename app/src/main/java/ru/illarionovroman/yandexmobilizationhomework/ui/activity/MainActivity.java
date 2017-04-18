@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.MainPagerAdapter;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.view.NonSwipeableViewPager;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationFragment;
 
@@ -149,10 +150,10 @@ public class MainActivity extends AppCompatActivity {
      * This method is gonna be called from list adapter, then we delegate it to translation fragment,
      * telling it to show this item
      */
-    public void onListItemClicked(long itemId) {
+    public void onListItemClicked(HistoryItem item) {
         mPager.setCurrentItem(FragmentPosition.TRANSLATION, true);
         TranslationFragment fragment = (TranslationFragment) mAdapter
                 .getRegisteredFragment(FragmentPosition.TRANSLATION);
-        fragment.loadAndShowItemFromDB(itemId, true);
+        fragment.showSelectedItem(item);
     }
 }

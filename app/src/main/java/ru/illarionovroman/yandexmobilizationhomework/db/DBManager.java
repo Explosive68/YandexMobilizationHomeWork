@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.CursorLoader;
 
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
+import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationParams;
 
 /**
  * Helper class for centralized DB management
@@ -43,13 +44,16 @@ public class DBManager {
                 Contract.HistoryEntry.DATE + " DESC");
     }
 
-    public static @Nullable HistoryItem getHistoryItemByWordAndLangs(Context context, String word,
-                                                           String languageFrom, String languageTo) {
+    public static @Nullable HistoryItem getHistoryItemByParams(Context context,
+                                                               final TranslationParams params) {
         HistoryItem item = null;
         String selection = Contract.HistoryEntry.WORD + WHERE_ARG_PLACEHOLDER + " AND " +
                 Contract.HistoryEntry.LANGUAGE_FROM + WHERE_ARG_PLACEHOLDER + " AND " +
                 Contract.HistoryEntry.LANGUAGE_TO + WHERE_ARG_PLACEHOLDER;
-        String[] selectionArgs = new String[]{word, languageFrom, languageTo};
+        String[] selectionArgs = new String[]{
+                params.getWordToTranslate(),
+                params.getLanguageCodeFrom(),
+                params.getLanguageCodeTo()};
 
         Cursor cursor =  context.getContentResolver().query(
                 Contract.HistoryEntry.CONTENT_URI_HISTORY,

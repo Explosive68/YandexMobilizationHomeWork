@@ -17,6 +17,7 @@ import butterknife.BindView;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
@@ -100,7 +101,7 @@ public class InternalHistoryFragment extends BaseFragment
     }
 
     @Override
-    public void onListItemClicked(long itemId) {
-        ((MainActivity) getActivity()).onListItemClicked(itemId);
+    public void onListItemClicked(HistoryItem item) {
+        ((MainActivity) getActivity()).onListItemClicked(item);
     }
 }

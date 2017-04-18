@@ -118,7 +118,8 @@ public class TranslationFragment extends BaseFragment {
     @Inject
     Languages mLanguages;
 
-    private CompositeDisposable mDisposables;
+    private CompositeDisposable mDisposables = new CompositeDisposable();
+    private Disposable mLoaderDisposable;
 
     /** Always use {@link #setCurrentItem(HistoryItem)} to change this field */
     private HistoryItem mCurrentItem;
@@ -177,20 +178,17 @@ public class TranslationFragment extends BaseFragment {
     //region Initialization methods
     //----------------------------------------------------------------------------------------------
     private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
-                HistoryItem item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
-                setCurrentItem(item);
-                fillAndShowTranslationViews(item);
-            }
+        HistoryItem item = null;
+        if (savedInstanceState != null && savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
+            item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
         } else {
             long itemId = Prefs.getLastUsedItemId(getContext());
             if (itemId != -1) {
                 // Preload in UI thread to show ready data
-                HistoryItem item = DBManager.getHistoryItemById(getContext(), itemId);
-                handleUpdatedHistoryItem(item);
+                item = DBManager.getHistoryItemById(getContext(), itemId);
             }
         }
+        handleUpdatedHistoryItem(item, true);
     }
 
     private void initializeFragment() {
@@ -199,14 +197,14 @@ public class TranslationFragment extends BaseFragment {
     }
 
     private void initializeInputWatcher() {
-        mDisposables = new CompositeDisposable();
-        String currentWord = mCurrentItem != null ? mCurrentItem.getWord() : "";
-        Observable<String> inputWatcher = TranslationHelper.createInputWatcher(
-                mEtWordInput, currentWord);
-        Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
+        Observable<String> inputWatcher = TranslationHelper.createInputWatcher(mEtWordInput);
+        Disposable inputDisposable = inputWatcher
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRestApi, inputText,
-                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(
+                        new TranslationParams(inputText, getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()),
+                        false)
+                );
         mDisposables.add(inputDisposable);
     }
 
@@ -230,16 +228,19 @@ public class TranslationFragment extends BaseFragment {
         });
 
         mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
-            // Swap actionBar items
+            // Swap actionBar items(languages)
             String buf = mTvLanguageFrom.getText().toString();
             mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
             mTvLanguageTo.setText(buf);
 
-            // Translate word from translation
+            // Place translation into input and translate it
             String translation = mTvTranslation.getText().toString();
+            mEtWordInput.setText(translation);
             if (!TextUtils.isEmpty(translation)) {
-                loadItemFromDatabaseOrNetwork(mRestApi, translation,
-                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+                loadItemFromDatabaseOrNetwork(
+                        new TranslationParams(translation, getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()),
+                        true
+                );
             }
         });
     }
@@ -253,36 +254,44 @@ public class TranslationFragment extends BaseFragment {
      * but if there is no such data there - then try to get it from network.
      * In the end - show successfully retrieved data or localized error with reason.
      */
-    private void loadItemFromDatabaseOrNetwork(RestApi restApi, String wordToTranslate,
-                                               String langCodeFrom,
-                                               String langCodeTo) {
+    private void loadItemFromDatabaseOrNetwork(final TranslationParams params, boolean updateInput) {
         showLoading();
 
-        Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(),
-                restApi, wordToTranslate, langCodeFrom, langCodeTo);
+        Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(), mRestApi, params);
 
-        mDisposables.add(historyItemSingle
-                .subscribe(this::handleUpdatedHistoryItem, this::handleTranslationError));
+        // Dispose previous loading if exists
+        if (mLoaderDisposable != null) {
+            mLoaderDisposable.dispose();
+        }
+        mLoaderDisposable = historyItemSingle.subscribe(
+                (item) -> handleUpdatedHistoryItem(item, updateInput),
+                this::handleTranslationError
+        );
+        mDisposables.add(mLoaderDisposable);
     }
 
     /**
      * Load item with given id from DB in background, then pass it to UI
      * @param itemId Id of item to load from DB
-     * @param updateDate Whether to update date of item or not
      */
-    public void loadAndShowItemFromDB(long itemId, boolean updateDate) {
+    private void loadAndSetItemFavoriteState(long itemId) {
         Single.just(itemId)
                 .map(id -> {
                     HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
-                    if (updateDate) {
-                        item.setDate(Utils.getCurrentFormattedDateUtc());
-                        DBManager.updateHistoryItemWithId(getContext(), item);
-                    }
                     return item;
                 })
                 .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleUpdatedHistoryItem);
+                .subscribe((item) -> handleUpdatedHistoryItem(item, false));
+    }
+
+    public void showSelectedItem(HistoryItem item) {
+        handleUpdatedHistoryItem(item, true);
+        // Update item date in background
+        new Thread(() -> {
+            item.setDate(Utils.getCurrentFormattedDateUtc());
+            DBManager.updateHistoryItemWithId(getContext(), item);
+        }).start();
     }
     //----------------------------------------------------------------------------------------------
     //endregion
@@ -293,12 +302,12 @@ public class TranslationFragment extends BaseFragment {
      * Update current item, toolbar items and show successful screen state
      * @param item {@link HistoryItem} to show
      */
-    private void handleUpdatedHistoryItem(@Nullable HistoryItem item) {
+    private void handleUpdatedHistoryItem(@Nullable HistoryItem item, boolean updateInput) {
         if (item != null) {
             setCurrentItem(item);
-            fillAndShowTranslationViews(item);
+            fillAndShowTranslationViews(item, updateInput);
         } else {
-            Timber.wtf("Item can't be null in successful case");
+            Timber.d("Item is null");
         }
     }
 
@@ -313,8 +322,8 @@ public class TranslationFragment extends BaseFragment {
         }
     }
 
-    private void fillAndShowTranslationViews(HistoryItem item) {
-        fillTranslationViews(item);
+    private void fillAndShowTranslationViews(HistoryItem item, boolean updateInput) {
+        fillTranslationViews(item, updateInput);
         showTranslationViews();
     }
 
@@ -322,15 +331,17 @@ public class TranslationFragment extends BaseFragment {
      * Get data from item and put it in corresponding views
      * @param item {@link HistoryItem} to get data from
      */
-    private void fillTranslationViews(HistoryItem item) {
+    private void fillTranslationViews(HistoryItem item, boolean updateInput) {
         // Set toolbar languages
         mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
         mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
 
-        // Set user input field. If it was focused in the moment of update - move cursor to the end
-        mEtWordInput.setText(item.getWord());
-        if (mEtWordInput.hasFocus()) {
-            mEtWordInput.setSelection(mEtWordInput.getText().length());
+        if (updateInput) {
+            // Set user input field. If it was focused in the moment of update - move cursor to the end
+            mEtWordInput.setText(item.getWord());
+            if (mEtWordInput.hasFocus()) {
+                mEtWordInput.setSelection(mEtWordInput.getText().length());
+            }
         }
 
         // Set translation text and favorite state button
@@ -435,7 +446,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationFavorite)
     void toggleTranslationFavoriteState() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+        if (TextUtils.isEmpty(mTvTranslation.getText().toString())) {
             return;
         }
         if (mCurrentItem != null) {
@@ -456,9 +467,6 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationShare)
     void shareTranslation() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
-            return;
-        }
         String translation = mTvTranslation.getText().toString();
         if (TextUtils.isEmpty(translation)) {
             return;
@@ -477,7 +485,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationFullscreen)
     void gotoFullScreenActivity() {
-        if (TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+        if (TextUtils.isEmpty(mTvTranslation.getText().toString())) {
             return;
         }
         Intent intent = new Intent(getContext(), FullscreenActivity.class);
@@ -487,8 +495,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.btnRetry)
     void retry() {
-        loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
-                getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+        loadItemFromDatabaseOrNetwork(getCurrentTranslationParams(), false);
     }
     //----------------------------------------------------------------------------------------------
     //endregion
@@ -507,8 +514,7 @@ public class TranslationFragment extends BaseFragment {
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
-                    getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+            loadItemFromDatabaseOrNetwork(getCurrentTranslationParams(), true);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -536,6 +542,12 @@ public class TranslationFragment extends BaseFragment {
         } else {
             return "";
         }
+    }
+
+    private TranslationParams getCurrentTranslationParams() {
+        return new TranslationParams(mEtWordInput.getText().toString(),
+                getCurrentCodeLanguageFrom(),
+                getCurrentCodeLanguageTo());
     }
 
     //region View state change methods
@@ -601,7 +613,7 @@ public class TranslationFragment extends BaseFragment {
             } catch (NumberFormatException ignore) {
             }
             if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadAndShowItemFromDB(id, false);
+                loadAndSetItemFavoriteState(id);
             }
         }
 
