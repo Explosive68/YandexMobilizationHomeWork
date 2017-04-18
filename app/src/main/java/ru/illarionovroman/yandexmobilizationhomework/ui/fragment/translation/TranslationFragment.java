@@ -20,15 +20,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -64,61 +65,48 @@ public class TranslationFragment extends BaseFragment {
     public static final String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
     private static final float ALPHA_BUTTONS_DISABLED = 0.3f;
+    private static final int USER_INPUT_UPDATE_TIMEOUT_SECONDS = 2;
 
     //region Views binding
     //----------------------------------------------------------------------------------------------
     /** User input views */
-    @BindView(R.id.etWordInput)
-    EditText mEtWordInput;
-    @BindView(R.id.ivWordMic)
-    ImageView mIvWorkMic;
-    @BindView(R.id.ivWordSpeaker)
-    ImageView mIvWordSpeaker;
+    @BindView(R.id.ivWordMic) ImageView mIvWorkMic;
+    @BindView(R.id.ivWordSpeaker) ImageView mIvWordSpeaker;
+    /** Always use {@link #setWordInputValue(String)} to change value of this field */
+    @BindView(R.id.etWordInput) EditText mEtWordInput;
 
     /** Translation views */
-    @BindView(R.id.tvTranslation)
-    TextView mTvTranslation;
-    @BindView(R.id.llTranslationButtons)
-    LinearLayout mLlTranslationButtons;
-    @BindView(R.id.ivTranslationSpeaker)
-    ImageView mIvTranslationSpeaker;
-    @BindView(R.id.ivTranslationFavorite)
-    ImageView mIvTranslationFavorite;
-    @BindView(R.id.ivTranslationShare)
-    ImageView mIvTranslationShare;
-    @BindView(R.id.ivTranslationFullscreen)
-    ImageView mIvTranslationFullscreen;
+    @BindView(R.id.tvTranslation) TextView mTvTranslation;
+    @BindView(R.id.llTranslationButtons) LinearLayout mLlTranslationButtons;
+    @BindView(R.id.ivTranslationSpeaker) ImageView mIvTranslationSpeaker;
+    @BindView(R.id.ivTranslationFavorite) ImageView mIvTranslationFavorite;
+    @BindView(R.id.ivTranslationShare) ImageView mIvTranslationShare;
+    @BindView(R.id.ivTranslationFullscreen) ImageView mIvTranslationFullscreen;
 
     /** Error views */
-    @BindView(R.id.llTranslationError)
-    LinearLayout mLlTranslationError;
-    @BindView(R.id.tvTranslationErrorTitle)
-    TextView mTvTranslationErrorTitle;
-    @BindView(R.id.tvTranslationErrorText)
-    TextView mTvTranslationErrorText;
+    @BindView(R.id.llTranslationError) LinearLayout mLlTranslationError;
+    @BindView(R.id.tvTranslationErrorTitle) TextView mTvTranslationErrorTitle;
+    @BindView(R.id.tvTranslationErrorText) TextView mTvTranslationErrorText;
 
     /** Progress bar */
-    @BindView(R.id.pbLoading)
-    ProgressBar mPbLoading;
+    @BindView(R.id.pbLoading) ProgressBar mPbLoading;
 
     /** ActionBar views */
-    @BindView(R.id.tvLanguageFrom)
-    TextView mTvLanguageFrom;
-    @BindView(R.id.tvLanguageTo)
-    TextView mTvLanguageTo;
-    @BindView(R.id.ivSwapLanguages)
-    ImageView mIvSwapLanguages;
+    @BindView(R.id.tvLanguageFrom) TextView mTvLanguageFrom;
+    @BindView(R.id.tvLanguageTo) TextView mTvLanguageTo;
+    @BindView(R.id.ivSwapLanguages) ImageView mIvSwapLanguages;
     //----------------------------------------------------------------------------------------------
     //endregion
 
-    @Inject
-    RestApi mRestApi;
-    @Inject
-    Gson mGson;
-    @Inject
-    Languages mLanguages;
+    @Inject RestApi mRestApi;
+    @Inject Gson mGson;
+    @Inject Languages mLanguages;
 
-    private CompositeDisposable mDisposables;
+    private CompositeDisposable mDisposables = new CompositeDisposable();
+    private Disposable mItemLoaderDisposable;
+
+    /** Variable to consume EditText change after programmatic edit */
+    private boolean mIgnoreInputChangeOnce = false;
 
     /** Always use {@link #setCurrentItem(HistoryItem)} to change this field */
     private HistoryItem mCurrentItem;
@@ -171,42 +159,57 @@ public class TranslationFragment extends BaseFragment {
             mDbObserver.unregisterIdObserver();
         }
     }
+
+    private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
+        HistoryItem item = null;
+        if (savedInstanceState != null && savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
+            item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
+        } else {
+            long itemId = Prefs.getLastUsedItemId(getContext());
+            if (itemId != -1) {
+                // Preload in UI thread to show ready data
+                item = DBManager.getHistoryItemById(getContext(), itemId);
+            }
+        }
+        handleItem(item);
+    }
     //----------------------------------------------------------------------------------------------
     //endregion
 
     //region Initialization methods
     //----------------------------------------------------------------------------------------------
-    private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
-                HistoryItem item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
-                setCurrentItem(item);
-                fillAndShowTranslationViews(item);
-            }
-        } else {
-            long itemId = Prefs.getLastUsedItemId(getContext());
-            if (itemId != -1) {
-                // Preload in UI thread to show ready data
-                HistoryItem item = DBManager.getHistoryItemById(getContext(), itemId);
-                handleUpdatedHistoryItem(item);
-            }
-        }
-    }
-
     private void initializeFragment() {
         initializeActionBar();
         initializeInputWatcher();
     }
 
+    /**
+     * Rx watcher for user input in the EditText. After every valid update initiates translation
+     * loading procedure
+     */
     private void initializeInputWatcher() {
-        mDisposables = new CompositeDisposable();
-        String currentWord = mCurrentItem != null ? mCurrentItem.getWord() : "";
-        Observable<String> inputWatcher = TranslationHelper.createInputWatcher(
-                mEtWordInput, currentWord);
-        Disposable inputDisposable = inputWatcher.subscribeOn(Schedulers.io())
+        Disposable inputDisposable = RxTextView.textChanges(mEtWordInput)
+                .skipInitialValue()
+                // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
+                .map(String::valueOf)
+                .map(String::trim)
+                .distinctUntilChanged()
+                .debounce(USER_INPUT_UPDATE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .filter(inputText -> {
+                    // Ignore programmatic input change
+                    if (mIgnoreInputChangeOnce) {
+                        mIgnoreInputChangeOnce = false;
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
+                .filter(inputText -> !TextUtils.isEmpty(inputText))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(mRestApi, inputText,
-                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo()));
+                .subscribe(inputText -> loadItemFromDatabaseOrNetwork(new TranslationParams(
+                        inputText, getCurrentCodeLangFrom(), getCurrentCodeLangTo()))
+                );
         mDisposables.add(inputDisposable);
     }
 
@@ -215,31 +218,32 @@ public class TranslationFragment extends BaseFragment {
     }
 
     private void setActionBarClickListeners() {
-        mTvLanguageFrom.setOnClickListener(tvLangFromTextView -> {
+        mTvLanguageFrom.setOnClickListener(tvLangFrom -> {
             Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageFrom());
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLangFrom());
             intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_FROM);
             startActivityForResult(intent, REQUEST_CODE_LANGUAGE_FROM);
         });
 
-        mTvLanguageTo.setOnClickListener(tvLangToTextView -> {
+        mTvLanguageTo.setOnClickListener(tvLangTo -> {
             Intent intent = new Intent(getContext(), LanguageSelectionActivity.class);
-            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLanguageTo());
+            intent.putExtra(EXTRA_CURRENT_LANGUAGE, getCurrentCodeLangTo());
             intent.putExtra(EXTRA_REQUEST_CODE, REQUEST_CODE_LANGUAGE_TO);
             startActivityForResult(intent, REQUEST_CODE_LANGUAGE_TO);
         });
 
-        mIvSwapLanguages.setOnClickListener(swapLangsImageView -> {
-            // Swap actionBar items
+        mIvSwapLanguages.setOnClickListener(ivSwapLangs -> {
+            // Swap actionBar items(languages)
             String buf = mTvLanguageFrom.getText().toString();
             mTvLanguageFrom.setText(mTvLanguageTo.getText().toString());
             mTvLanguageTo.setText(buf);
 
-            // Translate word from translation
+            // Place translation into input and translate it
             String translation = mTvTranslation.getText().toString();
+            setWordInputValue(translation);
             if (!TextUtils.isEmpty(translation)) {
-                loadItemFromDatabaseOrNetwork(mRestApi, translation,
-                        getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+                loadItemFromDatabaseOrNetwork(new TranslationParams(translation,
+                        getCurrentCodeLangFrom(), getCurrentCodeLangTo()));
             }
         });
     }
@@ -253,36 +257,44 @@ public class TranslationFragment extends BaseFragment {
      * but if there is no such data there - then try to get it from network.
      * In the end - show successfully retrieved data or localized error with reason.
      */
-    private void loadItemFromDatabaseOrNetwork(RestApi restApi, String wordToTranslate,
-                                               String langCodeFrom,
-                                               String langCodeTo) {
+    private void loadItemFromDatabaseOrNetwork(final TranslationParams params) {
         showLoading();
 
-        Single<HistoryItem> historyItemSingle = TranslationHelper.loadHistoryItem(getContext(),
-                restApi, wordToTranslate, langCodeFrom, langCodeTo);
-
-        mDisposables.add(historyItemSingle
-                .subscribe(this::handleUpdatedHistoryItem, this::handleTranslationError));
+        // Dispose previous loading if exists
+        if (mItemLoaderDisposable != null) {
+            mItemLoaderDisposable.dispose();
+        }
+        mItemLoaderDisposable = TranslationLoader.loadHistoryItem(getContext(), mRestApi, params)
+                .subscribe(this::handleItemAfterLoad, this::handleTranslationError);
+        mDisposables.add(mItemLoaderDisposable);
     }
 
     /**
      * Load item with given id from DB in background, then pass it to UI
+     *
      * @param itemId Id of item to load from DB
-     * @param updateDate Whether to update date of item or not
      */
-    public void loadAndShowItemFromDB(long itemId, boolean updateDate) {
+    private void loadItemById(long itemId) {
         Single.just(itemId)
                 .map(id -> {
                     HistoryItem item = DBManager.getHistoryItemById(getContext(), id);
-                    if (updateDate) {
-                        item.setDate(Utils.getCurrentFormattedDateUtc());
-                        DBManager.updateHistoryItemWithId(getContext(), item);
-                    }
                     return item;
                 })
                 .subscribeOn(Schedulers.trampoline())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleUpdatedHistoryItem);
+                .subscribe(this::handleItem);
+    }
+
+    /**
+     * On item selection - show it and refresh its date field
+     */
+    public void showSelectedItem(HistoryItem item) {
+        handleItem(item);
+        // Update item date in background
+        new Thread(() -> {
+            item.setDate(Utils.getCurrentFormattedDateUtc());
+            DBManager.updateHistoryItemWithId(getContext(), item);
+        }).start();
     }
     //----------------------------------------------------------------------------------------------
     //endregion
@@ -293,12 +305,26 @@ public class TranslationFragment extends BaseFragment {
      * Update current item, toolbar items and show successful screen state
      * @param item {@link HistoryItem} to show
      */
-    private void handleUpdatedHistoryItem(@Nullable HistoryItem item) {
+    private void handleItem(@Nullable HistoryItem item) {
         if (item != null) {
             setCurrentItem(item);
             fillAndShowTranslationViews(item);
         } else {
-            Timber.wtf("Item can't be null in successful case");
+            Timber.d("Item is null");
+        }
+    }
+
+    /**
+     * Always dispose loader after its work done.
+     * Also, when item comes from possible long-time load(slow network),
+     * we must check is it appropriate to show result or it's obsolete already.
+     */
+    private void handleItemAfterLoad(@Nullable HistoryItem item) {
+        if (mItemLoaderDisposable != null) {
+            mItemLoaderDisposable.dispose();
+        }
+        if (item != null && item.getWord().equals(mEtWordInput.getText().toString())) {
+            handleItem(item);
         }
     }
 
@@ -306,16 +332,19 @@ public class TranslationFragment extends BaseFragment {
      * Replace current item with new one and update observer
      * @param item New {@link HistoryItem} to replace the old one
      */
-    private void setCurrentItem(HistoryItem item) {
+    private void setCurrentItem(@Nullable HistoryItem item) {
         if (item != null) {
             mCurrentItem = item;
             mDbObserver.replaceItemObserver(item.getId());
+        } else {
+            mCurrentItem = null;
+            mDbObserver.unregisterIdObserver();
         }
     }
 
     private void fillAndShowTranslationViews(HistoryItem item) {
         fillTranslationViews(item);
-        showTranslationViews();
+        showTranslation();
     }
 
     /**
@@ -327,11 +356,7 @@ public class TranslationFragment extends BaseFragment {
         mTvLanguageFrom.setText(mLanguages.getLangNameByCode(item.getLanguageCodeFrom()));
         mTvLanguageTo.setText(mLanguages.getLangNameByCode(item.getLanguageCodeTo()));
 
-        // Set user input field. If it was focused in the moment of update - move cursor to the end
-        mEtWordInput.setText(item.getWord());
-        if (mEtWordInput.hasFocus()) {
-            mEtWordInput.setSelection(mEtWordInput.getText().length());
-        }
+        setWordInputValue(item.getWord());
 
         // Set translation text and favorite state button
         mTvTranslation.setText(item.getTranslation());
@@ -344,7 +369,7 @@ public class TranslationFragment extends BaseFragment {
      * @param error Throwable to analyze
      */
     private void handleTranslationError(Throwable error) {
-        showTranslationViews();
+        showTranslation();
 
         if (error instanceof HttpException) {
             try {
@@ -367,8 +392,6 @@ public class TranslationFragment extends BaseFragment {
                     getString(R.string.error_text_unknown));
             Timber.e(error, "Not HTTP translation error! Message: " + error.getMessage());
         }
-
-        Timber.e(error);
     }
 
     /**
@@ -425,7 +448,11 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivWordClean)
     void cleanWordInput() {
+        // Set all views to default state (except ActionBar)
         mEtWordInput.setText("");
+        mTvTranslation.setText("");
+        mIvTranslationFavorite.setActivated(false);
+        setCurrentItem(null);
     }
 
     @OnClick(R.id.ivTranslationSpeaker)
@@ -484,8 +511,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.btnRetry)
     void retry() {
-        loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
-                getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+        loadItemFromDatabaseOrNetwork(getCurrentTranslationParams());
     }
     //----------------------------------------------------------------------------------------------
     //endregion
@@ -504,17 +530,18 @@ public class TranslationFragment extends BaseFragment {
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            loadItemFromDatabaseOrNetwork(mRestApi, mEtWordInput.getText().toString(),
-                    getCurrentCodeLanguageFrom(), getCurrentCodeLanguageTo());
+            loadItemFromDatabaseOrNetwork(getCurrentTranslationParams());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
+    //region TranslationFragment-related helpers
+    //----------------------------------------------------------------------------------------------
     /**
      * Helper method to get the language code FROM which to translate
      */
-    private String getCurrentCodeLanguageFrom() {
+    private String getCurrentCodeLangFrom() {
         if (mTvLanguageFrom != null) {
             String nameLangFrom = mTvLanguageFrom.getText().toString();
             return mLanguages.getLangCodeByName(nameLangFrom);
@@ -526,7 +553,7 @@ public class TranslationFragment extends BaseFragment {
     /**
      * Helper method to get the language code TO which to translate
      */
-    private String getCurrentCodeLanguageTo() {
+    private String getCurrentCodeLangTo() {
         if (mTvLanguageTo != null) {
             String nameLangTo = mTvLanguageTo.getText().toString();
             return mLanguages.getLangCodeByName(nameLangTo);
@@ -534,6 +561,37 @@ public class TranslationFragment extends BaseFragment {
             return "";
         }
     }
+
+    /**
+     * Builds new {@link TranslationParams} from current word and languages
+     */
+    private TranslationParams getCurrentTranslationParams() {
+        return new TranslationParams(mEtWordInput.getText().toString(),
+                getCurrentCodeLangFrom(),
+                getCurrentCodeLangTo());
+    }
+
+    /**
+     * Correct way to change user input text on the fly.
+     * It will not trigger another data loading process because of input watcher.
+     * Also, if programmatic input change appears when user in process of editing by himself
+     * (for example, in case of long pause between symbols input), it will move cursor to the end
+     */
+    private void setWordInputValue(String newText) {
+        // If the same input on the screen - do nothing
+        if (newText.equals(mEtWordInput.getText().toString())) {
+            return;
+        }
+        // Set flag, which checked every time when EditText changes
+        mIgnoreInputChangeOnce = true;
+        mEtWordInput.setText(newText);
+        if (mEtWordInput.hasFocus()) {
+            // If change happens when we were typing - move cursor to the end
+            mEtWordInput.setSelection(mEtWordInput.getText().length());
+        }
+    }
+    //----------------------------------------------------------------------------------------------
+    //endregion
 
     //region View state change methods
     //----------------------------------------------------------------------------------------------
@@ -544,7 +602,7 @@ public class TranslationFragment extends BaseFragment {
         mLlTranslationError.setVisibility(View.GONE);
     }
 
-    private void showTranslationViews() {
+    private void showTranslation() {
         mPbLoading.setVisibility(View.GONE);
         mTvTranslation.setVisibility(View.VISIBLE);
         mLlTranslationButtons.setVisibility(View.VISIBLE);
@@ -552,16 +610,17 @@ public class TranslationFragment extends BaseFragment {
         mLlTranslationError.setVisibility(View.GONE);
     }
 
-    private void setTranslationButtonsEnabledState(boolean enabled) {
-        float alpha = enabled ? 1f : ALPHA_BUTTONS_DISABLED;
+    /** Set enabled and alpha state of translation buttons */
+    private void setTranslationButtonsEnabledState(boolean isEnabled) {
+        float alpha = isEnabled ? 1f : ALPHA_BUTTONS_DISABLED;
 
-        mIvTranslationSpeaker.setEnabled(enabled);
+        mIvTranslationSpeaker.setEnabled(isEnabled);
         mIvTranslationSpeaker.setAlpha(alpha);
-        mIvTranslationFavorite.setEnabled(enabled);
+        mIvTranslationFavorite.setEnabled(isEnabled);
         mIvTranslationFavorite.setAlpha(alpha);
-        mIvTranslationShare.setEnabled(enabled);
+        mIvTranslationShare.setEnabled(isEnabled);
         mIvTranslationShare.setAlpha(alpha);
-        mIvTranslationFullscreen.setEnabled(enabled);
+        mIvTranslationFullscreen.setEnabled(isEnabled);
         mIvTranslationFullscreen.setAlpha(alpha);
     }
 
@@ -590,6 +649,10 @@ public class TranslationFragment extends BaseFragment {
             onChange(selfChange, null);
         }
 
+        /**
+         * Analyze incoming uri: try to get id of changed item, and if it is current one - display
+         * changes
+         */
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             long id = -1;
@@ -598,7 +661,7 @@ public class TranslationFragment extends BaseFragment {
             } catch (NumberFormatException ignore) {
             }
             if (id != -1 && mCurrentItem != null && id == mCurrentItem.getId()) {
-                loadAndShowItemFromDB(id, false);
+                loadItemById(id);
             }
         }
 

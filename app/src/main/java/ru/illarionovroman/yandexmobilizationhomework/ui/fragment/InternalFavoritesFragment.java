@@ -23,6 +23,7 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.HistoryCursorAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
@@ -165,7 +166,7 @@ public class InternalFavoritesFragment extends BaseFragment
     }
 
     @Override
-    public void onListItemClicked(long itemId) {
-        ((MainActivity) getActivity()).onListItemClicked(itemId);
+    public void onListItemClicked(HistoryItem item) {
+        ((MainActivity) getActivity()).onListItemClicked(item);
     }
 }
