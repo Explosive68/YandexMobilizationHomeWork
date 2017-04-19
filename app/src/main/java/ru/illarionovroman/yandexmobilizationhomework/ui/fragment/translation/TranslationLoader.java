@@ -93,7 +93,7 @@ public class TranslationLoader {
      * Method for building parameter for translation request using currently selected languages.
      * @return E.g.: "ru-en", "en-ru", etc.
      */
-    private static String buildTranslationLangParam(Context context,
+    public static String buildTranslationLangParam(Context context,
                                                     String langCodeFrom, String langCodeTo) {
         return context.getString(R.string.translate_query_param_language_from_to,
                 langCodeFrom, langCodeTo);
