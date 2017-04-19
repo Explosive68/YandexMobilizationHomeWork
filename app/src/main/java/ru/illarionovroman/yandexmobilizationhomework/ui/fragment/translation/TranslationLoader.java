@@ -24,7 +24,7 @@ public class TranslationLoader {
      *                                        to perform translation
      * @return {@link HistoryItem} from DB or network
      */
-    static Single<HistoryItem> loadHistoryItem(final Context context, final RestApi restApi,
+    public static Single<HistoryItem> loadHistoryItem(final Context context, final RestApi restApi,
                                                       final TranslationParams params) {
         return Single.just(params.getWordToTranslate())
                 .flatMap(new Function<String, Single<HistoryItem>>() {
@@ -85,10 +85,7 @@ public class TranslationLoader {
                             params.getLanguageCodeFrom(),
                             params.getLanguageCodeTo()
                     );
-                    // Write it to DB
-                    long id = DBManager.addHistoryItem(context, item);
-                    // Now we can get the completed item
-                    return DBManager.getHistoryItemById(context, id);
+                    return item;
                 });
     }
 

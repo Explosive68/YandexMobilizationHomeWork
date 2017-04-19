@@ -318,12 +318,23 @@ public class TranslationFragment extends BaseFragment {
      * Always dispose loader after its work done.
      * Also, when item comes from possible long-time load(slow network),
      * we must check is it appropriate to show result or it's obsolete already.
+     *
+     * In case of result coming from network, it will not be in the database yet,
+     * so we have to write it to DB if this result is not obsolete.
      */
     private void handleItemAfterLoad(@Nullable HistoryItem item) {
         if (mItemLoaderDisposable != null) {
             mItemLoaderDisposable.dispose();
         }
+        // Check result is not obsolete
         if (item != null && item.getWord().equals(mEtWordInput.getText().toString())) {
+            // Check maturity of loaded item
+            if (item.getId() == HistoryItem.UNSPECIFIED_ID) {
+                // Immature - write it to DB
+                long id = DBManager.addHistoryItem(getContext(), item);
+                // Now we can get the completed item
+                item = DBManager.getHistoryItemById(getContext(), id);
+            }
             handleItem(item);
         }
     }
