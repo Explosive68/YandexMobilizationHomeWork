@@ -5,10 +5,12 @@ import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
+import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
 
 class TestUtils {
 
+    static final long TEST_VALUE_ID = 1;
     static final String TEST_VALUE_WORD = "Example";
     static final String TEST_VALUE_TRANSLATION = "Пример";
     static final String TEST_VALUE_LANG_FROM = "en";
@@ -26,5 +28,17 @@ class TestUtils {
         testValues.put(Contract.HistoryEntry.DATE, TEST_VALUE_DATE);
         testValues.put(Contract.HistoryEntry.IS_FAVORITE, TEST_VALUE_IS_FAVORITE);
         return testValues;
+    }
+
+    static HistoryItem createTestHistoryItem() {
+        HistoryItem resultItem = new HistoryItem(
+                TEST_VALUE_WORD,
+                TEST_VALUE_TRANSLATION,
+                TEST_VALUE_LANG_FROM,
+                TEST_VALUE_LANG_TO);
+        resultItem.setId(TEST_VALUE_ID);
+        resultItem.setIsFavorite(TEST_VALUE_IS_FAVORITE.equals("1"));
+        resultItem.setDate(TEST_VALUE_DATE);
+        return resultItem;
     }
 }
