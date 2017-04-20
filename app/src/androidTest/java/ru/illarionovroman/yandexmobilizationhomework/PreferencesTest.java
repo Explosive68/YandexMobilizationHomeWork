@@ -11,7 +11,8 @@ import org.junit.runner.RunWith;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -38,21 +39,21 @@ public class PreferencesTest {
     }
 
     @Test
-    public void preferences_WriteAndReadTest() throws Exception {
+    public void testWriteAndRead() throws Exception {
 
         // Use Prefs helper exactly as it's used in program
         Prefs.putLastUsedItemId(mContext, mHistoryItem.getId());
         long firstReadId = Prefs.getLastUsedItemId(mContext);
         // Check first write and read values match
-        assertTrue("First write and read Ids are not equals", TestUtils.TEST_VALUE_ID == firstReadId);
+        assertEquals("First write and read Ids are not equals", TestUtils.TEST_VALUE_ID, firstReadId);
 
         // Write another random id into preferences
         long secondWriteId = 10001;
         Prefs.putLastUsedItemId(mContext, secondWriteId);
         long secondReadId = Prefs.getLastUsedItemId(mContext);
         // Check first id was actually overwritten
-        assertTrue("Old id was not overwritten", secondReadId != firstReadId);
+        assertNotEquals("Old id was not overwritten", secondReadId, firstReadId);
         // Check second write and read values match
-        assertTrue("Second write and read Ids are not equals", secondReadId == secondWriteId);
+        assertEquals("Second write and read Ids are not equals", secondReadId, secondWriteId);
     }
 }

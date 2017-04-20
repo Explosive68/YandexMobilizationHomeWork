@@ -48,7 +48,7 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void create_database_test() throws Exception {
+    public void testCreateDatabase() throws Exception {
 
         // Use reflection to try to run the correct constructor whenever implemented
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class)
@@ -91,7 +91,7 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void insert_single_record_test() throws Exception {
+    public void testInsertSingleRecord() throws Exception {
 
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class)
                 .newInstance(mContext);
@@ -134,10 +134,10 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void query_single_record_test() throws Exception {
+    public void testQuerySingleRecord() throws Exception {
 
         // Insert test row
-        insert_single_record_test();
+        testInsertSingleRecord();
 
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class)
                 .newInstance(mContext);
@@ -189,10 +189,10 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void update_single_record_test() throws Exception {
+    public void testUpdateSingleRecord() throws Exception {
 
         // Insert test row
-        insert_single_record_test();
+        testInsertSingleRecord();
 
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class)
                 .newInstance(mContext);
@@ -265,10 +265,10 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void delete_single_record_test() throws Exception {
+    public void testDeleteSingleRecord() throws Exception {
 
         // Insert test row
-        insert_single_record_test();
+        testInsertSingleRecord();
 
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class)
                 .newInstance(mContext);
@@ -334,7 +334,7 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void upgrade_database_test() throws Exception {
+    public void testUpgradeDatabase() throws Exception {
 
         SQLiteOpenHelper dbHelper =
                 (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class).newInstance(mContext);
@@ -385,10 +385,10 @@ public class DatabaseTest {
      * @throws Exception in case the constructor hasn't been implemented yet
      */
     @Test
-    public void autoincrement_test() throws Exception {
+    public void testAutoincrement() throws Exception {
 
         // Insert test row
-        insert_single_record_test();
+        testInsertSingleRecord();
 
         SQLiteOpenHelper dbHelper =
                 (SQLiteOpenHelper) mDbHelperClass.getConstructor(Context.class).newInstance(mContext);
@@ -424,7 +424,6 @@ public class DatabaseTest {
         DBHelper dbHelper = new DBHelper(mContext);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         database.delete(Contract.HistoryEntry.TABLE_NAME, null, null);
-
 
         try {
             // Use reflection to get the database name from the db helper class

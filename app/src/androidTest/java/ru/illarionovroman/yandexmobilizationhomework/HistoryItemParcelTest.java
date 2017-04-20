@@ -9,8 +9,7 @@ import org.junit.runner.RunWith;
 
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -23,7 +22,7 @@ public class HistoryItemParcelTest {
     private HistoryItem mHistoryItem;
 
     @Before
-    public void createHistoryItem() {
+    public void initTestData() {
         mHistoryItem = new HistoryItem(
                 TestUtils.TEST_VALUE_WORD,
                 TestUtils.TEST_VALUE_TRANSLATION,
@@ -35,7 +34,7 @@ public class HistoryItemParcelTest {
     }
 
     @Test
-    public void historyItem_ParcelableWriteRead() throws Exception {
+    public void testWriteAndRead() throws Exception {
 
         // Write data to parcel
         Parcel parcel = Parcel.obtain();
@@ -46,11 +45,11 @@ public class HistoryItemParcelTest {
 
         // Read data from parcel and compare to written
         HistoryItem createdFromParcel = HistoryItem.CREATOR.createFromParcel(parcel);
-        assertThat(createdFromParcel.getWord(), is(TestUtils.TEST_VALUE_WORD));
-        assertThat(createdFromParcel.getTranslation(), is(TestUtils.TEST_VALUE_TRANSLATION));
-        assertThat(createdFromParcel.getLanguageCodeFrom(), is(TestUtils.TEST_VALUE_LANG_FROM));
-        assertThat(createdFromParcel.getLanguageCodeTo(), is(TestUtils.TEST_VALUE_LANG_TO));
-        assertThat(createdFromParcel.getIsFavorite(), is(TestUtils.TEST_VALUE_IS_FAVORITE.equals("1")));
-        assertThat(createdFromParcel.getDate(), is(TestUtils.TEST_VALUE_DATE));
+        assertEquals(createdFromParcel.getWord(), TestUtils.TEST_VALUE_WORD);
+        assertEquals(createdFromParcel.getTranslation(), TestUtils.TEST_VALUE_TRANSLATION);
+        assertEquals(createdFromParcel.getLanguageCodeFrom(), TestUtils.TEST_VALUE_LANG_FROM);
+        assertEquals(createdFromParcel.getLanguageCodeTo(), TestUtils.TEST_VALUE_LANG_TO);
+        assertEquals(createdFromParcel.getIsFavorite(), TestUtils.TEST_VALUE_IS_FAVORITE.equals("1"));
+        assertEquals(createdFromParcel.getDate(), TestUtils.TEST_VALUE_DATE);
     }
 }
