@@ -28,7 +28,7 @@ public interface RestApi {
      * @param format Possible values:<br>
      * &nbsp&nbsp&nbsp&nbsp plain — Text without markup (default value);<br>
      * &nbsp&nbsp&nbsp&nbsp html — HTML text.
-     * @return Translated text
+     * @return {@link Single<TranslationResponse>} with full translation data
      */
     @GET("translate")
     Single<TranslationResponse> getTranslation(@Query("text") String text,
