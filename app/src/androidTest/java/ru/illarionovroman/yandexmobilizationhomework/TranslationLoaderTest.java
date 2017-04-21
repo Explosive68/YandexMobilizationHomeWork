@@ -47,17 +47,13 @@ public class TranslationLoaderTest {
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
 
-    private TranslationParams mParams;
+    private TranslationParams mParams = createTestTranslationParams();
 
     @Mock
     RestApi mRestApi;
 
     @Before
     public void prepareTranslation() {
-        // Build test translation parameters
-        mParams = new TranslationParams(TestUtils.TEST_VALUE_WORD,
-                TestUtils.TEST_VALUE_LANG_FROM, TestUtils.TEST_VALUE_LANG_TO);
-
         // Simulate successful translation response from server
         TranslationResponse response = createSuccessfulTranslationResponse();
         Single<TranslationResponse> responseSingle = Single.just(response);
@@ -69,11 +65,11 @@ public class TranslationLoaderTest {
     }
 
     /**
-     * Test which checks loading from database
+     * Test which checks loading from database without calling network
      */
     @Test
     public void testLoadItemFromDatabase() {
-        // First, we need test item to be in database
+        // Firstly, we need test item to be in database
         HistoryItem item = new HistoryItem(
                 TestUtils.TEST_VALUE_WORD,
                 TestUtils.TEST_VALUE_TRANSLATION,
@@ -82,32 +78,23 @@ public class TranslationLoaderTest {
         );
         DBManager.addHistoryItem(mContext, item);
 
-        // Now when we ask TranslationLoader to get translation from DB or network, it must
-        // return result from database.
-        TestObserver<HistoryItem> testObserver = new TestObserver<>();
-        Single<HistoryItem> loadSingle =
-                TranslationLoader.loadHistoryItem(mContext, mRestApi, mParams);
-        loadSingle.subscribe(testObserver);
+        // Manually read item from DB to compare it with TranslationLoader result
+        HistoryItem readItem = DBManager.getHistoryItemByParams(mContext, mParams);
 
-        // Wait and check is everything went as expected
-        testObserver.awaitDone(1, TimeUnit.SECONDS);
-        testObserver.assertComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertValueCount(1);
+        // Now when we ask TranslationLoader to get translation from DB or network, it must
+        // return result from the database.
+        TranslationLoader.loadHistoryItem(mContext, mRestApi, mParams)
+                .test()
+                // Wait and check is everything went as expected
+                .awaitDone(1, TimeUnit.SECONDS)
+                .assertComplete()
+                .assertNoErrors()
+                .assertValueCount(1)
+                // Compare result with manually read item
+                .assertResult(readItem);
 
         // Check that network was not invoked
         verify(mRestApi, never()).getTranslation(anyString(), anyString(), eq(TRANSLATION_PARAM_FORMAT));
-
-        // We can confirm that this item came straight from DB by checking its Id and Date fields.
-        // For items from network ids will be undefined, date will be null.
-        HistoryItem loadedItem = testObserver.values().get(0);
-        assertNotEquals(loadedItem.getId(), HistoryItem.UNSPECIFIED_ID);
-        assertEquals(loadedItem.getWord(), TestUtils.TEST_VALUE_WORD);
-        assertEquals(loadedItem.getTranslation(), TestUtils.TEST_VALUE_TRANSLATION);
-        assertEquals(loadedItem.getLanguageCodeFrom(), TestUtils.TEST_VALUE_LANG_FROM);
-        assertEquals(loadedItem.getLanguageCodeTo(), TestUtils.TEST_VALUE_LANG_TO);
-        assertEquals(loadedItem.getIsFavorite(), TestUtils.TEST_VALUE_IS_FAVORITE.equals("1"));
-        assertNotNull(loadedItem.getDate());
     }
 
     /**
@@ -117,21 +104,20 @@ public class TranslationLoaderTest {
     @Test
     public void testLoadItemFromNetwork() {
         // Perform item load with mocked api
-        TestObserver<HistoryItem> testObserver = new TestObserver<>();
-        Single<HistoryItem> loadSingle =
-                TranslationLoader.loadHistoryItem(mContext, mRestApi, mParams);
-        loadSingle.subscribe(testObserver);
-
-        // Wait and check observer work
-        testObserver.awaitDone(RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        testObserver.assertComplete();
-        testObserver.assertNoErrors();
-        testObserver.assertValueCount(1);
+        TestObserver<HistoryItem> testObserver = TranslationLoader.loadHistoryItem(mContext, mRestApi, mParams)
+                .test()
+                // Wait and check observer work
+                .awaitDone(RESPONSE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .assertComplete()
+                .assertNoErrors()
+                .assertValueCount(1);
 
         // Check that network was called once
         verify(mRestApi, times(1)).getTranslation(anyString(), anyString(), eq(TRANSLATION_PARAM_FORMAT));
 
-        // Check correctness of loaded item
+        // We can confirm that this item came from network by checking its Id and Date fields.
+        // For item from network, Id will be undefined, and Date will be null,
+        // since that item was not written to DB yet.
         HistoryItem loadedItem = testObserver.values().get(0);
         assertEquals(loadedItem.getId(), HistoryItem.UNSPECIFIED_ID);
         assertEquals(loadedItem.getWord(), TestUtils.TEST_VALUE_WORD);
@@ -155,6 +141,14 @@ public class TranslationLoaderTest {
         translations.add(TestUtils.TEST_VALUE_TRANSLATION);
         response.setTranslations(translations);
         return response;
+    }
+
+    /**
+     * Builds test translation parameters
+     */
+    private TranslationParams createTestTranslationParams() {
+        return new TranslationParams(TestUtils.TEST_VALUE_WORD,
+                TestUtils.TEST_VALUE_LANG_FROM, TestUtils.TEST_VALUE_LANG_TO);
     }
 
     private void clearHistoryTable() {

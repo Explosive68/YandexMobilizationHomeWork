@@ -11,7 +11,7 @@ import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 
 
 public class HistoryItem implements Parcelable {
-    
+
     public static final long UNSPECIFIED_ID = -1;
 
     private long mId = UNSPECIFIED_ID;
@@ -21,7 +21,7 @@ public class HistoryItem implements Parcelable {
     private String mLanguageCodeTo;
     private String mDate = null;
     private int mIsFavorite = -1;
-    
+
     // Specially for RxJava2, because nulls are forbidden
     public HistoryItem() {
     }
@@ -137,5 +137,39 @@ public class HistoryItem implements Parcelable {
 
     public void setIsFavorite(boolean isFavorite) {
         this.mIsFavorite = isFavorite ? 1 : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof HistoryItem)) {
+            return false;
+        }
+
+        HistoryItem it = (HistoryItem) o;
+
+        return it.mId == mId &&
+                it.mWord.equals(mWord) &&
+                it.mTranslation.equals(mTranslation) &&
+                it.mLanguageCodeFrom.equals(mLanguageCodeFrom) &&
+                it.mLanguageCodeTo.equals(mLanguageCodeTo) &&
+                it.mDate.equals(mDate) &&
+                it.mIsFavorite == mIsFavorite;
+    }
+
+    /**
+     * Always override hashCode when you override equals
+     */
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + (int) (mId ^ (mId >>> 32));
+        result = 31 * result + mWord.hashCode();
+        result = 31 * result + mTranslation.hashCode();
+        result = 31 * result + mLanguageCodeFrom.hashCode();
+        result = 31 * result + mLanguageCodeTo.hashCode();
+        result = 31 * result + (mDate != null ? mDate.hashCode() : 0);
+        result = 31 * result + mIsFavorite;
+        return result;
     }
 }
