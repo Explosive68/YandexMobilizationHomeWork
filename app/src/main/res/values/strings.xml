@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YandexMobilizationHomeWork</string>
+    <string name="app_name" translatable="false">ReTranslator</string>
 
     <string-array name="internal_tabs">
         <item>History</item>
@@ -47,6 +47,8 @@
     <string name="history_is_empty">No translations in History</string>
     <string name="favorites_is_empty">No translations in Favorites</string>
     <string name="not_implemented">This feature is not implemented yet :(</string>
+
+    <string name="easter_egg">Mass Effect rules!</string>
 
     <!-- Localized array of supported languages -->
     <string-array name="language_codes_names">

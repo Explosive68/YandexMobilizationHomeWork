@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">YandexMobilizationHomeWork</string>
-
     <string-array name="internal_tabs">
         <item>История</item>
         <item>Избранное</item>
@@ -23,7 +21,7 @@
     <string name="default_language_to">Английский</string>
 
     <string name="about_title">О программе</string>
-    <string name="about_text">Тестовое задание для проекта Яндекса&#160;\"Мобилизация\", Москва&#160;2017</string>
+    <string name="about_text">Тестовое задание для проекта Яндекс&#160;\"Мобилизация\", Москва&#160;2017</string>
 
     <string name="button_text_retry">Повторить</string>
 
