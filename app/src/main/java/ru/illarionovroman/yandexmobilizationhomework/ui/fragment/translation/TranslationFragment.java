@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,6 +101,8 @@ public class TranslationFragment extends BaseFragment {
     @BindView(R.id.ivSwapLanguages) ImageView mIvSwapLanguages;
     //----------------------------------------------------------------------------------------------
     //endregion
+
+    private Toast mToast;
 
     @Inject RestApi mRestApi;
     @Inject Gson mGson;
@@ -444,12 +447,12 @@ public class TranslationFragment extends BaseFragment {
     //----------------------------------------------------------------------------------------------
     @OnClick(R.id.ivWordMic)
     void captureTextFromVoice() {
-        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+        showToast(R.string.not_implemented);
     }
 
     @OnClick(R.id.ivWordSpeaker)
     void sayWordInputAloud() {
-        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+        showToast(R.string.not_implemented);
     }
 
     @OnClick(R.id.ivWordClean)
@@ -463,7 +466,7 @@ public class TranslationFragment extends BaseFragment {
 
     @OnClick(R.id.ivTranslationSpeaker)
     void sayTranslationAloud() {
-        Toast.makeText(getContext(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+        showToast(R.string.not_implemented);
     }
 
     @OnClick(R.id.ivTranslationFavorite)
@@ -540,6 +543,17 @@ public class TranslationFragment extends BaseFragment {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    /**
+     * Cancel currently displayed toast before showing the new one
+     */
+    private void showToast(@StringRes int strResIdToShow) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(getContext(), strResIdToShow, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 
     //region TranslationFragment-related helpers
