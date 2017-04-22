@@ -40,7 +40,7 @@ public class MobilizationApp extends Application {
 
         // Init Timber and Stetho in debug mode only
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+            Timber.plant(new MobilizationDebugTree());
             Stetho.initializeWithDefaults(this);
         }
     }
@@ -59,5 +59,16 @@ public class MobilizationApp extends Application {
     public static RefWatcher getRefWatcher(Context context) {
         MobilizationApp app = (MobilizationApp) context.getApplicationContext();
         return app.mRefWatcher;
+    }
+
+    /**
+     * Customized Timber.DebugTree
+     */
+    private class MobilizationDebugTree extends Timber.DebugTree {
+        @Override
+        protected String createStackElementTag(StackTraceElement element) {
+            // This adds line number to log message
+            return super.createStackElementTag(element) + ":" + element.getLineNumber();
+        }
     }
 }
