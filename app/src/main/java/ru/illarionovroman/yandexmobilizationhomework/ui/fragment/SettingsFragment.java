@@ -13,24 +13,20 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.AboutActivity;
 
 
+/**
+ * One of the three main fragments. This one contains all available settings.
+ * Right now there is the one item only, "About".
+ * If I would have implement lots of settings here, I'd use {@link android.preference.PreferenceFragment}
+ */
 public class SettingsFragment extends BaseFragment {
 
     @BindView(R.id.llAbout)
     LinearLayout mLlAbout;
 
-    public SettingsFragment() {
-    }
-
-    public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
-        return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     @Override

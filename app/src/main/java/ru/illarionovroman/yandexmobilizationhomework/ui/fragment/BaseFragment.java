@@ -13,6 +13,9 @@ import butterknife.Unbinder;
 import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 
 
+/**
+ * Base fragment for all fragments in app
+ */
 public abstract class BaseFragment extends Fragment {
 
     protected Unbinder unbinder;

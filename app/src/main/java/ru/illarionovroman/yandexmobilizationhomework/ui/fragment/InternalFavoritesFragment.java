@@ -27,6 +27,22 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
+/**
+ * One of the internal fragments of HistoryFragment. This one shows Favorites list.
+ *
+ * The hardest part in this fragment is different behaviour of visible data update depends on
+ * visibility to user. The goal is to do not delete item immediately when we are toggling its
+ * isFavorite state.
+ *
+ * So, this is reachable through combining {@link #setUserVisibleHint(boolean)}
+ * and {@link #setIsVisible(boolean)}
+ * which is called from {@link HistoryFragment#updateFavoritesVisibleState(boolean)}.
+ *
+ * The reason of so complex approach lies in ViewPager's setOffScreenPageLimit(2). It retains
+ * all main fragments independent from their actual visibility. So system counts that all of them
+ * are visible all the time (and setUserVisibleHint is not invoked), even if user can't see two of
+ * them in particular moment.
+ */
 public class InternalFavoritesFragment extends BaseFragment
         implements HistoryCursorAdapter.OnListItemClickListener{
 
@@ -38,10 +54,15 @@ public class InternalFavoritesFragment extends BaseFragment
     private HistoryCursorAdapter mAdapter;
 
     /**
-     * Is fragment visible right now. We need it to decide whether to show data change immediately
+     * Is fragment visible right now. We need it to decide, whether to update Favorites list
+     * immediately upon separate item change, or do it later.
      */
     private boolean mIsVisible = false;
 
+    /**
+     * Favorites list updater. I'm using a simple ContentObserver here because of the need to
+     * analyze incoming Uri.
+     */
     private ContentObserver mFavoritesObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -53,6 +74,42 @@ public class InternalFavoritesFragment extends BaseFragment
             updateAdapterCursor(mAdapter, uri, mIsVisible);
         }
     };
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_internal_favorites, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
+        mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor, this);
+        initializeRecyclerView(mAdapter);
+        toggleFragmentEmptyState(mAdapter.getItemCount());
+
+        getContext().getContentResolver().registerContentObserver(
+                Contract.HistoryEntry.CONTENT_URI_FAVORITES, true, mFavoritesObserver);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mFavoritesObserver != null) {
+            getContext().getContentResolver().unregisterContentObserver(mFavoritesObserver);
+        }
+    }
+
+    private void initializeRecyclerView(HistoryCursorAdapter adapter) {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        mRvInternalFavorite.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
+                layoutManager.getOrientation());
+        mRvInternalFavorite.addItemDecoration(dividerItemDecoration);
+        mRvInternalFavorite.setAdapter(adapter);
+    }
 
     /**
      * Update favorites list, performing db load in background
@@ -83,7 +140,7 @@ public class InternalFavoritesFragment extends BaseFragment
                         // If it is generic Favorites list change - update data
                         // and display it right now
                         adapter.swapCursor(cursor);
-                        setListEmptyState(cursor.getCount());
+                        toggleFragmentEmptyState(cursor.getCount());
                     } else {
                         // If it is a specific item change
                         if (isVisible) {
@@ -93,58 +150,13 @@ public class InternalFavoritesFragment extends BaseFragment
                         } else {
                             // If list is invisible - update data and display it
                             adapter.swapCursor(cursor);
-                            setListEmptyState(cursor.getCount());
+                            toggleFragmentEmptyState(cursor.getCount());
                         }
                     }
                 });
     }
 
-    public InternalFavoritesFragment() {
-    }
-
-    public static InternalFavoritesFragment newInstance() {
-        InternalFavoritesFragment fragment = new InternalFavoritesFragment();
-        return fragment;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_internal_favorites, container, false);
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
-        mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor, this);
-        initializeRecyclerView(mAdapter);
-        setListEmptyState(mAdapter.getItemCount());
-
-        getContext().getContentResolver().registerContentObserver(
-                Contract.HistoryEntry.CONTENT_URI_FAVORITES, true, mFavoritesObserver);
-    }
-
-    private void initializeRecyclerView(HistoryCursorAdapter adapter) {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mRvInternalFavorite.setLayoutManager(layoutManager);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(),
-                layoutManager.getOrientation());
-        mRvInternalFavorite.addItemDecoration(dividerItemDecoration);
-        mRvInternalFavorite.setAdapter(adapter);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mFavoritesObserver != null) {
-            getContext().getContentResolver().unregisterContentObserver(mFavoritesObserver);
-        }
-    }
-
-    private void setListEmptyState(int itemsCount) {
+    private void toggleFragmentEmptyState(int itemsCount) {
         if (itemsCount > 0) {
             mRvInternalFavorite.setVisibility(View.VISIBLE);
             mTvFavoritesEmpty.setVisibility(View.GONE);
@@ -154,6 +166,9 @@ public class InternalFavoritesFragment extends BaseFragment
         }
     }
 
+    /**
+     * Watch for fragment visibility changes
+     */
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -161,12 +176,24 @@ public class InternalFavoritesFragment extends BaseFragment
         // When fragment hides - show previously changed data
         if (mAdapter != null && !mIsVisible) {
             mAdapter.notifyDataSetChanged();
-            setListEmptyState(mAdapter.getItemCount());
+            toggleFragmentEmptyState(mAdapter.getItemCount());
         }
     }
 
+    /**
+     * Delegate listItemClick event from HistoryCursorAdapter to MainActivity
+     */
     @Override
     public void onListItemClicked(HistoryItem item) {
         ((MainActivity) getActivity()).onListItemClicked(item);
+    }
+
+    /**
+     * This method will be used to set fragment's visibility from the parental fragment
+     * depending on parent's visibility and currently selected page
+     * @param isVisible Visibility state to set
+     */
+    public void setIsVisible(boolean isVisible) {
+        mIsVisible = isVisible;
     }
 }

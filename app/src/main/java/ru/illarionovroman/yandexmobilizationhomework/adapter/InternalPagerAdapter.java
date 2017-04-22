@@ -3,30 +3,29 @@ package ru.illarionovroman.yandexmobilizationhomework.adapter;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalFavoritesFragment;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalHistoryFragment;
 
 /**
- * Pager adapter which returns History and Favorites internal screens
+ * Pager adapter which returns InternalHistory and InternalFavorites screens
  */
-public class InternalPagerAdapter extends FragmentPagerAdapter {
-
+public class InternalPagerAdapter extends SmartFragmentPagerAdapter {
     private String[] mTabTitles;
 
     public InternalPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
+        // Get tab titles and count from xml string array
         mTabTitles = context.getResources().getStringArray(R.array.internal_tabs);
     }
 
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return InternalHistoryFragment.newInstance();
+            return new InternalHistoryFragment();
         } else {
-            return InternalFavoritesFragment.newInstance();
+            return new InternalFavoritesFragment();
         }
     }
 

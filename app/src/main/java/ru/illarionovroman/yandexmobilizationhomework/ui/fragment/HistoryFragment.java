@@ -14,8 +14,13 @@ import butterknife.BindView;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.adapter.InternalPagerAdapter;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
+/**
+ * One of the three main fragments. This one contains InternalHistoryFragment and
+ * InternalFavoritesFragment through ViewPager.
+ */
 public class HistoryFragment extends BaseFragment {
 
     private static final String BUNDLE_SELECTED_PAGE = "BUNDLE_SELECTED_PAGE";
@@ -31,19 +36,12 @@ public class HistoryFragment extends BaseFragment {
     @BindView(R.id.ivDelete)
     ImageView mIvDelete;
 
-    public HistoryFragment() {
-    }
-
-    public static HistoryFragment newInstance() {
-        HistoryFragment fragment = new HistoryFragment();
-        return fragment;
-    }
+    private InternalPagerAdapter mInternalAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_history, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_history, container, false);
     }
 
     @Override
@@ -53,14 +51,33 @@ public class HistoryFragment extends BaseFragment {
         setOnDeleteClickListener();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mInternalPager != null) {
+            outState.putInt(BUNDLE_SELECTED_PAGE, mInternalPager.getCurrentItem());
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mInternalPager != null) {
+            mInternalPager.clearOnPageChangeListeners();
+        }
+    }
+
     private void initPagerAndTabs() {
         // It is important to use CHILD FragmentManager
-        InternalPagerAdapter internalAdapter = new InternalPagerAdapter(getActivity(),
+        mInternalAdapter = new InternalPagerAdapter(getActivity(),
                 getChildFragmentManager());
-        mInternalPager.setAdapter(internalAdapter);
+        mInternalPager.setAdapter(mInternalAdapter);
         mInternalTabLayout.setupWithViewPager(mInternalPager);
     }
 
+    /**
+     * Delete button click action depends on the currently selected page
+     */
     private void setOnDeleteClickListener() {
         mIvDelete.setOnClickListener(imageView -> {
             int currentPosition = mInternalPager.getCurrentItem();
@@ -100,19 +117,24 @@ public class HistoryFragment extends BaseFragment {
         dialog.show();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mInternalPager != null) {
-            outState.putInt(BUNDLE_SELECTED_PAGE, mInternalPager.getCurrentItem());
-        }
-    }
+    /**
+     * This method will be called from {@link MainActivity.OnMainPageChangeListener#onPageSelected(int)}
+     * It will cause update of InternalFavoritesFragment visible state.
+     *
+     * @param isHistoryFragmentVisible is this HistoryFragment visible to user
+     */
+    public void updateFavoritesVisibleState(boolean isHistoryFragmentVisible) {
+        InternalFavoritesFragment fragment = (InternalFavoritesFragment) mInternalAdapter
+                .getRegisteredFragment(POSITION_FAVORITES);
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mInternalPager != null) {
-            mInternalPager.clearOnPageChangeListeners();
+        // The logic is as follows:
+        // If HistoryFragment is invisible, InternalHistoryFragment will be definitely invisible too.
+        // If HistoryFragment is visible, we need to check which page is currently selected in ViewPager.
+        if (!isHistoryFragmentVisible) {
+            fragment.setIsVisible(false);
+        } else {
+            boolean isInternalFavoritesVisible = mInternalPager.getCurrentItem() == POSITION_FAVORITES;
+            fragment.setIsVisible(isInternalFavoritesVisible);
         }
     }
 }

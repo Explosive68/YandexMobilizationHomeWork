@@ -21,6 +21,10 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 
+/**
+ * One of the internal fragments of HistoryFragment. This one shows History list.
+ * It uses CursorLoader to keep data fresh.
+ */
 public class InternalHistoryFragment extends BaseFragment
         implements LoaderManager.LoaderCallbacks<Cursor>,
         HistoryCursorAdapter.OnListItemClickListener {
@@ -34,19 +38,10 @@ public class InternalHistoryFragment extends BaseFragment
 
     private HistoryCursorAdapter mAdapter;
 
-    public InternalHistoryFragment() {
-    }
-
-    public static InternalHistoryFragment newInstance() {
-        InternalHistoryFragment fragment = new InternalHistoryFragment();
-        return fragment;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_internal_history, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_internal_history, container, false);
     }
 
     @Override
@@ -75,6 +70,9 @@ public class InternalHistoryFragment extends BaseFragment
         return DBManager.getHistoryCursorLoader(getContext());
     }
 
+    /**
+     * Always show fresh data and toggle empty view state
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
@@ -82,7 +80,7 @@ public class InternalHistoryFragment extends BaseFragment
         } else {
             mAdapter.swapCursor(null);
         }
-        setListEmptyState(cursor.getCount());
+        toggleFragmentEmptyState(cursor.getCount());
     }
 
     @Override
@@ -90,7 +88,7 @@ public class InternalHistoryFragment extends BaseFragment
         mAdapter.swapCursor(null);
     }
 
-    private void setListEmptyState(int itemsCount) {
+    private void toggleFragmentEmptyState(int itemsCount) {
         if (itemsCount > 0) {
             mRvInternalHistory.setVisibility(View.VISIBLE);
             mTvHistoryEmpty.setVisibility(View.GONE);
@@ -100,6 +98,9 @@ public class InternalHistoryFragment extends BaseFragment
         }
     }
 
+    /**
+     * Delegate listItemClick event from HistoryCursorAdapter to MainActivity
+     */
     @Override
     public void onListItemClicked(HistoryItem item) {
         ((MainActivity) getActivity()).onListItemClicked(item);

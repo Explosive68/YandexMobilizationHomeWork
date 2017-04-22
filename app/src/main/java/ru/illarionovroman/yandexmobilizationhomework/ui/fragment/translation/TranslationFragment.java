@@ -54,6 +54,9 @@ import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
 
+/**
+ * One of the three main fragments. This one's responsibility is translation.
+ */
 public class TranslationFragment extends BaseFragment {
 
     public static final int REQUEST_CODE_LANGUAGE_FROM = 1;
@@ -114,21 +117,12 @@ public class TranslationFragment extends BaseFragment {
     /** Current HistoryItem updater */
     private HistoryItemContentObserver mDbObserver = new HistoryItemContentObserver(new Handler());
 
-    public TranslationFragment() {
-    }
-
-    public static TranslationFragment newInstance() {
-        TranslationFragment fragment = new TranslationFragment();
-        return fragment;
-    }
-
     //region Lifecycle methods
     //----------------------------------------------------------------------------------------------
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_translation, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_translation, container, false);
     }
 
     @Override
@@ -315,6 +309,8 @@ public class TranslationFragment extends BaseFragment {
     }
 
     /**
+     * Handles the item after load, which could take some time.
+     *
      * Always dispose loader after its work done.
      * Also, when item comes from possible long-time load(slow network),
      * we must check is it appropriate to show result or it's obsolete already.
@@ -330,7 +326,7 @@ public class TranslationFragment extends BaseFragment {
         if (item != null && item.getWord().equals(mEtWordInput.getText().toString())) {
             // Check maturity of loaded item
             if (item.getId() == HistoryItem.UNSPECIFIED_ID) {
-                // Immature - write it to DB
+                // Immature - it came from network - write it to DB
                 long id = DBManager.addHistoryItem(getContext(), item);
                 // Now we can get the completed item
                 item = DBManager.getHistoryItemById(getContext(), id);
