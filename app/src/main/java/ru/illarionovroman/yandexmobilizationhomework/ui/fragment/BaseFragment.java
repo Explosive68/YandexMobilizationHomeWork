@@ -6,8 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 
 
 public abstract class BaseFragment extends Fragment {
@@ -24,5 +27,8 @@ public abstract class BaseFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        // Watch for fragment leaks
+        RefWatcher refWatcher = MobilizationApp.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 }

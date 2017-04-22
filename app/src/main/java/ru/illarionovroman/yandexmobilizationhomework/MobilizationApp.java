@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 
 import com.facebook.stetho.Stetho;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import ru.illarionovroman.yandexmobilizationhomework.dagger.component.AppComponent;
 import ru.illarionovroman.yandexmobilizationhomework.dagger.component.DaggerAppComponent;
@@ -16,15 +18,27 @@ public class MobilizationApp extends Application {
 
     private AppComponent mAppComponent;
 
+    private RefWatcher mRefWatcher;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        // Init LeakCanary
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        mRefWatcher = LeakCanary.install(this);
+
+        // Init Dagger modules
         mAppComponent = DaggerAppComponent.builder()
                 .appContextModule(new AppContextModule(getApplicationContext()))
                 .networkModule(new NetworkModule())
                 .build();
 
+        // Init Timber and Stetho in debug mode only
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
             Stetho.initializeWithDefaults(this);
@@ -37,5 +51,13 @@ public class MobilizationApp extends Application {
 
     public static MobilizationApp get(Context context) {
         return ((MobilizationApp)context.getApplicationContext());
+    }
+
+    /**
+     * This is needed to monitor the fragment leaks
+     */
+    public static RefWatcher getRefWatcher(Context context) {
+        MobilizationApp app = (MobilizationApp) context.getApplicationContext();
+        return app.mRefWatcher;
     }
 }
