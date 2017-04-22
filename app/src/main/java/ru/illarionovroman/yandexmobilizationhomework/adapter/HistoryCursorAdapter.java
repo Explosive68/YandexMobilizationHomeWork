@@ -16,7 +16,9 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.db.DBManager;
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 
-
+/**
+ * Adapter for History and Favorites lists
+ */
 public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdapter.HistoryViewHolder> {
 
     private Context mContext;
@@ -82,24 +84,23 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
     }
 
     /**
-     * When data changes and a re-query occurs, this function swaps the old Cursor
-     * with a newly updated Cursor (Cursor c) that is passed in.
+     * Replace old cursor with new one, without notifying
+     * @param c New cursor
      */
-    public void swapCursor(Cursor c) {
-        // check if this cursor is the same as the previous cursor (mCursor)
-        if (mCursor == c) {
-            return;
-        }
-        this.mCursor = c;
-        this.notifyDataSetChanged();
-    }
-
     public void swapCursorWithoutNotify(Cursor c) {
         // check if this cursor is the same as the previous cursor (mCursor)
         if (mCursor == c) {
             return;
         }
         this.mCursor = c;
+    }
+
+    /**
+     * Replace old cursor with new one, and notify
+     */
+    public void swapCursor(Cursor c) {
+        swapCursorWithoutNotify(c);
+        this.notifyDataSetChanged();
     }
 
     class HistoryViewHolder extends RecyclerView.ViewHolder {
@@ -113,7 +114,7 @@ public class HistoryCursorAdapter extends RecyclerView.Adapter<HistoryCursorAdap
         @BindView(R.id.tvTranslationDirection)
         TextView tvTranslationDirection;
 
-        public HistoryViewHolder(View itemView) {
+        HistoryViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

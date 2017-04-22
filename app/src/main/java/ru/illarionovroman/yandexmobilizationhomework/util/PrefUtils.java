@@ -4,7 +4,7 @@ package ru.illarionovroman.yandexmobilizationhomework.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class Prefs {
+public class PrefUtils {
 
     public static final String PREF_NAME = "LAST_USED_ITEM_ID_PREF";
     public static final String KEY_LAST_USED_ITEM_ID = "KEY_LAST_USED_ITEM_ID";

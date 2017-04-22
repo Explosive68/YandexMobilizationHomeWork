@@ -9,7 +9,9 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalFavoritesFragment;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.InternalHistoryFragment;
 
-
+/**
+ * Pager adapter which returns History and Favorites internal screens
+ */
 public class InternalPagerAdapter extends FragmentPagerAdapter {
 
     private String[] mTabTitles;

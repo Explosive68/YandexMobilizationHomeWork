@@ -49,7 +49,7 @@ import ru.illarionovroman.yandexmobilizationhomework.ui.activity.FullscreenActiv
 import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.BaseFragment;
 import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
-import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
+import ru.illarionovroman.yandexmobilizationhomework.util.PrefUtils;
 import ru.illarionovroman.yandexmobilizationhomework.util.Utils;
 import timber.log.Timber;
 
@@ -145,7 +145,7 @@ public class TranslationFragment extends BaseFragment {
         super.onSaveInstanceState(outState);
         if (mCurrentItem != null) {
             outState.putParcelable(ARG_CURRENT_ITEM, mCurrentItem);
-            Prefs.putLastUsedItemId(getContext(), mCurrentItem.getId());
+            PrefUtils.putLastUsedItemId(getContext(), mCurrentItem.getId());
         }
     }
 
@@ -165,7 +165,7 @@ public class TranslationFragment extends BaseFragment {
         if (savedInstanceState != null && savedInstanceState.containsKey(ARG_CURRENT_ITEM)) {
             item = savedInstanceState.getParcelable(ARG_CURRENT_ITEM);
         } else {
-            long itemId = Prefs.getLastUsedItemId(getContext());
+            long itemId = PrefUtils.getLastUsedItemId(getContext());
             if (itemId != -1) {
                 // Preload in UI thread to show ready data
                 item = DBManager.getHistoryItemById(getContext(), itemId);

@@ -12,9 +12,7 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Instrumented unit test which checks {@link HistoryItem} Parcelable implementation
  */
 @RunWith(AndroidJUnit4.class)
 public class HistoryItemParcelTest {

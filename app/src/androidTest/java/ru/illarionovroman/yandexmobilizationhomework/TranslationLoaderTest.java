@@ -38,6 +38,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Instrumented unit test which checks {@link TranslationLoader} work
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class TranslationLoaderTest {
 
@@ -130,6 +133,7 @@ public class TranslationLoaderTest {
 
     /**
      * Simulates successful translation response from server
+     * @return Synthetic successful {@link TranslationResponse} with example data
      */
     @NonNull
     private TranslationResponse createSuccessfulTranslationResponse() {
@@ -145,6 +149,7 @@ public class TranslationLoaderTest {
 
     /**
      * Builds test translation parameters
+     * @return {@link TranslationParams} with example data
      */
     private TranslationParams createTestTranslationParams() {
         return new TranslationParams(TestUtils.TEST_VALUE_WORD,

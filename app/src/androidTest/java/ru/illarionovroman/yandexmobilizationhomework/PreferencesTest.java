@@ -9,15 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
-import ru.illarionovroman.yandexmobilizationhomework.util.Prefs;
+import ru.illarionovroman.yandexmobilizationhomework.util.PrefUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ * Instrumented unit test which checks {@link PrefUtils} implementation
  */
 @RunWith(AndroidJUnit4.class)
 public class PreferencesTest {
@@ -41,16 +39,16 @@ public class PreferencesTest {
     @Test
     public void testWriteAndRead() throws Exception {
 
-        // Use Prefs helper exactly as it's used in program
-        Prefs.putLastUsedItemId(mContext, mHistoryItem.getId());
-        long firstReadId = Prefs.getLastUsedItemId(mContext);
+        // Use PrefUtils helper exactly as it's used in program
+        PrefUtils.putLastUsedItemId(mContext, mHistoryItem.getId());
+        long firstReadId = PrefUtils.getLastUsedItemId(mContext);
         // Check first write and read values match
         assertEquals("First write and read Ids are not equals", TestUtils.TEST_VALUE_ID, firstReadId);
 
         // Write another random id into preferences
         long secondWriteId = 10001;
-        Prefs.putLastUsedItemId(mContext, secondWriteId);
-        long secondReadId = Prefs.getLastUsedItemId(mContext);
+        PrefUtils.putLastUsedItemId(mContext, secondWriteId);
+        long secondReadId = PrefUtils.getLastUsedItemId(mContext);
         // Check first id was actually overwritten
         assertNotEquals("Old id was not overwritten", secondReadId, firstReadId);
         // Check second write and read values match

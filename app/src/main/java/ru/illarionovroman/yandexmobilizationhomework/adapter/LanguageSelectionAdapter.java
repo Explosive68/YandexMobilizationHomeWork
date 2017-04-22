@@ -19,7 +19,9 @@ import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
 
-
+/**
+ * Adapter for languages list in {@link ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity}
+ */
 public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelectionAdapter.LanguageViewHolder> {
 
     private Context mContext;
@@ -34,6 +36,7 @@ public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelec
                                     OnListItemClickListener listener) {
         mContext = context;
         MobilizationApp.get(context).getAppComponent().inject(this);
+        // That weird workaround is done to achieve opportunity to bind item by position
         mLangEntriesArray = mLanguages.getLanguagesMap().entrySet().toArray();
         mCurrentLangCode = currentLangCode;
         mOnClickListener = listener;
@@ -53,9 +56,11 @@ public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelec
         LinkedHashMap.Entry<String, String> langEntry =
                 ((LinkedHashMap.Entry<String, String>) mLangEntriesArray[position]);
 
+        // Bind language name
         String itemLanguageName = langEntry.getValue();
         holder.tvLanguageName.setText(itemLanguageName);
 
+        // Show check mark for selected item
         String itemLanguageCode = langEntry.getKey();
         if (!TextUtils.isEmpty(mCurrentLangCode)) {
             if (itemLanguageCode.equals(mCurrentLangCode)) {
