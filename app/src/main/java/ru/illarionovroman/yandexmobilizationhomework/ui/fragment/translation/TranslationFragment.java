@@ -183,7 +183,6 @@ public class TranslationFragment extends BaseFragment {
      */
     private void initializeInputWatcher() {
         Disposable inputDisposable = RxTextView.textChanges(mEtWordInput)
-                .skipInitialValue()
                 // RxBinding doc for textChanges() says that charSequence is mutable, get rid of it.
                 .map(String::valueOf)
                 .map(String::trim)
