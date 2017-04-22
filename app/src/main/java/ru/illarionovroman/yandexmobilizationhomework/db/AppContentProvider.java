@@ -41,19 +41,19 @@ import android.support.annotation.Nullable;
  */
 public class AppContentProvider extends ContentProvider {
 
-    private static final int HISTORY = 100;
-    private static final int HISTORY_WITH_ID = 101;
-    private static final int HISTORY_SEARCH = 102;
+    public static final int HISTORY = 100;
+    public static final int HISTORY_WITH_ID = 101;
+    public static final int HISTORY_SEARCH = 102;
 
-    private static final int FAVORITES = 200;
-    private static final int FAVORITES_SEARCH = 201;
+    public static final int FAVORITES = 200;
+    public static final int FAVORITES_SEARCH = 201;
 
     private static final String SQL_BOOLEAN_FALSE = "0";
     private static final String SQL_BOOLEAN_TRUE = "1";
 
     private static UriMatcher sUriMatcher = buildUriMatcher();
 
-    private static UriMatcher buildUriMatcher() {
+    public static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         uriMatcher.addURI(Contract.AUTHORITY, Contract.PATH_HISTORY, HISTORY);
