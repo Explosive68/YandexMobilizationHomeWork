@@ -28,6 +28,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
     // Support libraries
     compile "com.android.support:support-v4:${supportLibVersion}"
     compile "com.android.support:support-v4:${supportLibVersion}"
@@ -35,6 +36,7 @@ dependencies {
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
+
     // Test dependencies
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -42,28 +44,35 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.22'
     androidTestCompile 'org.mockito:mockito-android:2.7.22'
+
     // Network
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     compile 'com.google.code.gson:gson:2.8.0'
+
     // Rx
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
     compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
+
     // Say NO to boilerplate code
     compile 'com.jakewharton:butterknife:8.5.1'
+
     // Smart logger
     compile 'com.jakewharton.timber:timber:4.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    // Debug tool
-    debugCompile 'com.facebook.stetho:stetho:1.4.2'
-    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
+
+    // Debug tool. It should be debugCompile but it needs alternative files for debug build in this case
+    compile 'com.facebook.stetho:stetho:1.4.2'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
+
     // Dagger
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
-    //Memory leaks detection
+
+    //Memory leaks detection. No-op versions are almost empty
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
