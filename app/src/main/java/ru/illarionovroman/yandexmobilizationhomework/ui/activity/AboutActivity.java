@@ -5,7 +5,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 
@@ -14,6 +17,12 @@ import ru.illarionovroman.yandexmobilizationhomework.R;
  * Activity with About content.
  */
 public class AboutActivity extends AppCompatActivity {
+
+    @BindView(R.id.ivLogo)
+    ImageView mIvLogo;
+
+    private Toast mToast;
+    private int mClickCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +34,7 @@ public class AboutActivity extends AppCompatActivity {
 
     private void initializeActivity() {
         initializeActionBar();
+        setLogoClickListener();
     }
 
     private void initializeActionBar() {
@@ -37,6 +47,18 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
+    private void setLogoClickListener() {
+        int secretCount = 10;
+        mIvLogo.setOnClickListener(view -> {
+            mClickCount++;
+            if (2 < mClickCount && mClickCount < secretCount) {
+                showToast(String.valueOf(secretCount - mClickCount) + " more to go...");
+            } else if (mClickCount >= secretCount) {
+                showToast(getString(R.string.easter_egg));
+            }
+        });
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -46,5 +68,16 @@ public class AboutActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * Cancel currently displayed toast before showing the new one
+     */
+    private void showToast(String textToShow) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this, textToShow, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }

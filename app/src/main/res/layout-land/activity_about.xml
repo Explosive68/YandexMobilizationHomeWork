@@ -30,6 +30,7 @@
                 android:layout_weight="1">
 
                 <ImageView
+                    android:id="@+id/ivLogo"
                     android:layout_width="@dimen/image_size_logo_yandex"
                     android:layout_height="@dimen/image_size_logo_yandex"
                     android:src="@drawable/ic_logo_yandex"
