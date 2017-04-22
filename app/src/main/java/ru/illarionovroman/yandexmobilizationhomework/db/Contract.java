@@ -1,9 +1,12 @@
 package ru.illarionovroman.yandexmobilizationhomework.db;
 
-
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+
+/**
+ * Contract class to keep DB interactions consistent
+ */
 public class Contract {
 
     public static final String AUTHORITY = "ru.illarionovroman.yandexmobilizationhomework";

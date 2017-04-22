@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
 
+
 /**
  * Fullscreen activity with single big text and one button to exit
  */

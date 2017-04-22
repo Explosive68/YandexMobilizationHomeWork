@@ -26,7 +26,7 @@ public class DBManager {
                 Contract.HistoryEntry.DATE + " DESC");
     }
 
-    public static Cursor getAllHistoryItemsCursor(Context context) {
+    public static Cursor getAllHistoryCursor(Context context) {
         return context.getContentResolver().query(
                 Contract.HistoryEntry.CONTENT_URI_HISTORY,
                 null,
@@ -35,7 +35,7 @@ public class DBManager {
                 Contract.HistoryEntry.DATE + " DESC");
     }
 
-    public static Cursor getFavoriteHistoryItemsCursor(Context context) {
+    public static Cursor getAllFavoritesCursor(Context context) {
         return context.getContentResolver().query(
                 Contract.HistoryEntry.CONTENT_URI_FAVORITES,
                 null,

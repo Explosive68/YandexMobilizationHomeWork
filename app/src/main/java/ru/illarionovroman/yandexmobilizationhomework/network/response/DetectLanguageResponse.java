@@ -3,6 +3,7 @@ package ru.illarionovroman.yandexmobilizationhomework.network.response;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 public class DetectLanguageResponse {
 
     @SerializedName("code")

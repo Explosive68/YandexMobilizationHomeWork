@@ -1,6 +1,5 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation;
 
-
 import android.content.Context;
 
 import java.util.List;
@@ -15,6 +14,9 @@ import ru.illarionovroman.yandexmobilizationhomework.model.HistoryItem;
 import ru.illarionovroman.yandexmobilizationhomework.network.RestApi;
 
 
+/**
+ * Helper class to provide loading of {@link HistoryItem} from DB or network
+ */
 public class TranslationLoader {
 
     /**

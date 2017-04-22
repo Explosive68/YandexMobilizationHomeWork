@@ -85,7 +85,7 @@ public class InternalFavoritesFragment extends BaseFragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Cursor favoritesCursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
+        Cursor favoritesCursor = DBManager.getAllFavoritesCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), favoritesCursor, this);
         initializeRecyclerView(mAdapter);
         toggleFragmentEmptyState(mAdapter.getItemCount());
@@ -121,7 +121,7 @@ public class InternalFavoritesFragment extends BaseFragment
      */
     private void updateAdapterCursor(HistoryCursorAdapter adapter, Uri uri, boolean isVisible) {
         Single<Cursor> cursorSingle = Single.create(emitter -> {
-            Cursor cursor = DBManager.getFavoriteHistoryItemsCursor(getContext());
+            Cursor cursor = DBManager.getAllFavoritesCursor(getContext());
             emitter.onSuccess(cursor);
         });
 

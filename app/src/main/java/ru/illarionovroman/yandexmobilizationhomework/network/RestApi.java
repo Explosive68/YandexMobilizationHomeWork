@@ -1,6 +1,5 @@
 package ru.illarionovroman.yandexmobilizationhomework.network;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -9,6 +8,9 @@ import ru.illarionovroman.yandexmobilizationhomework.network.response.SupportedL
 import ru.illarionovroman.yandexmobilizationhomework.network.response.TranslationResponse;
 
 
+/**
+ * API interface to interact with the server.
+ */
 public interface RestApi {
 
     /**
@@ -16,10 +18,10 @@ public interface RestApi {
      * @return JSON response which contains list of supported languages
      */
     @GET("getLangs")
-    Observable<SupportedLanguagesResponse> getSupportedLanguages(@Query("ui") String languageCode);
+    Single<SupportedLanguagesResponse> getSupportedLanguages(@Query("ui") String languageCode);
 
     @GET("detect")
-    Observable<DetectLanguageResponse> detectLanguage(@Query("text") String languageCode,
+    Single<DetectLanguageResponse> detectLanguage(@Query("text") String languageCode,
                                                       @Query("hint") String hintList);
 
     /**

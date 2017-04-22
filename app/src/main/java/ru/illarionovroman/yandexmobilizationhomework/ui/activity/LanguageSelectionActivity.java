@@ -18,6 +18,10 @@ import ru.illarionovroman.yandexmobilizationhomework.adapter.LanguageSelectionAd
 import ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation.TranslationFragment;
 
 
+/**
+ * Activity, which provides selection of source or destination language for translation.
+ * Called from TranslationFragment for result.
+ */
 public class LanguageSelectionActivity extends AppCompatActivity
         implements LanguageSelectionAdapter.OnListItemClickListener {
 
@@ -25,8 +29,6 @@ public class LanguageSelectionActivity extends AppCompatActivity
 
     @BindView(R.id.rvLanguageSelection)
     RecyclerView mRvLanguageSelection;
-
-    private LanguageSelectionAdapter mAdapter;
 
     private String mCurrentLanguageCode = "";
 
@@ -48,8 +50,8 @@ public class LanguageSelectionActivity extends AppCompatActivity
 
         loadIntentData(actionBar);
 
-        mAdapter = new LanguageSelectionAdapter(this, mCurrentLanguageCode, this);
-        initializeRecyclerView(mAdapter);
+        LanguageSelectionAdapter adapter = new LanguageSelectionAdapter(this, mCurrentLanguageCode, this);
+        initializeRecyclerView(adapter);
     }
 
     private void loadIntentData(ActionBar actionBar) {

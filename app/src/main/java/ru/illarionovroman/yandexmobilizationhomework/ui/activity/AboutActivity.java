@@ -9,6 +9,10 @@ import android.view.MenuItem;
 import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 
+
+/**
+ * Activity with About content.
+ */
 public class AboutActivity extends AppCompatActivity {
 
     @Override

@@ -49,7 +49,7 @@ public class InternalHistoryFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         mRvInternalHistory.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        Cursor historyCursor = DBManager.getAllHistoryItemsCursor(getContext());
+        Cursor historyCursor = DBManager.getAllHistoryCursor(getContext());
         mAdapter = new HistoryCursorAdapter(getContext(), historyCursor, this);
         initializeRecyclerView(mAdapter);
 

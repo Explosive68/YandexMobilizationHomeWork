@@ -1,5 +1,8 @@
 package ru.illarionovroman.yandexmobilizationhomework.ui.fragment.translation;
 
+/**
+ * Helper class to unite all necessary translation parameters
+ */
 public class TranslationParams {
 
     private String mWordToTranslate;

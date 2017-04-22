@@ -19,7 +19,7 @@ import ru.illarionovroman.yandexmobilizationhomework.ui.activity.MainActivity;
 
 /**
  * One of the three main fragments. This one contains InternalHistoryFragment and
- * InternalFavoritesFragment through ViewPager.
+ * InternalFavoritesFragment via ViewPager.
  */
 public class HistoryFragment extends BaseFragment {
 

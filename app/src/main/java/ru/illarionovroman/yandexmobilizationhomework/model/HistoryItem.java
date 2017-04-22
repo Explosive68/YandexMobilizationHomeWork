@@ -10,6 +10,10 @@ import android.support.annotation.NonNull;
 import ru.illarionovroman.yandexmobilizationhomework.db.Contract;
 
 
+/**
+ * POJO for item of history. Contains several constructors for different needs,
+ * implements Parcelable, overrides equals + hashCode.
+ */
 public class HistoryItem implements Parcelable {
 
     public static final long UNSPECIFIED_ID = -1;

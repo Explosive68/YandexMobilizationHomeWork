@@ -15,7 +15,9 @@ import javax.inject.Singleton;
 
 import ru.illarionovroman.yandexmobilizationhomework.R;
 
-
+/**
+ * Available languages container
+ */
 @Singleton
 public class Languages {
 

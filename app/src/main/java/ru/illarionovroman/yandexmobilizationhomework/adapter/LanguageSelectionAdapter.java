@@ -18,9 +18,10 @@ import butterknife.ButterKnife;
 import ru.illarionovroman.yandexmobilizationhomework.MobilizationApp;
 import ru.illarionovroman.yandexmobilizationhomework.R;
 import ru.illarionovroman.yandexmobilizationhomework.util.Languages;
+import ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity;
 
 /**
- * Adapter for languages list in {@link ru.illarionovroman.yandexmobilizationhomework.ui.activity.LanguageSelectionActivity}
+ * Adapter for languages list in {@link LanguageSelectionActivity}
  */
 public class LanguageSelectionAdapter extends RecyclerView.Adapter<LanguageSelectionAdapter.LanguageViewHolder> {
 
