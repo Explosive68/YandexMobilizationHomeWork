@@ -57,6 +57,8 @@ import timber.log.Timber;
 
 /**
  * One of the three main fragments. This one's responsibility is translation.
+ *
+ * A little advice: view this class with full folding.
  */
 public class TranslationFragment extends BaseFragment {
 
@@ -534,12 +536,16 @@ public class TranslationFragment extends BaseFragment {
         if (resultCode == Activity.RESULT_OK) {
             String resultLangCode = data.getStringExtra(LanguageSelectionActivity.EXTRA_RESULT);
             String selectedLangName = mLanguages.getLangNameByCode(resultLangCode);
+            // Set selected language
             if (requestCode == REQUEST_CODE_LANGUAGE_FROM) {
                 mTvLanguageFrom.setText(selectedLangName);
             } else if (requestCode == REQUEST_CODE_LANGUAGE_TO) {
                 mTvLanguageTo.setText(selectedLangName);
             }
-            loadItemFromDatabaseOrNetwork(getCurrentTranslationParams());
+            // Init translation loading if input is not empty
+            if (!TextUtils.isEmpty(mEtWordInput.getText().toString())) {
+                loadItemFromDatabaseOrNetwork(getCurrentTranslationParams());
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
