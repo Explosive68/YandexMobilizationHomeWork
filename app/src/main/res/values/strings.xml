@@ -48,7 +48,7 @@
     <string name="favorites_is_empty">No translations in Favorites</string>
     <string name="not_implemented">This feature is not implemented yet :(</string>
 
-    <string name="easter_egg">Mass Effect rules!</string>
+    <string name="easter_egg" translatable="false">Mass Effect rules!</string>
 
     <!-- Localized array of supported languages -->
     <string-array name="language_codes_names">
